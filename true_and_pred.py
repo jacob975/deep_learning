@@ -94,7 +94,10 @@ if __name__ == "__main__":
     # plot the result
     detected_occurance = collections.Counter(collected_tracer_in_confusion_matrix)
     result_plt = plt.figure("histogram of true: {0}, pred: {1}".format(true_[true_label], pred_[pred_label]))
+    plt.title("histogram of true: {0}, pred: {1}".format(true_[true_label], pred_[pred_label]))
     plt.bar(list(detected_occurance.keys()), list(detected_occurance.values()))
+    plt.xlabel("serial numbers of objects")
+    plt.ylabel("numbers of repeating times")
     result_plt.savefig("histogram_true_{0}_pred_{1}.png".format(true_[true_label], pred_[pred_label]))
     #----------------------------------------
     # measuring time

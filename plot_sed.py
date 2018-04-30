@@ -31,8 +31,13 @@ import matplotlib.pyplot as plt
 def get_sed(detected_occurance, n, data, tracer):
     # initialize variables
     normed_by_band = [dict() for i in range(8)]
+    ct = 0
     for key in detected_occurance:
         if detected_occurance[key] >= n:
+            if ct < 5:
+                print (key)
+                print (np.where(tracer == key))
+                ct += 1
             selected_data = data[np.where(tracer == key)] 
             ind_of_peak = np.argmax(selected_data)
             if ind_of_peak >= 8:
@@ -116,10 +121,13 @@ if __name__ == "__main__":
     for ind, peak_at in enumerate(normed_by_band):
         if len(peak_at) == 0:
             continue
-        result_plt = plt.figure("sed of true: {0}, pred: {1}, peak at {2} band".format(true_[true_label], pred_[pred_label], ind))
+        result_plt = plt.figure("sed of true: {0}, pred: {1}, peak at {2} band".format(true_[true_label], pred_[pred_label], ind+1))
+        plt.title("sed of true: {0}, pred: {1}, peak at {2} band".format(true_[true_label], pred_[pred_label], ind+1))
+        plt.xlabel("signal/error")
+        plt.ylabel("precentage")
         for key, value in peak_at.items():
             plt.plot(range(1, 17), value[0])
-        result_plt.savefig("sed_true_{0}_pred_{1}_peak_at_{2}_band.png".format(true_[true_label], pred_[pred_label], ind))
+        result_plt.savefig("sed_true_{0}_pred_{1}_peak_at_{2}_band.png".format(true_[true_label], pred_[pred_label], ind+1))
     #----------------------------------------
     # measuring time
     elapsed_time = time.time() - start_time
