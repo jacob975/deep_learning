@@ -5,11 +5,11 @@ Abstract:
     The feature of this version is that set all number smaller than 0 as 0
 
 --------------------------------------------------
-                no observation      no detection
+                        no observation      no detection
 --------------------------------------------------
-dat2npy         0.00                0.00
-dat2npy_const   -9.99e+02           -9.99e+02
-dat2npy_pair    -9.99e+02           0.00
+dat2npy_noobs_nodet         0.00                0.00
+dat2npy_999_999          -9.99e+02           -9.99e+02
+dat2npy_999_0            -9.99e+02              0.00
 --------------------------------------------------
 
 Usage:
@@ -53,6 +53,9 @@ update log
     2. rename func nozero_filter as no_observation_filter
 20180415 version alpha 9:
     1. denote no-observation as 0 instead of -9.99+e02, if you need -9.99e+02, please use dat2npy_const.py
+20180430 version alpha 10:
+    1. This program become a prototype
+    2. the default setting of no observation and no detections is 0, 0
 '''
 import tensorflow as tf
 import time
@@ -97,7 +100,7 @@ def no_observation_filter(data_name, inp, maximun):
     # load tracer
     tracer_inp = np.loadtxt("{0}_tracer.dat".format(data_name[:-8]))
     # set up MaxLoss filter
-    _filter= np.array([ np.count_nonzero(row == 0.0) <= maximun for row in inp])
+    _filter= np.array([ np.count_nonzero(row <= 0.0) <= maximun for row in inp])
     # apply filter
     outp = inp[_filter]
     tracer_outp = tracer_inp[_filter]
