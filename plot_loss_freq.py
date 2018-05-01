@@ -14,10 +14,10 @@ Editor:
 #   This code is made in python3 #
 ##################################
 
-20180412
+20180430
 ####################################
 update log
-20180412 version alpha 1:
+20180430 version alpha 1:
     1. The code work 
 '''
 import numpy as np
@@ -37,7 +37,9 @@ def get_loss_freq(data, tracer, collected_tracer_in_confusion_matrix, no_obs):
         selected_data = data[np.where(tracer == key)]
         loss_pos = np.where(selected_data[0] == no_obs)
         loss_pos_collector = np.append(loss_pos_collector, loss_pos)
+    loss_pos_collector += 1
     loss_freq = collections.Counter(loss_pos_collector)
+    # normalized by the number of data
     loss_freq = {k: v / len(collected_tracer_in_confusion_matrix) for k, v in loss_freq.items()}
     return loss_freq
 
@@ -110,15 +112,17 @@ if __name__ == "__main__":
     np.savetxt("all_tracer_true_{0}_pred_{1}.txt".format(true_[true_label], pred_[pred_label]), collected_tracer_in_confusion_matrix)
     # calculate the loss freq
     loss_freq = get_loss_freq(data.test.images, tracer.test, collected_tracer_in_confusion_matrix, no_obs)
-    print (loss_freq)
+    print("\n### loss freq ###")
+    for k, v in loss_freq.items():
+        print ("{0}: {1}".format(k, v))
     # plot the loss freq
-    result_plt = plt.figure("loss freq of true: {0}, pred: {1}".format(true_[true_label], pred_[pred_label]))
-    plt.title("loss freq of true: {0}, pred: {1}".format(true_[true_label], pred_[pred_label]))
+    result_plt = plt.figure("loss freq of true: {0}, pred: {1}, {2} data".format(true_[true_label], pred_[pred_label], len(collected_tracer_in_confusion_matrix)))
+    plt.title("loss freq of true: {0}, pred: {1}, {2} data".format(true_[true_label], pred_[pred_label], len(collected_tracer_in_confusion_matrix)))
     plt.xlabel("signal/error")
-    plt.ylabel("precentage")
+    plt.ylabel("probability")
     plt.bar(list(loss_freq.keys()), list(loss_freq.values()), align='center')
-    result_plt.savefig("loss_freq_of_true_{0}_pred_{1}.png".format(true_[true_label], pred_[pred_label]))
+    result_plt.savefig("loss_freq_of_true_{0}_pred_{1}_{2}_data.png".format(true_[true_label], pred_[pred_label], len(collected_tracer_in_confusion_matrix)))
     #----------------------------------------
     # measuring time
     elapsed_time = time.time() - start_time
-    print ("Exiting Main Program, spending ", elapsed_time, "seconds.")
+    print ("\nExiting Main Program, spending ", elapsed_time, "seconds.")
