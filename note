@@ -1,0 +1,20 @@
+#############################################
+The strategy of the name of AI
+
+AI_[neural]_[layers] --- checkpoint_[iterations]
+                      |
+                      -- checkpoint_[iterations]
+                      |
+                      -- checkpoint_[iterations]
+
+#############################################
+#20180501
+# get new data
+# WFCAM
+awk '$17~/star/ && $17!~/dust/ { print $1" "$3 }' catalog-SWIRE-v3.tbl > coord_of_star_list
+awk '$17~/Galc/ && $17!~/dust/ { print $1" "$3 }' catalog-SWIRE-v3.tbl > coord_of_gala_list
+
+#############################################
+#region of data
+#name       RA          DEC
+#ELAIS N1   16 11 00    55 00 00
