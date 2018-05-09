@@ -19,6 +19,8 @@ Editor:
 update log
 20180430 version alpha 1:
     1. The code work 
+20180509 version alpha 2:
+    1. Make the length is constant 16
 '''
 import numpy as np
 import time
@@ -121,6 +123,7 @@ if __name__ == "__main__":
     plt.xlabel("signal/error")
     plt.ylabel("probability")
     plt.bar(list(loss_freq.keys()), list(loss_freq.values()), align='center')
+    plt.xlim(0, 17)
     result_plt.savefig("loss_freq_of_true_{0}_pred_{1}_{2}_data.png".format(true_[true_label], pred_[pred_label], len(collected_tracer_in_confusion_matrix)))
     #----------------------------------------
     # measuring time
