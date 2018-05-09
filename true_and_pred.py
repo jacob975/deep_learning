@@ -19,6 +19,10 @@ Editor:
 update log
 20180412 version alpha 1:
     1. The code work 
+20180509 version alpha 2:
+    1. two kinds of histogram will be plot
+        (1) serial number versus repeating times.
+        (2) repeating times versus number of data.
 '''
 import numpy as np
 import time
@@ -26,7 +30,9 @@ import load_lib
 import collections
 from sys import argv
 from glob import glob
+from IPython.core.pylabtools import figsize
 import matplotlib.pyplot as plt
+
 
 #--------------------------------------------
 # main code
@@ -91,14 +97,22 @@ if __name__ == "__main__":
     # save collected_tracer_in_confusion_matrix
     np.save("all_true_{0}_pred_{1}.npy".format(true_[true_label], pred_[pred_label]), collected_tracer_in_confusion_matrix)
     np.savetxt("all_true_{0}_pred_{1}.txt".format(true_[true_label], pred_[pred_label]), collected_tracer_in_confusion_matrix)
-    # plot the result
+    # plot serial number versus repeating times
     detected_occurance = collections.Counter(collected_tracer_in_confusion_matrix)
-    result_plt = plt.figure("histogram of true: {0}, pred: {1}".format(true_[true_label], pred_[pred_label]))
+    figsize(12, 9)
+    plt.subplot(211)
     plt.title("histogram of true: {0}, pred: {1}".format(true_[true_label], pred_[pred_label]))
     plt.bar(list(detected_occurance.keys()), list(detected_occurance.values()))
     plt.xlabel("serial numbers of objects")
     plt.ylabel("numbers of repeating times")
-    result_plt.savefig("histogram_true_{0}_pred_{1}.png".format(true_[true_label], pred_[pred_label]))
+    # plot repeating times versus number of data.
+    repeating_times = collections.Counter(list(detected_occurance.values()))
+    plt.subplot(212)
+    plt.title("historgram of repeating times")
+    plt.bar(list(repeating_times.keys()), list(repeating_times.values()))
+    plt.xlabel("repeating times")
+    plt.ylabel("numbers of data")
+    plt.savefig("histogram_true_{0}_pred_{1}.png".format(true_[true_label], pred_[pred_label]))
     #----------------------------------------
     # measuring time
     elapsed_time = time.time() - start_time
