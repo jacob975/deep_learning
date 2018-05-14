@@ -122,7 +122,7 @@ if __name__ == "__main__":
         plt.ylabel("normalized flux")
         for key, value in peak_at.items():
             plt.plot(range(1, 17), value[0])
-        result_plt.savefig("sed_true_{0}_pred_{1}_peak_at_{2}_band_{3}_data.png".format(true_[true_label], pred_[pred_label], ind+1, len(peak_at))
+        result_plt.savefig("sed_true_{0}_pred_{1}_peak_at_{2}_band_{3}_data.png".format(true_[true_label], pred_[pred_label], ind+1, len(peak_at)))
     #----------------------------------------
     # measuring time
     elapsed_time = time.time() - start_time

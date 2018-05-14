@@ -29,7 +29,7 @@ for each in ${AI_POOL}/2018*/;
 do
     # ${each##*/} means only take the last word of $each
     # ${each::-1} means take $each but the last latter. 
-    FULL_AI_NAME=${each::-1}
+    FULL_AI_NAME=${each:0:${#each} - 1}
     AI_NAME=${FULL_AI_NAME##*/}
     echo "##############"
     echo "AI under test: ${AI_NAME}"
