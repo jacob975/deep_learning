@@ -114,6 +114,10 @@ if __name__ == "__main__":
     # measure times
     start_time = time.time()
     #----------------------------------
+    # check argv is right
+    if len(argv) == 1:
+        print ("Error!\nUsage: dat2npy_1_0.py [dat files]")
+        exit()
     # read argv
     data_name_list = argv[1:]
     print ("The command is:\n {0}".format(argv))
