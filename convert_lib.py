@@ -27,6 +27,8 @@ import numpy as np
 # hint: 1 Jy = 1000 mJy
 #       Jy is a unit of flux density
 
+# the properties of bands in ukirt
+# example key : [band, wavelength, zeropoint]
 def set_ukirt():
     ukirt_system = {'V' : ["V", 0.5556, 3540] , 'I' : ["I", 0.90, 2250] , 'J' : ["J", 1.25, 1600] , 'H' : ["H", 1.65, 1020] ,\
                     'K' : ["K", 2.20, 657] , 'L' : ["L", 3.45, 290] , 'Lprime' : ["Lprime", 3.80, 252], 'M' : ["M", 4.80, 163] ,\
