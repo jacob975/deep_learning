@@ -94,11 +94,15 @@ if __name__ == "__main__":
     bands_k = catalogs[:,14:16]
     for i in range(5):
         print (bands_k[i])
-    # read distance
+    # read id, distance, and coordinate
     global ids
     ids = catalogs[:,0]
     global distances
     distances = catalogs[:,3]
+    coords_uploaded = catalogs[:, 1:3]
+    coords_detected = catalogs[:, 6:8]
+    coords = np.hstack((coords_uploaded, coords_detected))
+    print (coords)
     #-----------------------------------
     # convert mag to mJy
     global ukirt_system
@@ -126,7 +130,7 @@ if __name__ == "__main__":
     for i in range(11,20):
         print ("{0}: {1}, {2}".format(ids[i], k_mjy[i], err_k_mjy[i]))
     #-----------------------------------
-    # save each band respectively
+    # save each band and coord respectively
     j = np.stack((j_mjy, err_j_mjy))
     j = np.transpose(j)
     np.save("ukidss_j_{0}.npy".format(label), j)
@@ -139,6 +143,8 @@ if __name__ == "__main__":
     k = np.transpose(k)
     np.save("ukidss_k_{0}.npy".format(label), k)
     np.savetxt("ukidss_k_{0}.txt".format(label), k)
+    np.save("ukidss_coords_{0}.npy".format(label), coords)
+    np.savetxt("ukidss_coords_{0}.txt".format(label), coords)
     #-----------------------------------
     # measuring time
     elapsed_time = time.time() - start_time
