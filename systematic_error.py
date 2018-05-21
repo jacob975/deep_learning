@@ -46,18 +46,16 @@ if __name__ == "__main__":
         print ("2mass: {0}; ukidss:{1}".format(twomass[i], ukidss[i]))
     #-----------------------------------
     # plot the intensities in 2mass versus difference of intensities in 2mass and ukidss.
-    no_loss = np.where((ukidss[:,0] != 0) & (twomass[:,0] != 0) & (ukidss[:,0] < 100) & (twomass[:, 0] < 100))
-    '''
-    for i in no_loss[0]:
-        print("no loss: {0} ".format(i))
-        print("twomass: {0}, difference: {1}".format(twomass[i,0], ukidss[i,0]-twomass[i,0]))
-    '''
-    result_plt = plt.figure("systematic error between {0} and {1}".format(argv[1], argv[2]))
+    no_loss = np.where((ukidss[:,0] != 0) & (twomass[:,0] != 0) & (ukidss[:,0] < 200) & (twomass[:, 0] < 200))
+    #no_loss = np.where((ukidss[:,0] != 0) & (twomass[:,0] != 0))
     err_diff = np.sqrt(np.power(ukidss[no_loss[0], 1], 2) + np.power(twomass[no_loss[0], 1], 2))
+    result_plt = plt.figure("systematic error between {0} and {1}".format(argv[1], argv[2]))
+    plt.title("{0} versus {1}".format(name_twomass, name_ukidss))
+    plt.xlabel('2mass (mJy)')
+    plt.ylabel('ukidss -2mass (mjy)')
     plt.errorbar(twomass[no_loss[0], 0], ukidss[no_loss[0], 0] -twomass[no_loss[0], 0] , yerr=[err_diff, 2*err_diff], \
                 xerr=[twomass[no_loss[0], 1], 2*twomass[no_loss[0], 1]], fmt = 'ro')
-    result_plt.show()
-    input()
+    result_plt.savefig("syserr_{0}_{1}.png".format(name_twomass[:-4], name_ukidss[:-4]))
     #-----------------------------------
     # measuring time
     elapsed_time = time.time() - start_time

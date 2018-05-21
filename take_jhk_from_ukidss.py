@@ -1,9 +1,9 @@
 #!/usr/bin/python3
 '''
 Abstract:
-    This is a program to demo how to code deep learning code.
+    This is a program to take band JHK form ukidss catalog
 Usage:
-    std_code.py
+    take_jhk_from_ukidss.py [ukidss catalog file] [label]
 Editor:
     Jacob975
 
@@ -44,6 +44,7 @@ def mag_to_mjy(bands_j, band):
     # initialize variables
     j_mjy = []
     err_j_mjy = []
+    print("zeropoint: {0}".format(ukirt_system[band][2]))
     # convert
     for i in range(len(bands_j)):
         # if JHK is not found...
@@ -65,8 +66,13 @@ if __name__ == "__main__":
     # measure times
     start_time = time.time()
     #-----------------------------------    
+    # check argv
+    if len(argv) != 3:
+        print("Error\nUsage: take_jhk_from_ukidss.py [ukidss catalog file] [label]")
+        exit()
     # read the Database UKIDSSDR10PLUS as a catalog
     filename = argv[1]
+    label = argv[2]
     catalogs = readfile(filename)
     # split into J, H, and Ks bands.
     print("### the test on spliter ###")
@@ -113,20 +119,20 @@ if __name__ == "__main__":
     # print and check
     for i in range(11,20):
         print ("{0}: {1}, {2}".format(ids[i], k_mjy[i], err_k_mjy[i]))
+    #-----------------------------------
     # save each band respectively
     j = np.stack((j_mjy, err_j_mjy))
     j = np.transpose(j)
-    print (j)
-    np.save("ukidss_j.npy", j)
-    np.savetxt("ukidss_j.txt", j)
+    np.save("ukidss_j_{0}.npy".format(label), j)
+    np.savetxt("ukidss_j_{0}.txt".format(label), j)
     h = np.stack((h_mjy, err_h_mjy))
     h = np.transpose(h)
-    np.save("ukidss_h.npy", h)
-    np.savetxt("ukidss_h.txt", h)
+    np.save("ukidss_h_{0}.npy".format(label), h)
+    np.savetxt("ukidss_h_{0}.txt".format(label), h)
     k = np.stack((k_mjy, err_k_mjy))
     k = np.transpose(k)
-    np.save("ukidss_k.npy", k)
-    np.savetxt("ukidss_k.txt", k)
+    np.save("ukidss_k_{0}.npy".format(label), k)
+    np.savetxt("ukidss_k_{0}.txt".format(label), k)
     #-----------------------------------
     # measuring time
     elapsed_time = time.time() - start_time

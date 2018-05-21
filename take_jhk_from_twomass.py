@@ -1,9 +1,9 @@
 #!/usr/bin/python3
 '''
 Abstract:
-    This is a program to demo how to code deep learning code.
+    This is a program to take J, H, Ks bands from twomass files.
 Usage:
-    take_jhk_from_twomass.py [file name]
+    take_jhk_from_twomass.py [file name] [label]
 Editor:
     Jacob975
 
@@ -31,8 +31,13 @@ if __name__ == "__main__":
     # measure times
     start_time = time.time()
     #-----------------------------------    
+    # check argv
+    if len(argv) != 3:
+        print("Error\nUsage: take_jhk_from_twomass.py [file name] [label]")
+        exit()
     # read the Database UKIDSSDR10PLUS as a catalog
     filename = argv[1]
+    label = argv[2]
     catalogs = np.array(read_well_known_data(filename), dtype = np.float64)
     for i in range(5):
         print (catalogs[i])
@@ -51,12 +56,12 @@ if __name__ == "__main__":
     for i in range(5):
         print (k[i])
     # save each band respectively
-    np.save("twomass_j.npy", j)
-    np.savetxt("twomass_j.txt", j)
-    np.save("twomass_h.npy", h)
-    np.savetxt("twomass_h.txt", h)
-    np.save("twomass_k.npy", k)
-    np.savetxt("twomass_k.txt", k)
+    np.save("twomass_j_{0}.npy".format(label), j)
+    np.savetxt("twomass_j_{0}.txt".format(label), j)
+    np.save("twomass_h_{0}.npy".format(label), h)
+    np.savetxt("twomass_h_{0}.txt".format(label), h)
+    np.save("twomass_k_{0}.npy".format(label), k)
+    np.savetxt("twomass_k_{0}.txt".format(label), k)
     #-----------------------------------
     # measuring time
     elapsed_time = time.time() - start_time
