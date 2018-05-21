@@ -29,7 +29,7 @@ import time
 # main code
 if __name__ == "__main__":
     VERBOSE = 0
-    # measure times
+    # measure time
     start_time = time.time()
     #-----------------------------------
     # compare the difference between normal variable and tensorflow node.
@@ -44,6 +44,6 @@ if __name__ == "__main__":
     sess.run(model)
     print (sess.run(y))
     #-----------------------------------
-    # measuring time
+    # measure time
     elapsed_time = time.time() - start_time
     print ("Exiting Main Program, spending ", elapsed_time, "seconds.")
