@@ -17,6 +17,8 @@ Editor:
 update log
 20180514 version alpha 1
     1. The code work
+20180521 version alpha 2
+    2. change the limitation of distance to 0.6 arcsec
 '''
 import time
 import numpy as np
@@ -47,11 +49,15 @@ def mag_to_mjy(bands_j, band):
     print("zeropoint: {0}".format(ukirt_system[band][2]))
     # convert
     for i in range(len(bands_j)):
+        '''
+        # if the distance is larger than 1 beam size of irac...
+        elif distances[i] > 1.2:
+            mjy = err_mjy = 0.0
+        '''
         # if JHK is not found...
         if distances[i] == 0.0:
             mjy = err_mjy = 0.0
-        # if the distance is larger than 1 beam size of irac...
-        elif distances[i] > 1.2:
+        elif distances[i] > 0.6:
             mjy = err_mjy = 0.0
         else:
             mjy, err_mjy = convert_lib.mag_to_mJy(ukirt_system[band][2], bands_j[i,0], bands_j[i,1])

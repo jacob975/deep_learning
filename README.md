@@ -29,34 +29,51 @@ TensorFlow-Tutorials/04_Save_Restore.ipynb
 TensorFlow-Tutorials/05_Ensemble_Learning.ipynb
 
 TensorFlow-Tutorials/06_CIFAR-10.ipynb
+
+TensorFlow-Tutorials/07_Inception_Model.ipynb
 ```
 
-# How to train AI
+# How to train AI?
 
 Usage:
 ```sed_04_64_8.py [source] [id]```
 
-# Result tree
+# The product of training an AI
 
-+ `week, date. Month Year hh:mm`
++ `yyyy-mm-dd hh:mm:ss+UTC_trained_by_MaxLoss15`
   + test
-    + index		// tracer index
-    + labels		// true label
-    + data set		// data
+    + tracer	        // tracer index
+    + labels		    // true label
+    + data set		    // data
   - training
-    + index             // tracer index
+    + tracer            // tracer index
     + labels            // true label
     + data set          // data
   - validation
-    + index             // tracer index
+    + tracer             // tracer index
     + labels            // true label
     + data set          // data
   + cls true of test                        // predicted label of test set
   + cls pred of test                        // true label of test set
   + checkpoint_AI_64_8_`file_name`          // this is AI
 
+# How to make a prediction on dataset with trained AI?
+
+Usage:
+```sed_test_AI_64_8.py [source] [id] [directory] [AI]```
+
+# The product of prediction
+
++ `AI_yyyy-mm-dd hh:mm:ss+UTC_trained_by_MaxLoss15_test_on_MaxLoss15`
+  + test
+    + tracer            // tracer index
+    + labels            // true label
+    + data set          // data
+  + cls true of test                        // predicted label of test set
+  + cls pred of test                        // true label of test set
+  + result_of_AI_test
+
 # Tracer tree
 
-![DataSelection](https://github.com/jacob975/deep_learning/data_selection.png)
-
-![DataTracer](https://github.com/jacob975/deep_learning/data_tracer.png)
+https://github.com/jacob975/deep_learning/data_selection.png
+https://github.com/jacob975/deep_learning/data_tracer.png
