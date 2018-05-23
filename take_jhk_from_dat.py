@@ -1,9 +1,9 @@
 #!/usr/bin/python3
 '''
 Abstract:
-    This is a program to take J, H, Ks bands from twomass files.
+    This is a program to take J, H, Ks bands from dat files.
 Usage:
-    take_jhk_from_twomass.py [file name] [label]
+    take_jhk_from_dat.py [file name]
 Editor:
     Jacob975
 
@@ -32,13 +32,12 @@ if __name__ == "__main__":
     start_time = time.time()
     #-----------------------------------    
     # check argv
-    if len(argv) != 3:
-        print("Error\nUsage: take_jhk_from_twomass.py [file name] [label]")
+    if len(argv) != 2:
+        print("Error\nUsage: take_jhk_from_dat.py [file name]")
         exit()
-    # read the Database UKIDSSDR10PLUS as a catalog
-    filename = argv[1]
-    label = argv[2]
-    catalogs = np.array(read_well_known_data(filename), dtype = np.float64)
+    # read the dat file as catalog
+    name_dat_file = argv[1]
+    catalogs = np.array(read_well_known_data(name_dat_file), dtype = np.float64)
     for i in range(5):
         print (catalogs[i])
     # split into J, H, and Ks bands.
@@ -56,12 +55,12 @@ if __name__ == "__main__":
     for i in range(5):
         print (k[i])
     # save each band respectively
-    np.save("twomass_j_{0}.npy".format(label), j)
-    np.savetxt("twomass_j_{0}.txt".format(label), j)
-    np.save("twomass_h_{0}.npy".format(label), h)
-    np.savetxt("twomass_h_{0}.txt".format(label), h)
-    np.save("twomass_k_{0}.npy".format(label), k)
-    np.savetxt("twomass_k_{0}.txt".format(label), k)
+    np.save("{0}_j.npy".format(name_dat_file[:-4]), j)
+    np.savetxt("{0}_j.txt".format(name_dat_file[:-4]), j)
+    np.save("{0}_h.npy".format(name_dat_file[:-4]), h)
+    np.savetxt("{0}_h.txt".format(name_dat_file[:-4]), h)
+    np.save("{0}_k.npy".format(name_dat_file[:-4]), k)
+    np.savetxt("{0}_k.txt".format(name_dat_file[:-4]), k)
     #-----------------------------------
     # measuring time
     elapsed_time = time.time() - start_time
