@@ -128,6 +128,12 @@ if __name__ == "__main__":
     dat_file[replacement_k, 10] = err_k_mjy[replacement_k]
     np.save("{0}_u.npy".format(name_dat_file[:-4]), dat_file)
     np.savetxt("{0}_u.txt".format(name_dat_file[:-4]), dat_file)
+    np.save("replaced_with_j_in_ukidss_{0}.npy".format(name_dat_file[:-4]), replacement_j[0])
+    np.savetxt("replaced_with_j_in_ukidss_{0}.txt".format(name_dat_file[:-4]), replacement_j[0])
+    np.save("replaced_with_h_in_ukidss_{0}.npy".format(name_dat_file[:-4]), replacement_h[0])
+    np.savetxt("replaced_with_h_in_ukidss_{0}.txt".format(name_dat_file[:-4]), replacement_h[0])
+    np.save("replaced_with_k_in_ukidss_{0}.npy".format(name_dat_file[:-4]), replacement_k[0])
+    np.savetxt("replaced_with_k_in_ukidss_{0}.txt".format(name_dat_file[:-4]), replacement_k[0])
     #-----------------------------------
     # measuring time
     elapsed_time = time.time() - start_time
