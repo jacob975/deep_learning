@@ -68,6 +68,10 @@ data_width = 16
 
 # the def is used to read a list of data with the same class.
 def read_well_known_data(data_name):
+    if data_name[-3:] == "npy":
+        return np.load(data_name)
+    elif data_name[-3:] == "txt":
+        return np.loadtxt(data_name)
     f = open(data_name, 'r')
     data = []
     for ind, line in enumerate(f.readlines(), start = 0):
@@ -98,7 +102,7 @@ def normalize(inp):
 
 def no_observation_filter(data_name, inp, maximun):
     # load tracer
-    tracer_inp = np.loadtxt("{0}_tracer.dat".format(data_name[:-8]))
+    tracer_inp = np.loadtxt("{0}_tracer.dat".format(data_name[:4]))
     # set up MaxLoss filter
     _filter= np.array([ np.count_nonzero(row <= 0.0) <= maximun for row in inp])
     # apply filter

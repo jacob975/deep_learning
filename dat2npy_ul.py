@@ -40,29 +40,10 @@ import time
 import re           # this is used to apply multiple spliting
 import numpy as np
 from sys import argv
-from dat2npy import no_observation_filter
+from dat2npy import read_well_known_data, no_observation_filter
 
 # how many element in a data vector
 data_width = 16
-
-# the def is used to read a list of data with the same class.
-def read_well_known_data(data_name):
-    f = open(data_name, 'r')
-    data = []
-    for ind, line in enumerate(f.readlines(), start = 0):
-        # skip if no data or it's a hint.
-        if not len(line) or line.startswith('#'):
-            continue
-        row = re.split('[,\n\[\]]+', line)
-        # clean the empty element
-        row_c = [x for x in row if x != ""]
-        if len(row_c) != data_width:
-            print (line[:-1])
-            print ("the row {0} is wrong.\n".format(ind))
-            continue
-        data.append(row_c)
-    f.close()
-    return data
 
 def normalize(inp):
     # take norm
