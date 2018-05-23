@@ -23,6 +23,7 @@ import time
 import numpy as np
 from sys import argv
 import matplotlib.pyplot as plt
+from IPython.core.pylabtools import figsize
 
 #--------------------------------------------
 # main code
@@ -46,9 +47,10 @@ if __name__ == "__main__":
         print ("2mass: {0}; ukidss:{1}".format(twomass[i], ukidss[i]))
     #-----------------------------------
     # plot the intensities in 2mass versus difference of intensities in 2mass and ukidss.
-    no_loss = np.where((ukidss[:,0] != 0) & (twomass[:,0] != 0) & (ukidss[:,0] < 200) & (twomass[:, 0] < 200))
+    no_loss = np.where((ukidss[:,0] != 0) & (twomass[:,0] != 0) & (ukidss[:,0] < 50) & (twomass[:, 0] < 50))
     #no_loss = np.where((ukidss[:,0] != 0) & (twomass[:,0] != 0))
     err_diff = np.sqrt(np.power(ukidss[no_loss[0], 1], 2) + np.power(twomass[no_loss[0], 1], 2))
+    figsize(12.5, 5)
     result_plt = plt.figure("systematic error between {0} and {1}".format(argv[1], argv[2]))
     plt.title("{0} versus {1}".format(name_twomass, name_ukidss))
     plt.xlabel('2mass (mJy)')
