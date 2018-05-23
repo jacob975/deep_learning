@@ -389,6 +389,7 @@ if __name__ == "__main__":
     plot_transfer_values(i=17)
     #-----------------------------------------
     # Analysis of Transfer-Values using PCA
+    print("### Analysis of Transfer-Values using PCA ###")
     from sklearn.decomposition import PCA
     pca = PCA(n_components=2)
     transfer_values = transfer_values_train[0:3000]
@@ -399,6 +400,7 @@ if __name__ == "__main__":
     plot_scatter(transfer_values_reduced, cls)
     #-----------------------------------------
     # Analysis of Transfer-Values using t-SNE
+    print("### Analysis of Transfer-Values using t-SNE ###")
     from sklearn.manifold import TSNE
     pca = PCA(n_components=50)
     transfer_values_50d = pca.fit_transform(transfer_values)
@@ -406,12 +408,14 @@ if __name__ == "__main__":
     transfer_values_reduced = tsne.fit_transform(transfer_values_50d)
     print(transfer_values_reduced.shape)
     plot_scatter(transfer_values_reduced, cls)
+    #-----------------------------------------
     # New Classifier in TensorFlow
     # Placeholder Variables
+    print("### New Classifier in TensorFlow ###")
     transfer_len = model.transfer_len
     x = tf.placeholder(tf.float32, shape=[None, transfer_len], name='x')
     y_true = tf.placeholder(tf.float32, shape=[None, num_classes], name='y_true')
-    y_true_cls = tf.argmax(y_true, dimension=1)
+    y_true_cls = tf.argmax(y_true, axis=1)
     # Neural Network
     # Wrap the transfer-values as a Pretty Tensor object.
     x_pretty = pt.wrap(x)
