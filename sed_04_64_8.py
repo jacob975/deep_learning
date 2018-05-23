@@ -56,7 +56,6 @@ from sklearn.metrics import confusion_matrix
 import time
 from datetime import timedelta, datetime
 from sys import argv
-from help_func import plot_images
 from save_lib import save_arrangement, save_cls_pred, save_cls_true
 import astro_mnist
 import math
@@ -151,6 +150,34 @@ def optimize(num_iterations):
 
     # Print the time-usage.
     print("Time usage: " + str(timedelta(seconds=int(round(time_dif)))))
+
+# the def is used to plot data and their labels
+def plot_images(images, cls_true, cls_pred=None):
+    assert len(images) == len(cls_true) == 9
+    # Create figure with 3x3 sub-plots.
+    fig, axes = plt.subplots(3, 3)
+    fig.subplots_adjust(hspace=0.3, wspace=0.3)
+
+    for i, ax in enumerate(axes.flat):
+        # Plot image.
+        ax.plot(range(len(images[i])), images[i])
+
+        # Show true and predicted classes.
+        if cls_pred is None:
+            xlabel = "True: {0}".format(cls_true[i])
+        else:
+            xlabel = "True: {0}, Pred: {1}".format(cls_true[i], cls_pred[i])
+
+        ax.set_xlabel(xlabel)
+
+        # Remove ticks from the plot.
+        ax.set_xticks([])
+        ax.set_yticks([])
+
+    # Ensure the plot is shown correctly with multiple plots
+    # in a single Notebook cell.
+    plt.show()
+    return
 
 def plot_example_errors(cls_pred, correct):
     # This function is called from print_test_accuracy() below.

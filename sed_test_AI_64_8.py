@@ -15,16 +15,18 @@ Editor and Practicer:
 20170225
 ####################################
 update log
-    20180225 version alpha 1:
+20180225 version alpha 1:
     the code work well.
-    20180226 version alpha 2:
+20180226 version alpha 2:
     the AI can be choosed.
-    20180412 version alpha 3:
+20180412 version alpha 3:
     1. make directory a argument
-    20180414 version alpha 4:
+20180414 version alpha 4:
     1. add funcs for print precision and recall-rate.
+20180523 version alpha 5:
+    1. delete some plot functions I rarely use for a long time.
 '''
-from IPython.display import Image       # Used to create flowcart
+from IPython.display import Image       # Used to create flowchart
 import matplotlib.pyplot as plt
 import tensorflow as tf
 import numpy as np
@@ -32,7 +34,6 @@ from sklearn.metrics import confusion_matrix
 import time
 from datetime import datetime, timedelta
 from sys import argv
-from help_func import plot_images
 from save_lib import save_cls_pred, save_cls_true, save_arrangement
 from load_lib import print_precision, print_recall_rate
 import astro_mnist
@@ -46,33 +47,6 @@ def new_weights(shape):
 
 def new_biases(length):
     return tf.Variable(tf.constant(0.05, shape=[length]))
-
-def plot_example_errors(cls_pred, correct):
-    # This function is called from print_test_accuracy() below.
-
-    # cls_pred is an array of the predicted class-number for
-    # all images in the test-set.
-
-    # correct is a boolean array whether the predicted class
-    # is equal to the true class for each image in the test-set.
-
-    # Negate the boolean array.
-    incorrect = (correct == False)
-    
-    # Get the images from the test-set that have been
-    # incorrectly classified.
-    images = data.test.images[incorrect]
-    
-    # Get the predicted classes for those images.
-    cls_pred = cls_pred[incorrect]
-
-    # Get the true classes for those images.
-    cls_true = data.test.cls[incorrect]
-    
-    # Plot the first 9 images.
-    plot_images(images=images[0:9],
-                cls_true=cls_true[0:9],
-                cls_pred=cls_pred[0:9])
 
 def plot_confusion_matrix(cls_pred):
     # This is called from print_test_accuracy() below.
@@ -108,8 +82,7 @@ def plot_confusion_matrix(cls_pred):
     plt.show()
     '''
 
-def print_test_accuracy(show_example_errors=False,
-                        show_confusion_matrix=False):
+def print_test_accuracy(show_confusion_matrix=False):
 
     # For all the images in the test-set,
     # calculate the predicted classes and whether they are correct.
@@ -127,12 +100,7 @@ def print_test_accuracy(show_example_errors=False,
     # Print the accuracy.
     msg = "Accuracy on Test-Set: {0:.1%} ({1} / {2})"
     print(msg.format(acc, num_correct, num_images))
-
-    # Plot some examples of mis-classifications, if desired.
-    if show_example_errors:
-        print("Example errors:")
-        plot_example_errors(cls_pred=cls_pred, correct=correct)
-
+    
     # Plot the confusion matrix, if desired.
     if show_confusion_matrix:
         print("Confusion Matrix:")
@@ -245,8 +213,6 @@ if __name__ == "__main__":
     images = data.test.images[0:9]
     # Get the true classes for those images.
     cls_true = data.test.cls[0:9]
-    # Plot the images and labels using our helper-function above.
-    if VERBOSE> 2: plot_images(images=images, cls_true=cls_true)
     #-----------------------------------
     # Tensorflow Graph
     x = tf.placeholder(tf.float32, shape=[None, img_size_flat], name='x')
@@ -291,7 +257,7 @@ if __name__ == "__main__":
     batch_size = 512
     print ("batch_size = {0}".format(batch_size))
     # test the restored AI, show confusion matrix and example_errors
-    print_test_accuracy(show_example_errors=False, show_confusion_matrix=True)
+    print_test_accuracy(show_confusion_matrix=True)
     session.close()
     #-----------------------------------
     # measuring time
