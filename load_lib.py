@@ -23,7 +23,10 @@ update log
     1. It is hard to create pointer in python, so I back to call by value
     2. add a func to print confusion matrix
 20180414 version alpha 3:
-    1. add funcs for print precision and recall-rate.
+    1. add funcs for printing precision and recall-rate.
+20180523 version alpha 4: 
+    1. add funcs for printing accuracy of predictions.
+
 '''
 import tensorflow as tf
 import time
@@ -128,6 +131,13 @@ def confusion_matrix(cls_true, cls_pred):
     cm = confusion_matrix(y_true=cls_true,
                           y_pred=cls_pred)
     return 0, cm
+
+def print_accuracy(y_true, y_pred):
+    print("### accuracy ###")
+    correctly_predicted = np.where((y_pred == y_true))
+    accuracy = len(correctly_predicted[0])/len(y_true)
+    print("accuracy of prediction: {0:.2f}% ({1} /{2} )".format(accuracy*100, len(correctly_predicted[0]), len(y_true)))
+    return
 
 def print_precision(y_true, y_pred):
     print ("### precision ###")

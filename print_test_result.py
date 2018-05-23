@@ -24,7 +24,7 @@ import numpy as np
 import time
 import load_lib
 import collections
-from load_lib import print_precision, print_recall_rate
+from load_lib import print_accuracy, print_precision, print_recall_rate
 from sys import argv
 from glob import glob
 
@@ -77,6 +77,8 @@ if __name__ == "__main__":
         print ("number of galaxies: {0}".format(len(cls_true[cls_true == 1])))
         yso_length = len(cls_true[cls_true == 2])
         print ("number of YSOs: {0}".format(len(cls_true[cls_true == 2])))
+        # accuracy
+        print_accuracy(y_true = cls_true, y_pred = cls_pred)
         # recall rate
         print_recall_rate(y_true = cls_true, y_pred = cls_pred)
         # precision
