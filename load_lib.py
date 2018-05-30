@@ -125,6 +125,26 @@ def load_cls_true(sub_name, directory):
         return 1, None
     return 0, cls_true
 
+# This is the func to load coordinates of corresponding sources.
+def load_coords(sub_name, directory):
+    try:
+        train_coords = np.load("{0}/train_coords_source_sed_{1}.npy".format(directory, sub_name))
+    except:
+        print ("train coords not found")
+        train_coords = None
+    try:
+        validation_coords = np.load("{0}/validation_coords_source_sed_{1}.npy".format(directory, sub_name))
+    except:
+        print ("validation coords not found")
+        validation_coords = None
+    try:
+        test_coords = np.load("{0}/test_coords_source_sed_{1}.npy".format(directory, sub_name))
+    except:
+        print ("test coords not found")
+        test_coords = None
+    coords = shuffled_tracer(train_coords, validation_coords, test_coords)
+    return 0, coords
+
 # generate confusion matrix with given cls_true and cls_pred
 def confusion_matrix(cls_true, cls_pred):
     from sklearn.metrics import confusion_matrix

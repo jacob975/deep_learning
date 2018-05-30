@@ -39,29 +39,30 @@ if __name__ == "__main__":
     cls_true = None
     directory = None
     #----------------------------------------
+    # Loading section
     # load argv
     if len(argv) != 3:
         print ("Error!\nUsage: test_tracer.py [directory] [keyword]")
         exit()
     directory = argv[1]
     keyword = argv[2]
-    #----------------------------------------
     # load tracer
     failure, data, tracer = load_lib.load_arrangement(keyword, directory)
     if not failure:
         print ("load data and tracer success")
-    #----------------------------------------
     # load cls_pred
     failure, cls_pred = load_lib.load_cls_pred(keyword, directory)
     if not failure:
         print ("load cls_pred success")
-    #----------------------------------------
     # load cls_true
     failure, cls_true = load_lib.load_cls_true(keyword, directory)
     if not failure:
         print ("load cls_true success")
+    failure, coords = load_lib.load_coords(keyword, directory)
+    if not failure:
+        print ("load coords success")
     #----------------------------------------
-    # test
+    # test if the loading is successful or not
     print ("### data number ###")
     print ("length of training data set: {0}".format(len(data.train.images)))
     print ("length of validation data set: {0}".format(len(data.validation.images)))
@@ -76,22 +77,27 @@ if __name__ == "__main__":
     # print data and the corresponding shuffle tracer of the first data
     print ("### The first datum in dataset ###")
     print ("data.test.images: {0}".format(data.test.images[0]))
+    print ("RA: {0}, DEC: {1}".format(coords.test[0][0], coords.test[0][1]))
     print ("shuffle tracer: {0}".format(tracer.test[0]))
     print ("true label: {0}".format(cls_true[0]))
     print ("predict label: {0}".format(cls_pred[0]))
     # print data and the corresponding shuffle tracer of the last data
     print ("### The final datum in dataset ###")
     print ("data.test.images: {0}".format(data.test.images[-1]))
+    print ("RA: {0}, DEC: {1}".format(coords.test[-1][0], coords.test[-1][1]))
     print ("shuffle tracer: {0}".format(tracer.test[-1]))
     print ("true label: {0}".format(cls_true[-1]))
     print ("predict label: {0}\n".format(cls_pred[-1]))
-    #-----------------------------------
+    # print the number of quantities
     print ("number of stars: {0}".format(len(cls_true[cls_true == 0])))
     print ("number of galaxies: {0}".format(len(cls_true[cls_true == 1])))
     print ("number of YSOs: {0}".format(len(cls_true[cls_true == 2])))
+    #-----------------------------------
+    # Two ways to trace back with tracer is shown below
     gala2yso = tracer.test[(cls_true == 1) &(cls_pred == 2)]
     print (gala2yso)
     print ("number of galc to yso: {0}".format(len(gala2yso)))
+    # TBA....
     #-----------------------------------
     # measuring time
     elapsed_time = time.time() - start_time

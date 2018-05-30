@@ -56,7 +56,7 @@ from sklearn.metrics import confusion_matrix
 import time
 from datetime import timedelta, datetime
 from sys import argv
-from save_lib import save_arrangement, save_cls_pred, save_cls_true
+from save_lib import save_arrangement, save_cls_pred, save_cls_true, save_coords
 import astro_mnist
 import math
 import os
@@ -244,9 +244,11 @@ def print_test_accuracy(show_example_errors=False,
     # For all the images in the test-set,
     # calculate the predicted classes and whether they are correct.
     correct, cls_pred = predict_cls_test()
+    #----------------------------------------
     # save cls_pred and cls_true
-    save_cls_pred(argv, time_stamp, cls_pred)
-    save_cls_true(argv, time_stamp, data.test.cls)
+    save_cls_pred(images_name[:-4], time_stamp, cls_pred)
+    save_cls_true(images_name[:-4], time_stamp, data.test.cls)
+    #----------------------------------------
     # Classification accuracy and the number of correct classifications.
     acc, num_correct = cls_accuracy(correct)
     
@@ -339,21 +341,28 @@ if __name__ == "__main__":
     VERBOSE = 0
     # measure times
     start_time = time.time()
-    time_stamp = argv[3]
+    time_stamp = argv[4]
     print ("starting time: {0}".format(time_stamp))
     #-----------------------------------
     # Load Data
+    global images_name
     images_name = argv[1]
     labels_name = argv[2]
-    data, tracer = astro_mnist.read_data_sets(images_name, labels_name)
+    coords_name = argv[3]
+    data, tracer, coords = astro_mnist.read_data_sets(images_name, labels_name, coords_name)
     print("Size of:")
     print("- Training-set:\t\t{}".format(len(data.train.labels)))
     print("- Test-set:\t\t{}".format(len(data.test.labels)))
     print("- Validation-set:\t{}".format(len(data.validation.labels)))
     data.test.cls = np.argmax(data.test.labels, axis=1)
-    # save arrangement
-    if save_arrangement(argv, time_stamp, data, tracer):
-        print ("tracer and data is saved.")
+    #-----------------------------------
+    # save arrangement and coords
+    failure = save_arrangement(images_name[:-4], time_stamp, data, tracer)
+    if not failure:
+        print ("tracers and data are saved.")
+    failure = save_coords(images_name[:-4], time_stamp, coords)
+    if not failure:
+        print ("coords are saved.")
     #-----------------------------------
     # Data dimension
     # We know that from the length of a data. 
@@ -424,7 +433,7 @@ if __name__ == "__main__":
     validation_list = []
     improved_validation_list = []
     saver = tf.train.Saver()
-    save_dir = '{0}/checkpoint_AI_64_8_{1}'.format(time_stamp, argv[1][:-4])
+    save_dir = '{0}/checkpoint_AI_64_8_{1}'.format(time_stamp, images_name[:-4])
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
     save_path = os.path.join(save_dir, 'best_validation')

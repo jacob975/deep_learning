@@ -34,7 +34,7 @@ from sklearn.metrics import confusion_matrix
 import time
 from datetime import datetime, timedelta
 from sys import argv
-from save_lib import save_cls_pred, save_cls_true, save_arrangement
+from save_lib import save_cls_pred, save_cls_true, save_arrangement, save_coords
 from load_lib import print_precision, print_recall_rate
 import astro_mnist
 import math
@@ -88,8 +88,8 @@ def print_test_accuracy(show_confusion_matrix=False):
     # calculate the predicted classes and whether they are correct.
     correct, cls_pred = predict_cls_test()
     # save cls_pred and cls_true
-    save_cls_pred(argv, directory, cls_pred)
-    save_cls_true(argv, directory, data.test.cls)
+    save_cls_pred(images_name[:-4], directory, cls_pred)
+    save_cls_true(images_name[:-4], directory, data.test.cls)
     
     # Classification accuracy and the number of correct classifications.
     acc, num_correct = cls_accuracy(correct)
@@ -178,21 +178,26 @@ if __name__ == "__main__":
     VERBOSE = 0
     # measure times
     start_time = time.time()
-    directory = argv[3]
+    directory = argv[4]
     #-----------------------------------
     # Load Data
     images_name = argv[1]
     labels_name = argv[2]
-    AI_saved_dir = argv[4]
-    data, tracer = astro_mnist.read_data_sets(images_name, labels_name, train_weight = 0, validation_weight = 0, test_weight = 1)
+    coords_name = argv[3]
+    AI_saved_dir = argv[5]
+    data, tracer, coords = astro_mnist.read_data_sets(images_name, labels_name, coords_name, train_weight = 0, validation_weight = 0, test_weight = 1)
     print("Size of:")
     print("- Training-set:\t\t{}".format(len(data.train.labels)))
     print("- Test-set:\t\t{}".format(len(data.test.labels)))
     print("- Validation-set:\t{}".format(len(data.validation.labels)))
     data.test.cls = np.argmax(data.test.labels, axis=1)
-    # save arrangement
-    if save_arrangement(argv, directory, data, tracer):
+    # save arrangement and coords
+    failure = save_arrangement(images_name[:-4], directory, data, tracer)
+    if not failure:
         print ("tracer and data is saved.")
+    failure = save_coords(images_name[:-4], directory, coords)
+    if not failure:
+        print ("coords are saved.")
     #-----------------------------------
     # Data dimension
     # We know that MNIST images are 28 pixels in each dimension.

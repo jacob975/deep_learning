@@ -18,6 +18,7 @@ case ${2} in
             {print "["$22"," $26"," $30"," $42"," $60"," $78"," $96"," $114"," \
             $23"," $27"," $31"," $43"," $61"," $79"," $97"," $115"],"}' ${1} > star_sed.dat
         awk '$15~/star/ && $15!~/dust/ {print FNR }' ${1} > star_tracer.dat
+        awk '$15~/star/ && $15!~/dust/ {print $3" "$5 }' ${1} > star_coord.dat
         exit 0
         ;;
     
@@ -26,6 +27,7 @@ case ${2} in
             {print "["$22"," $26"," $30"," $42"," $60"," $78"," $96"," $114"," \
             $23"," $27"," $31"," $43"," $61"," $79"," $97"," $115"],"}' ${1} > gala_sed.dat
 	    awk '$15~/Galc/   {print FNR }' ${1} > gala_tracer.dat
+        awk '$15~/Galc/ {print $3" "$5 }' ${1} > gala_coord.dat
         exit 0
         ;;
     "yso")
@@ -33,6 +35,7 @@ case ${2} in
             {print "["$22"," $26"," $30"," $42"," $60"," $78"," $96"," $114"," \
             $23"," $27"," $31"," $43"," $61"," $79"," $97"," $115"],"}' ${1} > ysos_sed.dat
         awk '$15~/YSOc/  {print FNR}' ${1} > ysos_tracer.dat
+        awk '$15~/YSOc/  {print $3" "$5}' ${1} > ysos_coord.dat
         exit 0
         ;;
     "others")
@@ -41,6 +44,8 @@ case ${2} in
             $27"," $31"," $43"," $61"," $79"," $97"," $115"],"}' ${1} > othr_sed.dat 
         awk '$15~/red/|| $15~/rising/ || $15~/falling/ || $15~/cup-up/ || $15~/cup-down/ || $15~/flat/ \
             {print FNR}' ${1} > othr_tracer.dat
+        awk '$15~/red/|| $15~/rising/ || $15~/falling/ || $15~/cup-up/ || $15~/cup-down/ || $15~/flat/ \
+            {print $3" "$5}' ${1} > othr_coord.dat
         exit 0
         ;;
     *)
