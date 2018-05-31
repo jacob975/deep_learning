@@ -48,7 +48,8 @@ if __name__ == "__main__":
     #-----------------------------------
     # pick coordinate of large signals and small signals
     # then plot the flux in 2mass versus difference of intensities in 2mass and ukidss.
-    # large signals
+    # save infos of large signals
+    # include flux and coords
     large_signals = np.where((ukidss[:,0] != 0) & (twomass[:,0] < 1000) & (twomass[:, 0] > 200))
     err_diff = np.sqrt(np.power(ukidss[large_signals[0], 1], 2) + np.power(twomass[large_signals[0], 1], 2)) 
     result_plt = plt.figure("systematic error of large signals between {0} and {1}".format(argv[1], argv[2]))
@@ -60,7 +61,8 @@ if __name__ == "__main__":
     result_plt.savefig("sources_with_large_signals_{0}_{1}.png".format(name_twomass[:-4], name_ukidss[:-4]))
     np.save("{0}_sources_with_large_signals.npy".format(name_twomass[:-4]), coords_w_fulldata[large_signals])
     np.savetxt("{0}_sources_with_large_signals.txt".format(name_twomass[:-4]), coords_w_fulldata[large_signals])
-    # small signals
+    # save infos of small signals
+    # include flux and coords
     small_signals = np.where((ukidss[:,0] != 0) & (twomass[:,0] != 0) & (twomass[:,0] < 30))
     err_diff = np.sqrt(np.power(ukidss[small_signals[0], 1], 2) + np.power(twomass[small_signals[0], 1], 2)) 
     result_plt = plt.figure("systematic error of small signals between {0} and {1}".format(argv[1], argv[2]))
