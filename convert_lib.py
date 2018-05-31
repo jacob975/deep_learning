@@ -19,12 +19,16 @@ Editor:
 update log
 20180502 version alpha 1
     1. the code work
+20180531 version alpha 2
+    1. add a group of funcs for converting between pixel and wcs
+    but they haven't been tested.
 '''
 import numpy as np
 
 ####################################
+# Convert quantities between magnitude and Jy
 # Those convert function comes from: http://ssc.spitzer.caltech.edu/warmmission/propkit/pet/magtojy/index.html
-# hint: 1 Jy = 1000 mJy
+# Hint: 1 Jy = 1000 mJy
 #       Jy is a unit of flux density
 
 # the properties of bands in ukirt
@@ -62,7 +66,7 @@ def mJy_to_mag(zeropoint, flux_density):
     flux_density = mJy_to_Jy(flux_density)
     magnitude = Jy_to_mag(zeropoint, flux_density)
     return magnitude
-####################################
+#-----------------------------------------------------
 # convertion with error
 def Jy_to_mJy(flux_density, err_flux_density):
     return 1000 * flux_density, 1000* err_flux_density
@@ -91,3 +95,17 @@ def mJy_to_mag(zeropoint, flux_density, err_flux_density):
     flux_density, err_flux_density = mJy_to_Jy(flux_density, err_flux_density)
     magnitude, err_magnitude = Jy_to_mag(zeropoint, flux_density, err_flux_density)
     return magnitude, err_magnitude
+
+######################################################
+# Convert quantities between pixel and wcs
+def pix2wcs(radec, name_image):
+    hdulist = pyfits.open(name_image)
+    wcs = pywcs.WCS(hdulist[0].header)
+    pix = wcs.wcs_sky2pix(radec, 1)
+    return pix
+
+def wcs2wpix(pix, name_image):
+    hdulist = pyfits.open(name_image)
+    wcs = pywcs.WCS(hdulist[0].header)
+    radec = wcs.pix2wcs_sky(pix, 1)
+    return radec
