@@ -62,11 +62,14 @@ if __name__ == "__main__":
     print("number of coords of selected sources: {0}".format(len(coords_of_certain_data)))
     print("5 examples")
     for i in range(5):
-        print("{0} {1}".format(coords_of_certain_data[i][0], coords_of_certain_data[i][1]))
+        try:
+            print("{0} {1}".format(coords_of_certain_data[i][0], coords_of_certain_data[i][1]))
+        except:
+            break
     print("...")
     # save the result
-    np.save("{0}/print_coords_test_{1}_{2}.npy".format(directory, true_label, pred_label), coords_of_certain_data)
-    np.savetxt("{0}/print_coords_test_{1}_{2}.txt".format(directory, true_label, pred_label), coords_of_certain_data)
+    np.save("{0}/coords_test_{1}_{2}.npy".format(directory, true_label, pred_label), coords_of_certain_data)
+    np.savetxt("{0}/coords_test_{1}_{2}.txt".format(directory, true_label, pred_label), coords_of_certain_data)
     #-----------------------------------
     # measure time
     elapsed_time = time.time() - start_time
