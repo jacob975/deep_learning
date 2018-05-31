@@ -22,6 +22,7 @@ do
     jter=0
     while [ $jter -le 2 ]
     do
+        echo "###############"
         echo "print_coords.py ${WORK_DIR} ${keyword} ${iter} ${jter}"
         print_coords.py "${WORK_DIR}" "${keyword}" ${iter} ${jter}
         ((jter++))
