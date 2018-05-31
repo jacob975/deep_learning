@@ -3,7 +3,7 @@
 Abstract:
     This is a program to test how to plot points on images
 Usage:
-    compare_points_on_images.py [name of image] [name of regions file A] [name of regions file B]
+    plot_compare_points_on_images.py [name of image] [name of regions file A] [name of regions file B]
 Editor:
     Jacob975
 
@@ -69,7 +69,7 @@ if __name__ == "__main__":
     #-----------------------------------
     # Load argv
     if len(argv) != 4:
-        print ("Error!\nUsage: compare_points_on_images.py [name of image] [name of regions file A] [name of regions file B]")
+        print ("Error!\nUsage: plot_compare_points_on_images.py [name of image] [name of regions file A] [name of regions file B]")
         exit()
     name_image = argv[1]
     name_regions_file_A = argv[2]
