@@ -21,14 +21,25 @@ import os
 from sys import argv
 
 def plot_point_on_ds9(name_image, name_regions_file):
-    # using ds9 to display
-    cmd =   "ds9 -zscale {0} \
-            -regions color red \
+    # convert region file from XY to ds9/fortran
+    cmd =   "ds9 {0}\
             -regions format xy \
             -regions system wcs \
             -regions sky fk5 \
             -regions load {1} \
-            -zoom to fit &".format(name_image, name_regions_file)
+            -regions select all \
+            -regions format ds9 \
+            -regions save {2}.reg \
+            -exit ".format(name_image, name_regions_file, name_regions_file[:-4])
+    os.system(cmd)
+    # set boxcircle size 1
+    cmd = "sed -i -e 's/boxcircle/boxcircle 2/g' {0}.reg".format(name_regions_file[:-4])
+    os.system(cmd)
+    # display
+    cmd =   "ds9 -zscale {0} \
+            -regions format ds9 \
+            -regions load {1}.reg \
+            -zoom to fit &".format(name_image, name_regions_file[:-4])
     os.system(cmd)
     return
 
