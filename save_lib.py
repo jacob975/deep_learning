@@ -25,6 +25,8 @@ update log
     1. add explaination
 20180530 version alpha 4:
     1. add a func for saving coords of sources
+20180601 version alpha 5:
+    1. add a func for saving predicted labels
 '''
 import tensorflow as tf
 import time
@@ -64,20 +66,29 @@ def save_arrangement(keyword, time_stamp, data, tracer):
         np.savetxt("{0}/test_labels_{1}.txt".format(time_stamp, keyword), data.test.labels)
     return 0
 
-# This is used to saving pred label
+# This is used to saving pred cls
 def save_cls_pred(keyword, time_stamp, cls_pred):
     # time_stamp is used to create a uniq folder
     # keyword is used to denote filename
-    # cls_pred is predicted label
+    # cls_pred is the index of predicted label
     np.save("{0}/test_cls_pred_{1}.npy".format(time_stamp, keyword), cls_pred)
     np.savetxt("{0}/test_cls_pred_{1}.txt".format(time_stamp, keyword), cls_pred)
     return 0
 
-# THis is used to saving true label
+# This is used to saving pred label
+def save_label_pred(keyword, time_stamp, label_pred):
+    # time_stamp is used to create a uniq folder
+    # keyword is used to denote filename
+    # label_pred is predicted label
+    np.save("{0}/test_labels_pred_{1}.npy".format(time_stamp, keyword), label_pred)
+    np.savetxt("{0}/test_labels_pred_{1}.txt".format(time_stamp, keyword), label_pred)
+    return 0
+
+# THis is used to saving true cls
 def save_cls_true(keyword, time_stamp, cls_true):
     # time_stamp is used to create a uniq folder
     # keyword is used to denote filename
-    # cls_pred is true label
+    # cls_pred is the index of true label
     np.save("{0}/test_cls_true_{1}.npy".format(time_stamp, keyword), cls_true)
     np.savetxt("{0}/test_cls_true_{1}.txt".format(time_stamp, keyword), cls_true)
     return 0
