@@ -25,6 +25,9 @@ update log
     1. add funcs for print precision and recall-rate.
 20180523 version alpha 5:
     1. delete some plot functions I rarely use for a long time.
+20180601 version alpha 6:
+    1. delete some functions never used in this code.
+    2. add a func to save predicted labels.
 '''
 from IPython.display import Image       # Used to create flowchart
 import matplotlib.pyplot as plt
@@ -32,21 +35,13 @@ import tensorflow as tf
 import numpy as np
 from sklearn.metrics import confusion_matrix
 import time
-from datetime import datetime, timedelta
 from sys import argv
-from save_lib import save_cls_pred, save_cls_true, save_arrangement, save_coords
+from save_lib import save_cls_pred, save_cls_true, save_arrangement, save_coords, save_label_pred
 from load_lib import print_precision, print_recall_rate
 import astro_mnist
-import math
 import os
 # We also need PrettyTensor.
 import prettytensor as pt
-
-def new_weights(shape):
-    return tf.Variable(tf.truncated_normal(shape, stddev=0.05))
-
-def new_biases(length):
-    return tf.Variable(tf.constant(0.05, shape=[length]))
 
 def plot_confusion_matrix(cls_pred):
     # This is called from print_test_accuracy() below.
@@ -65,22 +60,6 @@ def plot_confusion_matrix(cls_pred):
     print(cm)
     print_precision(y_true = cls_true, y_pred = cls_pred)
     print_recall_rate(y_true = cls_true, y_pred = cls_pred)
-    '''
-    # Plot the confusion matrix as an image.
-    plt.matshow(cm)
-
-    # Make various adjustments to the plot.
-    plt.colorbar()
-    tick_marks = np.arange(num_classes)
-    plt.xticks(tick_marks, range(num_classes))
-    plt.yticks(tick_marks, range(num_classes))
-    plt.xlabel('Predicted')
-    plt.ylabel('True')
-
-    # Ensure the plot is shown correctly with multiple plots
-    # in a single Notebook cell.
-    plt.show()
-    '''
 
 def print_test_accuracy(show_confusion_matrix=False):
 
@@ -132,7 +111,6 @@ def predict_cls(images, labels, cls_true):
 
         # Calculate the predicted class using TensorFlow.
         cls_pred[i:j] = session.run(y_pred_cls, feed_dict=feed_dict)
-
         # Set the start-index for the next batch to the
         # end-index of the current batch.
         i = j
@@ -142,15 +120,20 @@ def predict_cls(images, labels, cls_true):
 
     return correct, cls_pred
 
+def predict_label(images, labels):
+    # Number of images.
+    num_images = len(images)
+    # initialize
+    label_pred = np.zeros(num_images*3).reshape((num_images, 3))
+    feed_dict = {x: images[:,:], y_true: labels[:,:]}
+    # process 
+    label_pred = session.run(y_pred, feed_dict=feed_dict)
+    return label_pred
+
 def predict_cls_test():
     return predict_cls(images = data.test.images,
                        labels = data.test.labels,
                        cls_true = data.test.cls)
-
-def predict_cls_validation():
-    return predict_cls(images = data.validation.images,
-                       labels = data.validation.labels,
-                       cls_true = data.validation.cls)
 
 def cls_accuracy(correct):
     # Calculate the number of correctly classified images.
@@ -162,15 +145,6 @@ def cls_accuracy(correct):
     acc = float(correct_sum) / len(correct)
 
     return acc, correct_sum
-
-def validation_accuracy():
-    # Get the array of booleans whether the classifications are correct
-    # for the validation-set.
-    # The function returns two values but we only need the first.
-    correct, _ = predict_cls_validation()
-    
-    # Calculate the classification accuracy and return it.
-    return cls_accuracy(correct)
 
 #--------------------------------------------
 # main code
@@ -252,17 +226,16 @@ if __name__ == "__main__":
     #-----------------------------------
     # Tensorflow run
     session = tf.Session()
-    '''
-    def init_variables():
-        session.run(tf.global_variables_initializer())
-    init_variables()
-    '''
     # restore previous weight
     saver.restore(sess=session, save_path=save_path)
     batch_size = 512
     print ("batch_size = {0}".format(batch_size))
     # test the restored AI, show confusion matrix and example_errors
+    # and save the cls of prediction
     print_test_accuracy(show_confusion_matrix=True)
+    # save labels of prediction
+    label_pred = predict_label(data.test.images, data.test.labels)
+    save_label_pred(images_name[:-4], directory, label_pred)
     session.close()
     #-----------------------------------
     # measuring time

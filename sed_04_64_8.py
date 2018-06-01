@@ -54,7 +54,6 @@ import tensorflow as tf
 import numpy as np
 from sklearn.metrics import confusion_matrix
 import time
-from datetime import timedelta, datetime
 from sys import argv
 from save_lib import save_arrangement, save_cls_pred, save_cls_true, save_coords
 import astro_mnist

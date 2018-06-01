@@ -18,13 +18,13 @@ Editor:
 ####################################
 update log
 20180430 version alpha 1:
-    1. The code work 
+    1. The code work
+20180601 version alpha 2:
+    1. add func to print reliable data out 
 '''
 import numpy as np
 import time
-import load_lib
-import collections
-from load_lib import print_accuracy, print_precision, print_recall_rate
+from load_lib import confusion_matrix_infos, load_arrangement, load_labels_pred, load_cls_true 
 from sys import argv
 from glob import glob
 
@@ -52,37 +52,41 @@ if __name__ == "__main__":
         print ("#################################")
         print ("start to loading data saved in {0}".format(directory))
         # load tracer
-        failure, data, tracer = load_lib.load_arrangement(keyword, directory)
+        failure, data, tracer = load_arrangement(keyword, directory)
         if not failure:
             print ("load data and tracer success")
-        # load cls_pred
-        failure, cls_pred = load_lib.load_cls_pred(keyword, directory)
+        # load label_pred
+        failure, labels_pred = load_labels_pred(keyword, directory)
         if not failure:
-            print ("load cls_pred success")
+            print ("load labels_pred success")
         # load cls_true
-        failure, cls_true = load_lib.load_cls_true(keyword, directory)
+        failure, cls_true = load_cls_true(keyword, directory)
         if not failure:
             print ("load cls_true success")
-        # confusion matrix
-        print ("### confusion matrix ###")
-        failure, cm = load_lib.confusion_matrix(cls_true, cls_pred)
-        if not failure:
-            print ("confusion matrix success")
-        print (cm)
         #-----------------------------------
-        # print the properties
-        star_length = len(cls_true[cls_true == 0])
-        print ("number of stars: {0}".format(len(cls_true[cls_true == 0])))
-        gala_length = len(cls_true[cls_true == 1])
-        print ("number of galaxies: {0}".format(len(cls_true[cls_true == 1])))
-        yso_length = len(cls_true[cls_true == 2])
-        print ("number of YSOs: {0}".format(len(cls_true[cls_true == 2])))
-        # accuracy
-        print_accuracy(y_true = cls_true, y_pred = cls_pred)
-        # recall rate
-        print_recall_rate(y_true = cls_true, y_pred = cls_pred)
-        # precision
-        print_precision(y_true = cls_true, y_pred = cls_pred)
+        # print the properties of sources
+        infos = confusion_matrix_infos(cls_true, labels_pred)
+        print("### sources in dataset ### ")
+        star_length = len(infos.cls_true[infos.cls_true == 0])
+        print ("number of stars: {0}".format(star_length))
+        galaxy_length = len(infos.cls_true[infos.cls_true == 1])
+        print ("number of galaxies: {0}".format(galaxy_length))
+        yso_length = len(infos.cls_true[infos.cls_true == 2])
+        print ("number of ysos: {0}".format(yso_length))
+        print("### reliable sources in dataset ### ")
+        star_length = len(infos.cls_true_reliable[infos.cls_true_reliable == 0])
+        print ("number of stars: {0}".format(star_length))
+        galaxy_length = len(infos.cls_true_reliable[infos.cls_true_reliable == 1])
+        print ("number of galaxies: {0}".format(galaxy_length))
+        yso_length = len(infos.cls_true_reliable[infos.cls_true_reliable == 2])
+        print ("number of ysos: {0}".format(yso_length))
+        # print the properties of predictions
+        failure, cm, cm_reliable = infos.confusion_matrix()
+        print("confusion matrix:\n{0}".format(cm))
+        print("reliable confusion matrix:\n{0}".format(cm_reliable))
+        infos.print_accuracy()
+        infos.print_precision()
+        infos.print_recall_rate()
     #----------------------------------------
     # measuring time
     elapsed_time = time.time() - start_time

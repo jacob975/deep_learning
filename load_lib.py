@@ -101,11 +101,11 @@ def load_dat_tracer():
 def load_table_tracer():
     return 0, table_tracer
 
-# This is used to loading pred label
+# This is used to loading the index of pred label
 def load_cls_pred(sub_name, directory):
     # directory is used to create a uniq folder
     # sub_name is used to denote filename
-    # cls_pred is predicted label
+    # cls_pred is the index of predicted labels
     try:
         cls_pred = np.load("{0}/test_cls_pred_source_sed_{1}.npy".format(directory, sub_name))
     except:
@@ -113,11 +113,23 @@ def load_cls_pred(sub_name, directory):
         return 1, None
     return 0, cls_pred
 
-# THis is used to loading true label
+# This is used to loading pred label
+def load_labels_pred(sub_name, directory):
+    # directory is used to create a uniq folder
+    # sub_name is used to denote filename
+    # cls_pred is predicted label
+    try:
+        labels_pred = np.load("{0}/test_labels_pred_source_sed_{1}.npy".format(directory, sub_name))
+    except:
+        print("test_labels_pred not found")
+        return 1, None
+    return 0, labels_pred
+
+# THis is used to loading the index of true lable
 def load_cls_true(sub_name, directory):
     # directory is used to create a uniq folder
     # sub_name is used to denote filename
-    # cls_pred is true label
+    # cls_pred is the index of true labels
     try:
         cls_true = np.load("{0}/test_cls_true_source_sed_{1}.npy".format(directory, sub_name))
     except:
@@ -156,7 +168,8 @@ def print_accuracy(y_true, y_pred):
     print("### accuracy ###")
     correctly_predicted = np.where((y_pred == y_true))
     accuracy = len(correctly_predicted[0])/len(y_true)
-    print("accuracy of prediction: {0:.2f}% ({1} /{2} )".format(accuracy*100, len(correctly_predicted[0]), len(y_true)))
+    print("accuracy of prediction: {0:.2f}% ({1} /{2} )"\
+    .format(accuracy*100, len(correctly_predicted[0]), len(y_true)))
     return
 
 def print_precision(y_true, y_pred):
@@ -166,7 +179,8 @@ def print_precision(y_true, y_pred):
         denominator = np.where(y_pred == label)
         numerator = np.where((y_pred == label) & (y_true == label))
         precision = len(numerator[0])/len(denominator[0])
-        print("precision for predict {0} is : {1:.2f}% ({2} /{3} )".format(objects[label], precision*100, len(numerator[0]), len(denominator[0])))
+        print("precision for predict {0} is : {1:.2f}% ({2} /{3} )"\
+        .format(objects[label], precision*100, len(numerator[0]), len(denominator[0])))
     return
 
 def print_recall_rate(y_true, y_pred):
@@ -176,5 +190,81 @@ def print_recall_rate(y_true, y_pred):
         denominator = np.where(y_true == label)
         numerator = np.where((y_pred == label) & (y_true == label))
         precision = len(numerator[0])/len(denominator[0])
-        print("recall-rate for true {0} is : {1:.2f}% ({2} /{3} )".format(objects[label], precision*100, len(numerator[0]), len(denominator[0])))
+        print("recall-rate for true {0} is : {1:.2f}% ({2} /{3} )"\
+        .format(objects[label], precision*100, len(numerator[0]), len(denominator[0])))
     return
+
+#-------------------------------------------------------------------
+# This class is used to print infomations about prediction and truth
+class confusion_matrix_infos():
+    objects = ['star', 'galaxy', 'yso']
+    def __init__(self, cls_true, labels_pred):
+        self.cls_true = cls_true
+        self.labels_pred = labels_pred
+        self.cls_pred = np.argmax(self.labels_pred, axis = 1)
+        self.reliable = np.where((np.max(self.labels_pred, axis = 1) > 0.8))
+        self.cls_true_reliable = self.cls_true[self.reliable]
+        self.cls_pred_reliable = self.cls_pred[self.reliable]
+        return
+
+    def confusion_matrix(self):
+        from sklearn.metrics import confusion_matrix
+        # all of them
+        cm = confusion_matrix(y_true=self.cls_true,
+                              y_pred=self.cls_pred)
+        # only reliable
+        cm_reliable = confusion_matrix(y_true=self.cls_true_reliable, y_pred=self.cls_pred_reliable)
+        return 0, cm, cm_reliable
+    
+    def print_accuracy(self):
+        # all of them
+        print("### accuracy ###")
+        correctly_predicted = np.where((self.cls_pred == self.cls_true))
+        accuracy = len(correctly_predicted[0])/len(self.cls_true)
+        print("accuracy of prediction: {0:.2f}% ({1} /{2} )"\
+        .format(accuracy*100, len(correctly_predicted[0]), len(self.cls_true)))
+        # only reliable
+        print("### reliable accuracy ###")
+        correctly_predicted = np.where((self.cls_pred_reliable == self.cls_true_reliable))
+        accuracy = len(correctly_predicted[0])/len(self.cls_true_reliable)
+        print("accuracy of prediction: {0:.2f}% ({1} /{2} )"\
+        .format(accuracy*100, len(correctly_predicted[0]), len(self.cls_true_reliable)))
+        return
+    
+    def print_precision(self):
+        # all of them
+        print ("### precision ###")
+        for label in range(3):
+            denominator = np.where(self.cls_pred == label)
+            numerator = np.where((self.cls_pred == label) & (self.cls_true == label))
+            precision = len(numerator[0])/len(denominator[0])
+            print("precision for predict {0} is : {1:.2f}% ({2} /{3} )"\
+            .format(self.objects[label], precision*100, len(numerator[0]), len(denominator[0])))
+        # only reliable
+        print ("### reliable precision ###")
+        for label in range(3):
+            denominator = np.where(self.cls_pred_reliable == label)
+            numerator = np.where((self.cls_pred_reliable == label) & (self.cls_true_reliable == label))
+            precision = len(numerator[0])/len(denominator[0])
+            print("precision for predict {0} is : {1:.2f}% ({2} /{3} )"\
+            .format(self.objects[label], precision*100, len(numerator[0]), len(denominator[0])))
+        return
+    
+    def print_recall_rate(self):
+        # all of them
+        print ("### recall-rate ###")
+        for label in range(3):
+            denominator = np.where(self.cls_true == label)
+            numerator = np.where((self.cls_pred == label) & (self.cls_true == label))
+            precision = len(numerator[0])/len(denominator[0])
+            print("recall-rate for true {0} is : {1:.2f}% ({2} /{3} )"\
+            .format(self.objects[label], precision*100, len(numerator[0]), len(denominator[0])))
+        # only reliable
+        print ("### reliable recall-rate ###")
+        for label in range(3):
+            denominator = np.where(self.cls_true_reliable == label)
+            numerator = np.where((self.cls_pred_reliable == label) & (self.cls_true_reliable == label))
+            precision = len(numerator[0])/len(denominator[0])
+            print("recall-rate for true {0} is : {1:.2f}% ({2} /{3} )"\
+            .format(self.objects[label], precision*100, len(numerator[0]), len(denominator[0])))
+        return
