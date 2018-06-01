@@ -15,6 +15,10 @@ Editor:
 20180531
 ####################################
 update log
+20180531 version alpha 1:
+    1. the code works
+20180601 version alpha 2:
+    1. set the order of color is red, green, blue
 '''
 import time
 import os
@@ -35,6 +39,8 @@ def compare_point_on_ds9(name_image, name_regions_file_A, name_regions_file_B):
     # set boxcircle size 1
     cmd = "sed -i -e 's/boxcircle/boxcircle 2/g' {0}.reg".format(name_regions_file_A[:-4])
     os.system(cmd)
+    cmd = "sed -i -e 's/green/red/g' {0}.reg".format(name_regions_file_A[:-4])
+    os.system(cmd)
     # convert region file B from XY to ds9/fortran
     cmd =   "ds9 {0}\
             -regions format xy \
@@ -48,8 +54,6 @@ def compare_point_on_ds9(name_image, name_regions_file_A, name_regions_file_B):
     os.system(cmd)
     # set boxcircle size 1
     cmd = "sed -i -e 's/boxcircle/boxcircle 2/g' {0}.reg".format(name_regions_file_B[:-4])
-    os.system(cmd)
-    cmd = "sed -i -e 's/green/red/g' {0}.reg".format(name_regions_file_B[:-4])
     os.system(cmd)
     # display
     cmd =   "ds9 -zscale {0} \

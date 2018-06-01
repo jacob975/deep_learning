@@ -2,7 +2,7 @@
 
 # code for test AI
 
-# Usage: test_schedule.sh [DIR where AI saved] [keyword of AI] [keyword of dataset]
+# Usage: make_prediction.sh [DIR where AI saved] [keyword of AI] [keyword of dataset]
 
 # 20180413 version alpha 1
 # The code work

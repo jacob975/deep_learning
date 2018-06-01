@@ -26,7 +26,9 @@ update log
     1. add funcs for printing precision and recall-rate.
 20180523 version alpha 4: 
     1. add funcs for printing accuracy of predictions.
-
+20180601 version alpha 5:
+    1. add funcs for selecting high reliability sources from dataset
+    2. delete some imported module never used.
 '''
 import tensorflow as tf
 import time
@@ -37,7 +39,6 @@ from six.moves import xrange  # pylint: disable=redefined-builtin
 
 from tensorflow.contrib.learn.python.learn.datasets import base
 from tensorflow.python.framework import dtypes
-from tensorflow.python.platform import gfile
 
 from astro_mnist import DataSet, shuffled_tracer
 
