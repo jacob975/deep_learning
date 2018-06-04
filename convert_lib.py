@@ -22,6 +22,8 @@ update log
 20180531 version alpha 2
     1. add a group of funcs for converting between pixel and wcs
     but they haven't been tested.
+20180604 version alpha 3
+    1. update the parameter of system.
 '''
 import numpy as np
 
@@ -33,12 +35,21 @@ import numpy as np
 
 # the properties of bands in ukirt
 # example key : [band, wavelength, zeropoint]
+# 20180604
+# I find that band J is inconsistent with 2mass, so I modified the zeropoint of band J.
+def set_ukirt():
+    ukirt_system = {'V' : ["V", 0.5556, 3540] , 'I' : ["I", 0.90, 2250] , 'J' : ["J", 1.25, 1500] , 'H' : ["H", 1.65, 1020] ,\
+                    'K' : ["K", 2.20, 657] , 'L' : ["L", 3.45, 290] , 'Lprime' : ["Lprime", 3.80, 252], 'M' : ["M", 4.80, 163] ,\
+                    'N' : ["N", 10.1, 39.8], 'Q' : ["Q", 20.0, 10.4] }
+    return ukirt_system
+'''
+# This is copy from http://ssc.spitzer.caltech.edu/warmmission/propkit/pet/magtojy/
 def set_ukirt():
     ukirt_system = {'V' : ["V", 0.5556, 3540] , 'I' : ["I", 0.90, 2250] , 'J' : ["J", 1.25, 1600] , 'H' : ["H", 1.65, 1020] ,\
                     'K' : ["K", 2.20, 657] , 'L' : ["L", 3.45, 290] , 'Lprime' : ["Lprime", 3.80, 252], 'M' : ["M", 4.80, 163] ,\
                     'N' : ["N", 10.1, 39.8], 'Q' : ["Q", 20.0, 10.4] }
     return ukirt_system
-
+'''
 def set_2mass():
     twomass_system = { 'J' : ["J", 1.235, 1594] , 'H' : ["H", 1.662, 1024] , 'Ks' : ["Ks", 2.159, 666.7] }
     return twomass_system
