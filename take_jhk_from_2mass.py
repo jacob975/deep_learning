@@ -1,9 +1,9 @@
 #!/usr/bin/python3
 '''
 Abstract:
-    This is a program to take band JHK form ukidss catalog
+    This is a program to take band JHK form 2mass catalog
 Usage:
-    take_jhk_from_ukidss_galactic_plane.py [ukidss catalog file] [label]
+    take_jhk_from_2mass.py [2mass catalog file] [label]
 Editor:
     Jacob975
 
@@ -12,33 +12,16 @@ Editor:
 #   This code is made in python3 #
 ##################################
 
-20180514
+20180608
 ####################################
 update log
-20180514 version alpha 1
-    1. The code work
-20180521 version alpha 2
-    2. change the limitation of distance to 0.6 arcsec
+20180608 version alpha 1
+    1. The code works
 '''
 import time
 import numpy as np
 import convert_lib
 from sys import argv
-
-def readfile(filename):
-    try:
-        f = open(filename, 'r')
-    except:
-        return []
-    data = []
-    for line in f.readlines():
-        # skip if no data or it's a hint.
-        if line == "\n" or line.startswith('#'):
-            continue
-        datum = np.array(line[:-1].split(','), dtype = np.float64)
-        data.append(datum)
-    f.close
-    return np.array(data)
 
 # this function is used to convert magnitude to mini Janskey
 # take j band as example
@@ -46,7 +29,7 @@ def mag_to_mjy(bands_j, band):
     # initialize variables
     j_mjy = []
     err_j_mjy = []
-    print("zeropoint: {0}".format(ukirt_system[band][2]))
+    print("zeropoint: {0}".format(twomass_system[band][2]))
     # convert
     for i in range(len(bands_j)):
         '''
@@ -60,7 +43,7 @@ def mag_to_mjy(bands_j, band):
         elif distances[i] > 0.6:
             mjy = err_mjy = 0.0
         else:
-            mjy, err_mjy = convert_lib.mag_to_mJy(ukirt_system[band][2], bands_j[i,0], bands_j[i,1])
+            mjy, err_mjy = convert_lib.mag_to_mJy(twomass_system[band][2], bands_j[i,0], bands_j[i,1])
         j_mjy.append(mjy)
         err_j_mjy.append(err_mjy)
     return np.array(j_mjy), np.array(err_j_mjy)
@@ -74,43 +57,54 @@ if __name__ == "__main__":
     #-----------------------------------    
     # check argv
     if len(argv) != 3:
-        print("Error\nUsage: take_jhk_from_ukidss_galactic_plane.py [ukidss catalog file] [label]")
+        print("Error\nUsage: take_jhk_from_2mass.py [2mass catalog file] [label]")
         exit()
     # read the Database UKIDSSDR10PLUS as a catalog
     filename = argv[1]
     label = argv[2]
-    catalogs = readfile(filename)
+    catalogs = np.loadtxt(filename, skiprows = 79, dtype = np.str)
+    for i in range(5):
+        print(catalogs[i])
+    
     # split into J, H, and Ks bands.
     print("### the test on spliter ###")
     print('### J ###')
-    bands_j = catalogs[:,14:16]
+    bands_j = catalogs[:,11:13]
+    bands_j[bands_j == 'null'] = '0.0'
+    bands_j = np.array(bands_j, dtype = np.float64)
     for i in range(5):
         print (bands_j[i])
     print('### H ###')
-    bands_h = catalogs[:,16:18]
+    bands_h = catalogs[:,15:17]
+    bands_h[bands_h == 'null'] = '0.0'
+    bands_h = np.array(bands_h, dtype = np.float64)
     for i in range(5):
         print (bands_h[i])
-    print('### K1 ###')
-    bands_k_1 = catalogs[:,18:20]
+    print('### K ###')
+    bands_k = catalogs[:,19:21]
+    bands_k[bands_k == 'null'] = '0.0'
+    bands_k = np.array(bands_k, dtype = np.float64)
     for i in range(5):
-        print (bands_k_1[i])
-    print('### K2 ###')
-    bands_k_2 = catalogs[:,20:22]
-    for i in range(5):
-        print (bands_k_2[i])
+        print (bands_k[i])
+    
     # read id, distance, and coordinate
     global ids
-    ids = catalogs[:,0]
+    ids = np.array(catalogs[:,0], dtype = int)
     global distances
-    distances = catalogs[:,3]
-    coords_uploaded = catalogs[:, 1:3]
-    coords_detected = catalogs[:, 6:8]
+    distances = catalogs[:,1]
+    distances[distances == 'null'] = '999.0'
+    distances = np.array(distances, dtype = np.float64)
+    coords_uploaded = np.array(catalogs[:, 3:5], dtype = np.float64)
+    coords_detected = catalogs[:,5:7]
+    coords_detected[ coords_detected == 'null'] = '0.0'
+    coords_detected = np.array(coords_detected, dtype = np.float64)
     coords = np.hstack((coords_uploaded, coords_detected))
-    print (coords)
+    for i in range(5):
+        print(coords[i], distances[i])
     #-----------------------------------
     # convert mag to mJy
-    global ukirt_system
-    ukirt_system = convert_lib.set_ukirt()
+    global twomass_system
+    twomass_system = convert_lib.set_twomass()
     print("### converting from magnitude to mJy ###")
     print('### J ###')
     j_mjy = []
@@ -126,40 +120,29 @@ if __name__ == "__main__":
     # print and check
     for i in range(11,20):
         print ("{0}: {1}, {2}".format(ids[i], h_mjy[i], err_h_mjy[i]))
-    print('### K1 ###')
-    k_1_mjy = []
-    err_k_1_mjy = []
-    k_1_mjy, err_k_1_mjy =  mag_to_mjy(bands_k_1, 'K')
+    print('### K ###')
+    k_mjy = []
+    err_k_mjy = []
+    k_mjy, err_k_mjy =  mag_to_mjy(bands_k, 'Ks')
     # print and check
     for i in range(11,20):
-        print ("{0}: {1}, {2}".format(ids[i], k_1_mjy[i], err_k_1_mjy[i]))
-    print('### K2 ###')
-    k_2_mjy = []
-    err_k_2_mjy = []
-    k_2_mjy, err_k_2_mjy =  mag_to_mjy(bands_k_2, 'K')
-    # print and check
-    for i in range(11,20):
-        print ("{0}: {1}, {2}".format(ids[i], k_2_mjy[i], err_k_2_mjy[i]))
+        print ("{0}: {1}, {2}".format(ids[i], k_mjy[i], err_k_mjy[i]))
     #-----------------------------------
     # save each band and coord respectively
     j = np.stack((j_mjy, err_j_mjy))
     j = np.transpose(j)
-    np.save("ukidss_j_{0}.npy".format(label), j)
-    np.savetxt("ukidss_j_{0}.txt".format(label), j)
+    np.save("twomass_j_{0}.npy".format(label), j)
+    np.savetxt("twomass_j_{0}.txt".format(label), j)
     h = np.stack((h_mjy, err_h_mjy))
     h = np.transpose(h)
-    np.save("ukidss_h_{0}.npy".format(label), h)
-    np.savetxt("ukidss_h_{0}.txt".format(label), h)
-    k_1 = np.stack((k_1_mjy, err_k_1_mjy))
-    k_1 = np.transpose(k_1)
-    np.save("ukidss_k1_{0}.npy".format(label), k_1)
-    np.savetxt("ukidss_k1_{0}.txt".format(label), k_1)
-    k_2 = np.stack((k_2_mjy, err_k_2_mjy))
-    k_2 = np.transpose(k_2)
-    np.save("ukidss_k2_{0}.npy".format(label), k_2)
-    np.savetxt("ukidss_k2_{0}.txt".format(label), k_2)
-    np.save("ukidss_coords_{0}.npy".format(label), coords)
-    np.savetxt("ukidss_coords_{0}.txt".format(label), coords)
+    np.save("twomass_h_{0}.npy".format(label), h)
+    np.savetxt("twomass_h_{0}.txt".format(label), h)
+    k = np.stack((k_mjy, err_k_mjy))
+    k = np.transpose(k)
+    np.save("twomass_k_{0}.npy".format(label), k)
+    np.savetxt("twomass_k_{0}.txt".format(label), k)
+    np.save("twomass_coords_{0}.npy".format(label), coords)
+    np.savetxt("twomass_coords_{0}.txt".format(label), coords)
     #-----------------------------------
     # measuring time
     elapsed_time = time.time() - start_time

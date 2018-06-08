@@ -63,7 +63,7 @@ if __name__ == "__main__":
         pass
     #-----------------------------------
     # plot the intensities in 2mass versus difference of intensities in 2mass and ukidss.
-    no_loss = np.where((ukidss[:,0] != 0) & (twomass[:,0] != 0) & (ukidss[:,0] < 100) & (twomass[:, 0] < 100))
+    no_loss = np.where((ukidss[:,0] != 0) & (twomass[:,0] != 0) & (ukidss[:,0] < 50) & (twomass[:, 0] < 50))
     #no_loss = np.where((ukidss[:,0] != 0) & (twomass[:,0] != 0))
     err_diff = np.sqrt(np.power(ukidss[no_loss[0], 1], 2) + np.power(twomass[no_loss[0], 1], 2))
     figsize(12.5, 5)
@@ -71,8 +71,10 @@ if __name__ == "__main__":
     plt.title("{0} versus {1}".format(name_twomass, name_ukidss))
     plt.xlabel('2mass (mJy)')
     plt.ylabel('ukidss -2mass (mjy)')
-    plt.errorbar(twomass[no_loss[0], 0], ukidss[no_loss[0], 0] -twomass[no_loss[0], 0] , yerr=[err_diff, 2*err_diff], \
-                xerr=[twomass[no_loss[0], 1], 2*twomass[no_loss[0], 1]], alpha = 0.3, fmt = 'ro')
+    axes = plt.gca()
+    axes.set_ylim([-20,5])
+    plt.errorbar(twomass[no_loss[0], 0], ukidss[no_loss[0], 0] -twomass[no_loss[0], 0] , yerr=[err_diff, err_diff], \
+                xerr=[twomass[no_loss[0], 1], twomass[no_loss[0], 1]], alpha = 0.1, fmt = 'ro')
     result_plt.savefig("syserr_{0}_{1}.png".format(name_twomass[:-4], name_ukidss[:-4]))
     #-----------------------------------
     # measuring time
