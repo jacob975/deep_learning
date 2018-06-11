@@ -84,9 +84,9 @@ if __name__ == "__main__":
     name_dat_file = argv[2]
     catalogs = readfile(name_ukidss_catalog)
     # split into J, H, and Ks bands.
-    bands_j = catalogs[:,14:16]
-    bands_h = catalogs[:,16:18]
-    bands_k = catalogs[:,18:20]
+    bands_j = catalogs[:,10:12]
+    bands_h = catalogs[:,12:14]
+    bands_k = catalogs[:,14:16]
     # read id, distance, and coordinate
     global ids
     ids = catalogs[:,0]
@@ -119,7 +119,7 @@ if __name__ == "__main__":
     dat_file = np.array(str_dat_file, dtype = np.float64)
     replacement_j = np.where((j_mjy != 0) & (dat_file[:, 0] < 30) & (err_j_mjy != 0))
     replacement_h = np.where((h_mjy != 0) & (dat_file[:, 1] < 15) & (err_h_mjy != 0))
-    replacement_k = np.where((k_mjy != 0) & (dat_file[:, 2] < 25) & (err_k_mjy != 0))
+    replacement_k = np.where((k_mjy != 0) & (dat_file[:, 2] < 15) & (err_k_mjy != 0))
     dat_file[replacement_j, 0] = j_mjy[replacement_j]
     dat_file[replacement_h, 1] = h_mjy[replacement_h]
     dat_file[replacement_k, 2] = k_mjy[replacement_k]
