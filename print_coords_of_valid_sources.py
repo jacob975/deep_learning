@@ -32,7 +32,7 @@ if __name__ == "__main__":
     # Load argv
     if len(argv) != 3:
         print ("Error!\nUsage:\tprint_coords_of_valid_sources.py [source data files] [coord files]") 
-        print ("Example:print_coords_of_valid_sources.py ukidss_j_star.txt star_coords.dat")
+        print ("Example:print_coords_of_valid_sources.py ukidss_j_star.txt star_coord.dat")
         exit()
     name_sources = argv[1]
     name_coords = argv[2]

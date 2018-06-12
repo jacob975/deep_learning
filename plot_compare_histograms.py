@@ -64,14 +64,23 @@ if __name__ == "__main__":
     no_loss_for_ukidss = np.where((ukidss[:,0] != 0) & (ukidss[:,0] < 50) )
     no_loss_for_twomass = np.where((twomass[:,0] != 0) & (twomass[:, 0] < 50))
     figsize(12.5, 5)
-    result_plt = plt.figure("histograms of {0} and {1}".format(name_twomass[:-4], name_ukidss[:-4]))
+    result_plt = plt.figure("Histograms of {0} and {1}".format(name_twomass[:-4], name_ukidss[:-4]))
     plt.title("{0} and {1}".format(name_twomass[:-4], name_ukidss[:-4]))
     plt.ylabel('# of sources')
     plt.xlabel('$log_{10}(mjy)$')
-    plt.hist(np.log10(twomass[no_loss_for_twomass[0], 0]), 50, range = (-3, 2), histtype = "bar", color = "g", alpha=0.50, label = "{0}".format(name_twomass[:-4]))
-    plt.hist(np.log10(ukidss[no_loss_for_ukidss[0], 0]), 50, range = (-3, 2), histtype = "bar", color = "r", alpha=0.50, label = "{0}".format(name_ukidss[:-4]))
+    plt.hist(np.log10(twomass[no_loss_for_twomass[0], 0]), 50, range = (-3, 2), histtype = "bar", color = "r", alpha=0.50, label = "{0}".format(name_twomass[:-4]))
+    plt.hist(np.log10(ukidss[no_loss_for_ukidss[0], 0]), 50, range = (-3, 2), histtype = "bar", color = "g", alpha=0.50, label = "{0}".format(name_ukidss[:-4]))
     plt.legend()
     result_plt.savefig("hist_{0}_and_{1}.png".format(name_twomass[:-4], name_ukidss[:-4]))
+    # plot the same figure but normalized
+    normed_result_plt = plt.figure("Normalized histograms of {0} and {1}".format(name_twomass[:-4], name_ukidss[:-4]))
+    plt.title("{0} and {1}".format(name_twomass[:-4], name_ukidss[:-4]))
+    plt.ylabel('normalized # of sources')
+    plt.xlabel('$log_{10}(mjy)$')
+    plt.hist(np.log10(twomass[no_loss_for_twomass[0], 0]), 50, range = (-3, 2), normed = True, histtype = "bar", color = "r", alpha=0.50, label = "{0}".format(name_twomass[:-4]))
+    plt.hist(np.log10(ukidss[no_loss_for_ukidss[0], 0]), 50, range = (-3, 2), normed = True, histtype = "bar", color = "g", alpha=0.50, label = "{0}".format(name_ukidss[:-4]))
+    plt.legend()
+    normed_result_plt.savefig("hist_{0}_and_{1}_n.png".format(name_twomass[:-4], name_ukidss[:-4]))
     #-----------------------------------
     # measuring time
     elapsed_time = time.time() - start_time
