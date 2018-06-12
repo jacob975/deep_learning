@@ -3,7 +3,7 @@
 Abstract:
     This is a program to take band JHK form ukidss catalog
 Usage:
-    take_jhk_from_ukidss_galactic_plane.py [ukidss catalog file] [label]
+    take_jhk_from_ukidss_GCS.py [ukidss catalog file] [label]
 Editor:
     Jacob975
 
@@ -19,9 +19,6 @@ update log
     1. The code work
 20180521 version alpha 2
     2. change the limitation of distance to 0.6 arcsec
-20180608 version alpha 3
-    3. rename
-    take_jhk_from_ukidss_galactic_plane.py ==> take_jhk_from_ukidss_galactic_cluster.py
 '''
 import time
 import numpy as np
@@ -77,7 +74,7 @@ if __name__ == "__main__":
     #-----------------------------------    
     # check argv
     if len(argv) != 3:
-        print("Error\nUsage: take_jhk_from_ukidss_galactic_cluster.py [ukidss catalog file] [label]")
+        print("Error\nUsage: take_jhk_from_ukidss_GCS.py [ukidss catalog file] [label]")
         exit()
     # read the Database UKIDSSDR10PLUS as a catalog
     filename = argv[1]
@@ -94,13 +91,13 @@ if __name__ == "__main__":
     for i in range(5):
         print (bands_h[i])
     print('### K1 ###')
-    bands_k_1 = catalogs[:,18:20]
+    bands_k1 = catalogs[:,18:20]
     for i in range(5):
-        print (bands_k_1[i])
+        print (bands_k1[i])
     print('### K2 ###')
-    bands_k_2 = catalogs[:,20:22]
+    bands_k2 = catalogs[:,20:22]
     for i in range(5):
-        print (bands_k_2[i])
+        print (bands_k2[i])
     # read id, distance, and coordinate
     global ids
     ids = catalogs[:,0]
@@ -130,19 +127,19 @@ if __name__ == "__main__":
     for i in range(11,20):
         print ("{0}: {1}, {2}".format(ids[i], h_mjy[i], err_h_mjy[i]))
     print('### K1 ###')
-    k_1_mjy = []
-    err_k_1_mjy = []
-    k_1_mjy, err_k_1_mjy =  mag_to_mjy(bands_k_1, 'K')
+    k1_mjy = []
+    err_k1_mjy = []
+    k1_mjy, err_k1_mjy =  mag_to_mjy(bands_k1, 'K')
     # print and check
     for i in range(11,20):
-        print ("{0}: {1}, {2}".format(ids[i], k_1_mjy[i], err_k_1_mjy[i]))
+        print ("{0}: {1}, {2}".format(ids[i], k1_mjy[i], err_k1_mjy[i]))
     print('### K2 ###')
-    k_2_mjy = []
-    err_k_2_mjy = []
-    k_2_mjy, err_k_2_mjy =  mag_to_mjy(bands_k_2, 'K')
+    k2_mjy = []
+    err_k2_mjy = []
+    k2_mjy, err_k2_mjy =  mag_to_mjy(bands_k2, 'K2')
     # print and check
     for i in range(11,20):
-        print ("{0}: {1}, {2}".format(ids[i], k_2_mjy[i], err_k_2_mjy[i]))
+        print ("{0}: {1}, {2}".format(ids[i], k2_mjy[i], err_k2_mjy[i]))
     #-----------------------------------
     # save each band and coord respectively
     j = np.stack((j_mjy, err_j_mjy))
@@ -153,14 +150,14 @@ if __name__ == "__main__":
     h = np.transpose(h)
     np.save("ukidss_h_{0}.npy".format(label), h)
     np.savetxt("ukidss_h_{0}.txt".format(label), h)
-    k_1 = np.stack((k_1_mjy, err_k_1_mjy))
-    k_1 = np.transpose(k_1)
-    np.save("ukidss_k1_{0}.npy".format(label), k_1)
-    np.savetxt("ukidss_k1_{0}.txt".format(label), k_1)
-    k_2 = np.stack((k_2_mjy, err_k_2_mjy))
-    k_2 = np.transpose(k_2)
-    np.save("ukidss_k2_{0}.npy".format(label), k_2)
-    np.savetxt("ukidss_k2_{0}.txt".format(label), k_2)
+    k1 = np.stack((k1_mjy, err_k1_mjy))
+    k1 = np.transpose(k1)
+    np.save("ukidss_k1_{0}.npy".format(label), k1)
+    np.savetxt("ukidss_k1_{0}.txt".format(label), k1)
+    k2 = np.stack((k2_mjy, err_k2_mjy))
+    k2 = np.transpose(k2)
+    np.save("ukidss_k2_{0}.npy".format(label), k2)
+    np.savetxt("ukidss_k2_{0}.txt".format(label), k2)
     np.save("ukidss_coords_{0}.npy".format(label), coords)
     np.savetxt("ukidss_coords_{0}.txt".format(label), coords)
     #-----------------------------------

@@ -38,10 +38,20 @@ import numpy as np
 # 20180604
 # I find that band J is inconsistent with 2mass, so I modified the zeropoint of band J.
 
+# This is copy from paper "Hewett, P. C. et al. 2006" 
 def set_ukirt():
-    ukirt_system = {'V' : ["V", 0.5556, 3540] , 'I' : ["I", 0.90, 2250] , 'J' : ["J", 1.25, 1500] , 'H' : ["H", 1.65, 1020] ,\
-                    'K' : ["K", 2.20, 657] , 'L' : ["L", 3.45, 290] , 'Lprime' : ["Lprime", 3.80, 252], 'M' : ["M", 4.80, 163] ,\
-                    'N' : ["N", 10.1, 39.8], 'Q' : ["Q", 20.0, 10.4] }
+    ukirt_system = {'u' : ["u", 0.3546, 1545] ,\
+                    'g' : ["g", 0.4670, 3991] ,\
+                    'r' : ["r", 0.6156, 3174] ,\
+                    'i' : ["i", 0.7471, 2593] ,\
+                    'z' : ["z", 0.8918, 2222] ,\
+                    'Z' : ["Z", 0.8817, 2232] ,\
+                    'Y' : ["Y", 1.0305, 2026] ,\
+                    'J' : ["J", 1.2483, 1530] ,\
+                    'H' : ["H", 1.6313, 1019] ,\
+                    'H2' : ["H2", 1.662, 1024] ,\
+                    'K' : ["K", 2.2010, 631] ,\
+                    'K2' : ["K2", 2.159, 666.7] }
     return ukirt_system
 '''
 # This is copy from http://ssc.spitzer.caltech.edu/warmmission/propkit/pet/magtojy/

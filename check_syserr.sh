@@ -12,7 +12,7 @@
 if [ "$#" -ne 2 ]; then
     echo "Illegal number of parameters"
     echo "Usage: ${0##*/} [label of ukidss survey] [label of regions]" 
-    echo "Available ukidss survey: DXS, GCS"
+    echo "Available ukidss survey: DXS, GCS, GPS"
     echo "Available regions: ELAIS_N1, CHA_II, LUP_I, LUP_III, LUP_IV, OPH, PER, SER"
     echo "Example: ${0##*/} GCS OPH"
     exit 1
@@ -52,5 +52,16 @@ do
         plot_compare_histograms.py ${label}_sed_j.txt ukidss_j_${label}.txt
         plot_compare_histograms.py ${label}_sed_h.txt ukidss_h_${label}.txt
         plot_compare_histograms.py ${label}_sed_k.txt ukidss_k_${label}.txt
+    elif [ "${name_ukidss_survey}" == "GPS" ]; then
+        systematic_error.py ${label}_sed_j.txt ukidss_j_${label}.txt
+        systematic_error.py ${label}_sed_h.txt ukidss_h1_${label}.txt
+        systematic_error.py ${label}_sed_h.txt ukidss_h2_${label}.txt
+        systematic_error.py ${label}_sed_k.txt ukidss_k1_${label}.txt
+        systematic_error.py ${label}_sed_k.txt ukidss_k2_${label}.txt
+        plot_compare_histograms.py ${label}_sed_j.txt ukidss_j_${label}.txt
+        plot_compare_histograms.py ${label}_sed_h.txt ukidss_h1_${label}.txt
+        plot_compare_histograms.py ${label}_sed_h.txt ukidss_h2_${label}.txt
+        plot_compare_histograms.py ${label}_sed_k.txt ukidss_k1_${label}.txt
+        plot_compare_histograms.py ${label}_sed_k.txt ukidss_k2_${label}.txt
     fi
 done
