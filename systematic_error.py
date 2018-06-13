@@ -75,6 +75,7 @@ if __name__ == "__main__":
     axes.set_ylim([-20,5])
     plt.errorbar(twomass[no_loss[0], 0], ukidss[no_loss[0], 0] -twomass[no_loss[0], 0] , yerr=[err_diff, err_diff], \
                 xerr=[twomass[no_loss[0], 1], twomass[no_loss[0], 1]], alpha = 0.1, fmt = 'ro')
+    plt.plot((-5, 55), (0, 0), linestyle='--')
     result_plt.savefig("syserr_{0}_{1}.png".format(name_twomass[:-4], name_ukidss[:-4]))
     #-----------------------------------
     # measuring time
