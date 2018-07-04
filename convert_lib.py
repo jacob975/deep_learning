@@ -28,6 +28,16 @@ update log
 import numpy as np
 
 ####################################
+from uncertainties import unumpy
+# How to cite this package
+# If you use this package for a publication (in a journal, on the web, etc.), 
+# please cite it by including as much information as possible from the following: 
+# Uncertainties: a Python package for calculations with uncertainties, Eric O. LEBIGOT, 
+# http://pythonhosted.org/uncertainties/. Adding the version number is optional.
+####################################
+
+
+####################################
 # Convert quantities between magnitude and Jy
 # Those convert function comes from: http://ssc.spitzer.caltech.edu/warmmission/propkit/pet/magtojy/index.html
 # Hint: 1 Jy = 1000 mJy
@@ -49,18 +59,10 @@ def set_ukirt():
                     'Y' : ["Y", 1.0305, 2026] ,\
                     'J' : ["J", 1.2483, 1530] ,\
                     'H' : ["H", 1.6313, 1019] ,\
-                    'H2' : ["H2", 1.662, 1024] ,\
-                    'K' : ["K", 2.2010, 631] ,\
-                    'K2' : ["K2", 2.159, 666.7] }
+                    'K' : ["K", 2.2010, 631] }
     return ukirt_system
-'''
-# This is copy from http://ssc.spitzer.caltech.edu/warmmission/propkit/pet/magtojy/
-def set_ukirt():
-    ukirt_system = {'V' : ["V", 0.5556, 3540] , 'I' : ["I", 0.90, 2250] , 'J' : ["J", 1.25, 1600] , 'H' : ["H", 1.65, 1020] ,\
-                    'K' : ["K", 2.20, 657] , 'L' : ["L", 3.45, 290] , 'Lprime' : ["Lprime", 3.80, 252], 'M' : ["M", 4.80, 163] ,\
-                    'N' : ["N", 10.1, 39.8], 'Q' : ["Q", 20.0, 10.4] }
-    return ukirt_system
-'''
+
+# This is copy from https://www.ipac.caltech.edu/2mass/releases/allsky/doc/sec6_4a.html
 def set_twomass():
     twomass_system = { 'J' : ["J", 1.235, 1594] , 'H' : ["H", 1.662, 1024] , 'Ks' : ["Ks", 2.159, 666.7] }
     return twomass_system
@@ -119,15 +121,25 @@ def mJy_to_mag(zeropoint, flux_density, err_flux_density):
     return magnitude, err_magnitude
 
 ######################################################
-# Convert quantities between pixel and wcs
-def pix2wcs(radec, name_image):
-    hdulist = pyfits.open(name_image)
-    wcs = pywcs.WCS(hdulist[0].header)
-    pix = wcs.wcs_sky2pix(radec, 1)
-    return pix
+# Convert quantities between 2MASS mag system and UKIRT mag system
 
-def wcs2wpix(pix, name_image):
-    hdulist = pyfits.open(name_image)
-    wcs = pywcs.WCS(hdulist[0].header)
-    radec = wcs.pix2wcs_sky(pix, 1)
-    return radec
+class TWOMASS_to_UKIDSS():
+    def __init__(self, J2, H2, K2):
+        # Load data from 2MASS
+        self.J2 = J2
+        self.H2 = H2
+        self.K2 = K2
+        # Data type of J2, H2, and K2 must be uncertainties.unumpy.
+        self.Jw = self.getJw_base_on_J2_H2()
+        self.Hw = self.getHw_base_on_J2_H2()
+        self.Kw = self.getKw_base_on_J2_K2()
+        return
+    def getJw_base_on_J2_H2(self):
+        Jw = self.J2 - 0.065 * (self.J2 - self.H2)
+        return Jw
+    def getHw_base_on_J2_H2(self):
+        Hw = self.H2 + 0.070 * (self.J2 - self.H2) - 0.030
+        return Hw
+    def getKw_base_on_J2_K2(self):
+        Kw = self.K2 - 0.010 * (self.J2 - self.K2)
+        return Kw

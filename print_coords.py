@@ -55,6 +55,7 @@ if __name__ == "__main__":
     infos = load_lib.confusion_matrix_infos(cls_true, labels_pred)
     failure, cm = load_lib.confusion_matrix(cls_true, infos.cls_pred)
     print(cm)
+    #------------------------------------
     # read the coords of data in certain position of confusion matrix
     index_of_certain_data = np.where((cls_true == true_label) & (infos.cls_pred == pred_label))
     coords_of_certain_data = coords.test[index_of_certain_data]
