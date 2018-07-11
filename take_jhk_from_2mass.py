@@ -58,6 +58,8 @@ def mag_to_mjy(bands, band, system):
                 mjy, err_mjy = convert_lib.mag_to_mJy(system[band][2], bands[i,0], bands[i,1])
         j_mjy.append(mjy)
         err_j_mjy.append(err_mjy)
+    j_mjy = np.nan_to_num(j_mjy)
+    err_j_mjy = np.nan_to_num(err_j_mjy)
     return np.array(j_mjy), np.array(err_j_mjy)
 
 # This def is used to fill up empty error with median one.

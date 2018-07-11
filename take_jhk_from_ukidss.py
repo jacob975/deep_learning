@@ -3,7 +3,7 @@
 Abstract:
     This is a program to take band JHK form ukidss catalog
 Usage:
-    take_jhk_from_ukidss_GCS.py [ukidss catalog file] [label]
+    take_jhk_from_ukidss.py [ukidss catalog file] [label]
 Editor:
     Jacob975
 
@@ -19,6 +19,8 @@ update log
     1. The code work
 20180521 version alpha 2
     2. change the limitation of distance to 0.6 arcsec
+20180711 version alpha 3
+    1. Ensemble version for DXS, GCS, and GPS
 '''
 import time
 import numpy as np
@@ -73,27 +75,37 @@ if __name__ == "__main__":
     start_time = time.time()
     #-----------------------------------    
     # check argv
-    if len(argv) != 3:
-        print("Error\nUsage: take_jhk_from_ukidss_GCS.py [ukidss catalog file] [label]")
+    if len(argv) != 4:
+        print("Error\nUsage: take_jhk_from_ukidss.py [Type of UKIDSS catalog] [ukidss catalog file] [label]")
+        print("Available type of UKIDSS catalog: DXS, GPS, GCS.")
         exit()
     # read the Database UKIDSSDR10PLUS as a catalog
-    filename = argv[1]
-    label = argv[2]
+    type_ukidss_catalog = argv[1]
+    filename = argv[2]
+    label = argv[3]
+    #-----------------------------------
     catalogs = readfile(filename)
     # split into J, H, and Ks bands.
-    print("### the test on spliter ###")
-    print('### J ###')
-    bands_j = catalogs[:,14:16]
-    for i in range(5):
-        print (bands_j[i])
-    print('### H ###')
-    bands_h = catalogs[:,16:18]
-    for i in range(5):
-        print (bands_h[i])
-    print('### K1 ###')
-    bands_k1 = catalogs[:,18:20]
-    for i in range(5):
-        print (bands_k1[i])
+    bands_j = []
+    bands_h = []
+    bands_k = []
+    if type_ukidss_catalog == "DXS":
+        bands_j = catalogs[:,10:12]
+        bands_h = catalogs[:,12:14]
+        bands_k = catalogs[:,14:16]
+    elif type_ukidss_catalog == "GCS":
+        bands_j = catalogs[:,14:16]
+        bands_h = catalogs[:,16:18]
+        bands_k = catalogs[:,18:20]
+    elif type_ukidss_catalog == "GPS":
+        bands_j = catalogs[:,10:12]
+        bands_h = catalogs[:,12:14]
+        bands_k = catalogs[:,14:16]
+    else:
+        print("Wrong type of UKIDSS catalog")
+        print("Usage: take_jhk_from_ukidss.py [Type of UKIDSS catalog] [ukidss catalog file] [label]")
+        print("Available type of UKIDSS catalog: DXS, GCS, GPS")
+        exit(1)
     # read id, distance, and coordinate
     global ids
     ids = catalogs[:,0]
@@ -122,13 +134,13 @@ if __name__ == "__main__":
     # print and check
     for i in range(11,20):
         print ("{0}: {1}, {2}".format(ids[i], h_mjy[i], err_h_mjy[i]))
-    print('### K1 ###')
-    k1_mjy = []
-    err_k1_mjy = []
-    k1_mjy, err_k1_mjy =  mag_to_mjy(bands_k1, 'K')
+    print('### K ###')
+    k_mjy = []
+    err_k_mjy = []
+    k_mjy, err_k_mjy =  mag_to_mjy(bands_k, 'K')
     # print and check
     for i in range(11,20):
-        print ("{0}: {1}, {2}".format(ids[i], k1_mjy[i], err_k1_mjy[i]))
+        print ("{0}: {1}, {2}".format(ids[i], k_mjy[i], err_k_mjy[i]))
     #-----------------------------------
     # save each band and coord respectively
     j = np.stack((j_mjy, err_j_mjy))
@@ -139,10 +151,10 @@ if __name__ == "__main__":
     h = np.transpose(h)
     np.save("ukidss_h_{0}.npy".format(label), h)
     np.savetxt("ukidss_h_{0}.txt".format(label), h)
-    k1 = np.stack((k1_mjy, err_k1_mjy))
-    k1 = np.transpose(k1)
-    np.save("ukidss_k1_{0}.npy".format(label), k1)
-    np.savetxt("ukidss_k1_{0}.txt".format(label), k1)
+    k = np.stack((k_mjy, err_k_mjy))
+    k = np.transpose(k)
+    np.save("ukidss_k_{0}.npy".format(label), k)
+    np.savetxt("ukidss_k_{0}.txt".format(label), k)
     np.save("ukidss_coords_{0}.npy".format(label), coords)
     np.savetxt("ukidss_coords_{0}.txt".format(label), coords)
     #-----------------------------------

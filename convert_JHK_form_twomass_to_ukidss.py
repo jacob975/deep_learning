@@ -21,7 +21,7 @@ update log
 import time
 import numpy as np
 import convert_lib
-from convert_lib import TWOMASS_to_UKIDSS
+from convert_lib import TWOMASS_to_UKIDSS, fill_up_error
 from sys import argv
 from dat2npy_noobs_nodet import read_well_known_data
 
@@ -42,20 +42,22 @@ def readfile(filename):
     return np.array(data)
 
 # this function is used to convert magnitude to mini Janskey
-def mag_to_mjy(mag, err_mag, band, system):
+def mag_to_mjy(mag, band, system):
     print("zeropoint: {0} mJy".format(system[band][2]))
-    mjy, err_mjy = convert_lib.mag_to_mJy(system[band][2], mag, err_mag)
-    mjy[np.isnan(mjy)] = 0
-    err_mjy[np.isnan(err_mjy)] = 0
-    return np.array(mjy), np.array(err_mjy)
+    mjy, err_mjy = convert_lib.mag_to_mJy(system[band][2], mag[:,0], mag[:,1])
+    mjy = np.nan_to_num(mjy)
+    err_mjy = np.nan_to_num(err_mjy)
+    mjy = np.transpose(np.stack((mjy, err_mjy)))
+    return np.array(mjy)
 
 # This function for converting mini Janskey to magnitude
-def mjy_to_mag(mjy, err_mjy, band, system):
+def mjy_to_mag(mjy, band, system):
     print("zeropoint: {0} mJy".format(system[band][2]))
-    mag, err_mag = convert_lib.mJy_to_mag(system[band][2], mjy, err_mjy)
-    mag[np.isnan(mag)] = 0
-    err_mag[np.isnan(err_mag)] = 0
-    return np.array(mag), np.array(err_mag)
+    mag, err_mag = convert_lib.mJy_to_mag(system[band][2], mjy[:,0], mjy[:,1])
+    mag = np.nan_to_num(mag)
+    err_mag = np.nan_to_num(err_mag)
+    mag = np.transpose(np.stack((mag, err_mag)))
+    return np.array(mag)
 
 def wipe_out_non_physical_numbers(target_list):
     # remove inf
@@ -80,34 +82,39 @@ if __name__ == "__main__":
     # replace the small signals in 2MASS with signals in UKIDSS in bands JHK
     str_dat_file = read_well_known_data(name_dat_file)
     dat_file = np.array(str_dat_file, dtype = np.float64)
-    j_mjy = dat_file[:,0]
-    h_mjy = dat_file[:,1]
-    k_mjy = dat_file[:,2]
-    err_j_mjy = dat_file[:,8] 
-    err_h_mjy = dat_file[:,9] 
-    err_k_mjy = dat_file[:,10]
+    j_mjy = np.transpose(np.stack((dat_file[:, 0], dat_file[:, 8])))
+    h_mjy = np.transpose(np.stack((dat_file[:, 1], dat_file[:, 9])))
+    k_mjy = np.transpose(np.stack((dat_file[:, 2], dat_file[:, 10])))
+    # reomve exotic number before processed
+    j_mjy[j_mjy == -9.99e+02] = 0.0
+    h_mjy[h_mjy == -9.99e+02] = 0.0
+    k_mjy[k_mjy == -9.99e+02] = 0.0
     # print something for check
-    print("j = {0}+/-{1}, h = {2}+/-{3} k = {4}+/-{5}".format(j_mjy[0], err_j_mjy[0], h_mjy[0], err_h_mjy[0], k_mjy[0], err_k_mjy[0]))
+    print("j = {0}+/-{1}, h = {2}+/-{3} k = {4}+/-{5}".format(j_mjy[0, 0], j_mjy[0, 1], h_mjy[0,0], h_mjy[0,1], k_mjy[0, 0], k_mjy[0, 1]))
     # convert from flux to 2MASS bands system
     twomass_system = convert_lib.set_twomass()
-    j_mag, err_j_mag =  mjy_to_mag(j_mjy, err_j_mjy, 'J', twomass_system)
-    h_mag, err_h_mag =  mjy_to_mag(h_mjy, err_h_mjy, 'H', twomass_system)
-    k_mag, err_k_mag =  mjy_to_mag(k_mjy, err_k_mjy, 'Ks',twomass_system)
+    j_mag =  mjy_to_mag(j_mjy, 'J', twomass_system)
+    h_mag =  mjy_to_mag(h_mjy, 'H', twomass_system)
+    k_mag =  mjy_to_mag(k_mjy, 'Ks',twomass_system) 
+    # fill up empty error
+    j_mag = fill_up_error(j_mag)
+    h_mag = fill_up_error(h_mag)
+    k_mag = fill_up_error(k_mag)
     # print something for check
-    print("j = {0}+/-{1}, h = {2}+/-{3} k = {4}+/-{5}".format(j_mag[0], err_j_mag[0], h_mag[0], err_h_mag[0], k_mag[0], err_k_mag[0]))
+    print("j = {0}+/-{1}, h = {2}+/-{3} k = {4}+/-{5}".format(j_mjy[0, 0], j_mjy[0, 1], h_mjy[0,0], h_mjy[0,1], k_mjy[0, 0], k_mjy[0, 1]))
     # convert from 2MASS bands system to UKIDSS bands system
     ukirt_system = convert_lib.set_ukirt()
-    j_mjy_u, err_j_mjy_u =  mag_to_mjy(j_mag, err_j_mag, 'J', ukirt_system)
-    h_mjy_u, err_h_mjy_u =  mag_to_mjy(h_mag, err_h_mag, 'H', ukirt_system)
-    k_mjy_u, err_k_mjy_u =  mag_to_mjy(k_mag, err_k_mag, 'K', ukirt_system)
-    dat_file[:,0] = j_mjy_u
-    dat_file[:,1] = h_mjy_u
-    dat_file[:,2] = k_mjy_u
-    dat_file[:,8] = err_j_mjy_u
-    dat_file[:,9] = err_h_mjy_u
-    dat_file[:,10] = err_k_mjy_u
+    j_mjy_u =  mag_to_mjy(j_mag, 'J', ukirt_system)
+    h_mjy_u =  mag_to_mjy(h_mag, 'H', ukirt_system)
+    k_mjy_u =  mag_to_mjy(k_mag, 'K', ukirt_system)
+    dat_file[:,0] = j_mjy_u[:,0]
+    dat_file[:,1] = h_mjy_u[:,0]
+    dat_file[:,2] = k_mjy_u[:,0]
+    dat_file[:,8] = j_mjy_u[:,1]
+    dat_file[:,9] = h_mjy_u[:,1]
+    dat_file[:,10] =k_mjy_u[:,1]
     # print something for check
-    print("j = {0}+/-{1}, h = {2}+/-{3} k = {4}+/-{5}".format(j_mjy_u[0], err_j_mjy_u[0], h_mjy_u[0], err_h_mjy_u[0], k_mjy_u[0], err_k_mjy_u[0]))
+    print("j = {0}+/-{1}, h = {2}+/-{3} k = {4}+/-{5}".format(j_mjy[0, 0], j_mjy[0, 1], h_mjy[0,0], h_mjy[0,1], k_mjy[0, 0], k_mjy[0, 1]))
     np.save("{0}_u.npy".format(name_dat_file[:-4]), dat_file)
     np.savetxt("{0}_u.txt".format(name_dat_file[:-4]), dat_file)
     #-----------------------------------

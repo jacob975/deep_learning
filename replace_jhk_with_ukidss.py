@@ -18,11 +18,15 @@ Editor:
 update log
 20180523 version alpha 1
     1. The code work
+20180711 version alpha 2
+    1. Add a func for replace with 2MASS data
+    2. Ensemble version for DXS, GPS, GCS
+    3. fill up error with median value
 '''
 import time
 import numpy as np
 import convert_lib
-from convert_lib import TWOMASS_to_UKIDSS
+from convert_lib import TWOMASS_to_UKIDSS, fill_up_error
 from sys import argv
 from dat2npy_noobs_nodet import read_well_known_data
 from uncertainties import ufloat
@@ -62,7 +66,7 @@ def mag_to_mjy(bands, band, distances, system):
             try:
                 mjy, err_mjy = convert_lib.mag_to_mJy(system[band][2], bands[i].n, bands[i].s)
             except:
-                mjy, err_mjy = convert_lib.mag_to_mJy(system[band][2], bands[i][0], bands[i][1])
+                mjy, err_mjy = convert_lib.mag_to_mJy(system[band][2], bands[i,0], bands[i,1])
         mjy_array.append(mjy)
         err_mjy_array.append(err_mjy)
     mjy_array = np.nan_to_num(mjy_array)
@@ -83,30 +87,46 @@ if __name__ == "__main__":
     start_time = time.time()
     #-----------------------------------    
     # Load and check argv
-    if len(argv) != 4:
-        print("Error\nreplace_jhk_with_ukidss.py [ukidss catalog file] [twomass catalog file] [target dat file]")
+    if len(argv) != 5:
+        print("Error\nreplace_jhk_with_ukidss.py [Type of UKIDSS catalog] [ukidss catalog file] [twomass catalog file] [target dat file]")
+        print("Available type of UKIDSS catalog: DXS, GCS, GPS")
         print("If you want to skip ukidss catalog, you can use keyword 'skip'.")
         exit()
-    name_ukidss_catalog = argv[1]
-    name_twomass_catalog = argv[2]
-    name_dat_file = argv[3]
+    type_ukidss_catalog = argv[1]
+    name_ukidss_catalog = argv[2]
+    name_twomass_catalog = argv[3]
+    name_dat_file = argv[4]
     #-----------------------------------
+    # read the Database UKIDSSDR10PLUS as a catalog
     ukidss_j_mjy = None
     ukidss_h_mjy = None
     ukidss_k_mjy = None
     ukidss_err_j_mjy = None
     ukidss_err_h_mjy = None
     ukidss_err_k_mjy = None
-    # read the Database UKIDSSDR10PLUS as a catalog
     if name_ukidss_catalog != "skip":
         catalogs = readfile(name_ukidss_catalog)
         # split into J, H, and Ks bands.
-        ukidss_bands_j = catalogs[:,14:16]
-        print (ukidss_bands_j)
-        ukidss_bands_h = catalogs[:,16:18]
-        print (ukidss_bands_h)
-        ukidss_bands_k = catalogs[:,18:20]
-        print (ukidss_bands_k)
+        ukidss_bands_j = []  
+        ukidss_bands_h = [] 
+        ukidss_bands_k = [] 
+        if type_ukidss_catalog == "DXS":
+            ukidss_bands_j = catalogs[:,10:12]
+            ukidss_bands_h = catalogs[:,12:14]
+            ukidss_bands_k = catalogs[:,14:16]
+        elif type_ukidss_catalog == "GCS":
+            ukidss_bands_j = catalogs[:,14:16]
+            ukidss_bands_h = catalogs[:,16:18]
+            ukidss_bands_k = catalogs[:,18:20]
+        elif type_ukidss_catalog == "GPS":
+            ukidss_bands_j = catalogs[:,10:12]
+            ukidss_bands_h = catalogs[:,12:14]
+            ukidss_bands_k = catalogs[:,14:16]
+        else:
+            print("Wrong type of UKIDSS catalog")
+            print("Usage: replace_jhk_with_ukidss.py [Type of UKIDSS catalog] [ukidss catalog file] [twomass catalog file] [target dat file]")
+            print("Available type of UKIDSS catalog: DXS, GCS, GPS")
+            exit(1)
         # read distance
         ukidss_distances = catalogs[:,3]
         # convert mag to mJy
@@ -144,6 +164,10 @@ if __name__ == "__main__":
     twomass_bands_ju = []
     twomass_bands_hu = []
     twomass_bands_ku = []
+    # fill up empty error
+    twomass_bands_j = fill_up_error(twomass_bands_j)
+    twomass_bands_h = fill_up_error(twomass_bands_h)
+    twomass_bands_k = fill_up_error(twomass_bands_k)
     for i in range(len(twomass_catalogs)):
         twomass_band_j = ufloat(twomass_bands_j[i,0], twomass_bands_j[i,1])
         twomass_band_h = ufloat(twomass_bands_h[i,0], twomass_bands_h[i,1])
