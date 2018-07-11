@@ -39,7 +39,8 @@ def plot_point_on_ds9(name_image, name_regions_file):
     cmd =   "ds9 -zscale {0} \
             -regions format ds9 \
             -regions load {1}.reg \
-            -zoom to fit &".format(name_image, name_regions_file[:-4])
+            -zoom to fit \
+            -saveimage png {1}.png&".format(name_image, name_regions_file[:-4])
     os.system(cmd)
     return
 

@@ -28,7 +28,7 @@ update log
 import numpy as np
 
 ####################################
-from uncertainties import unumpy
+from uncertainties import unumpy, ufloat
 # How to cite this package
 # If you use this package for a publication (in a journal, on the web, etc.), 
 # please cite it by including as much information as possible from the following: 
@@ -92,6 +92,7 @@ def mJy_to_mag(zeropoint, flux_density):
     return magnitude
 #-----------------------------------------------------
 # convertion with error
+
 def Jy_to_mJy(flux_density, err_flux_density):
     return 1000 * flux_density, 1000* err_flux_density
 

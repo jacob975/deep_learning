@@ -61,7 +61,7 @@ def compare_point_on_ds9(name_image, name_regions_file_A, name_regions_file_B):
             -regions load {1}.reg \
             -regions load {2}.reg \
             -zoom to fit \
-            -saveimage png regions_shown.png&".format(name_image, name_regions_file_A[:-4], name_regions_file_B[:-4])
+            -saveimage png {1}_versus_{2}.png&".format(name_image, name_regions_file_A[:-4], name_regions_file_B[:-4])
     os.system(cmd)
     return
 

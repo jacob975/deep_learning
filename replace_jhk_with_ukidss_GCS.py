@@ -4,7 +4,7 @@ Abstract:
     This is a program to take band JHK from ukidss catalog, 
     and replace the small signals in 2MASS with signals in UKIDSS in bands JHK.
 Usage:
-    replace_jhk_with_ukidss.py [ukidss catalog file] [target dat file]
+    replace_jhk_with_ukidss.py [ukidss catalog file] [twomass catalog file] [target dat file]
 Editor:
     Jacob975
 
@@ -47,8 +47,8 @@ def readfile(filename):
 # take j band as example
 def mag_to_mjy(bands, band, distances, system):
     # initialize variables
-    j_mjy = []
-    err_j_mjy = []
+    mjy_array = []
+    err_mjy_array = []
     print("zeropoint: {0}".format(ukirt_system[band][2]))
     # convert
     for i in range(len(bands)):
@@ -62,10 +62,12 @@ def mag_to_mjy(bands, band, distances, system):
             try:
                 mjy, err_mjy = convert_lib.mag_to_mJy(system[band][2], bands[i].n, bands[i].s)
             except:
-                mjy, err_mjy = convert_lib.mag_to_mJy(system[band][2], bands[i,0], bands[i,1])
-        j_mjy.append(mjy)
-        err_j_mjy.append(err_mjy)
-    return np.array(j_mjy), np.array(err_j_mjy)
+                mjy, err_mjy = convert_lib.mag_to_mJy(system[band][2], bands[i][0], bands[i][1])
+        mjy_array.append(mjy)
+        err_mjy_array.append(err_mjy)
+    mjy_array = np.nan_to_num(mjy_array)
+    err_mjy_array = np.nan_to_num(err_mjy_array)
+    return np.array(mjy_array), np.array(err_mjy_array)
 
 def wipe_out_non_physical_numbers(target_list):
     # remove inf
@@ -83,37 +85,48 @@ if __name__ == "__main__":
     # Load and check argv
     if len(argv) != 4:
         print("Error\nreplace_jhk_with_ukidss.py [ukidss catalog file] [twomass catalog file] [target dat file]")
+        print("If you want to skip ukidss catalog, you can use keyword 'skip'.")
         exit()
     name_ukidss_catalog = argv[1]
     name_twomass_catalog = argv[2]
     name_dat_file = argv[3]
     #-----------------------------------
+    ukidss_j_mjy = None
+    ukidss_h_mjy = None
+    ukidss_k_mjy = None
+    ukidss_err_j_mjy = None
+    ukidss_err_h_mjy = None
+    ukidss_err_k_mjy = None
     # read the Database UKIDSSDR10PLUS as a catalog
-    catalogs = readfile(name_ukidss_catalog)
-    # split into J, H, and Ks bands.
-    ukidss_bands_j = catalogs[:,14:16]
-    ukidss_bands_h = catalogs[:,16:18]
-    ukidss_bands_k = catalogs[:,18:20]
-    # read distance
-    ukidss_distances = catalogs[:,3]
-    # convert mag to mJy
-    ukirt_system = convert_lib.set_ukirt()
-    print("### converting from magnitude to mJy ###")
-    ukidss_j_mjy, ukidss_err_j_mjy =  mag_to_mjy(ukidss_bands_j, 'J', ukidss_distances, ukirt_system)
-    ukidss_h_mjy, ukidss_err_h_mjy =  mag_to_mjy(ukidss_bands_h, 'H', ukidss_distances, ukirt_system)
-    ukidss_k_mjy, ukidss_err_k_mjy =  mag_to_mjy(ukidss_bands_k, 'K', ukidss_distances, ukirt_system)
-    # wipe out non-physical values
-    wipe_out_non_physical_numbers(ukidss_j_mjy)
-    wipe_out_non_physical_numbers(ukidss_h_mjy)
-    wipe_out_non_physical_numbers(ukidss_k_mjy)
-    wipe_out_non_physical_numbers(ukidss_err_j_mjy)
-    wipe_out_non_physical_numbers(ukidss_err_h_mjy)
-    wipe_out_non_physical_numbers(ukidss_err_k_mjy)
-    # save the converted file of ukidss jhk bands
-    ukidss_flux = np.stack((ukidss_j_mjy, ukidss_h_mjy, ukidss_k_mjy, ukidss_err_j_mjy, ukidss_err_h_mjy, ukidss_err_k_mjy))
-    ukidss_flux = np.transpose(ukidss_flux)
-    np.save("{0}_flux.npy".format(name_ukidss_catalog[:-4]), ukidss_flux)
-    np.savetxt("{0}_flux.txt".format(name_ukidss_catalog[:-4]), ukidss_flux)
+    if name_ukidss_catalog != "skip":
+        catalogs = readfile(name_ukidss_catalog)
+        # split into J, H, and Ks bands.
+        ukidss_bands_j = catalogs[:,14:16]
+        print (ukidss_bands_j)
+        ukidss_bands_h = catalogs[:,16:18]
+        print (ukidss_bands_h)
+        ukidss_bands_k = catalogs[:,18:20]
+        print (ukidss_bands_k)
+        # read distance
+        ukidss_distances = catalogs[:,3]
+        # convert mag to mJy
+        ukirt_system = convert_lib.set_ukirt()
+        print("### converting from magnitude to mJy ###")
+        ukidss_j_mjy, ukidss_err_j_mjy =  mag_to_mjy(ukidss_bands_j, 'J', ukidss_distances, ukirt_system)
+        ukidss_h_mjy, ukidss_err_h_mjy =  mag_to_mjy(ukidss_bands_h, 'H', ukidss_distances, ukirt_system)
+        ukidss_k_mjy, ukidss_err_k_mjy =  mag_to_mjy(ukidss_bands_k, 'K', ukidss_distances, ukirt_system)
+        # wipe out non-physical values
+        wipe_out_non_physical_numbers(ukidss_j_mjy)
+        wipe_out_non_physical_numbers(ukidss_h_mjy)
+        wipe_out_non_physical_numbers(ukidss_k_mjy)
+        wipe_out_non_physical_numbers(ukidss_err_j_mjy)
+        wipe_out_non_physical_numbers(ukidss_err_h_mjy)
+        wipe_out_non_physical_numbers(ukidss_err_k_mjy)
+        # save the converted file of ukidss jhk bands
+        ukidss_flux = np.stack((ukidss_j_mjy, ukidss_h_mjy, ukidss_k_mjy, ukidss_err_j_mjy, ukidss_err_h_mjy, ukidss_err_k_mjy))
+        ukidss_flux = np.transpose(ukidss_flux)
+        np.save("{0}_flux.npy".format(name_ukidss_catalog[:-4]), ukidss_flux)
+        np.savetxt("{0}_flux.txt".format(name_ukidss_catalog[:-4]), ukidss_flux)
     #-----------------------------------
     # read the Database 2MASS as a catalog
     twomass_catalogs = np.loadtxt(name_twomass_catalog, skiprows = 79, dtype = np.str)
@@ -131,7 +144,7 @@ if __name__ == "__main__":
     twomass_bands_ju = []
     twomass_bands_hu = []
     twomass_bands_ku = []
-    for i in range(len(catalogs)):
+    for i in range(len(twomass_catalogs)):
         twomass_band_j = ufloat(twomass_bands_j[i,0], twomass_bands_j[i,1])
         twomass_band_h = ufloat(twomass_bands_h[i,0], twomass_bands_h[i,1])
         twomass_band_k = ufloat(twomass_bands_k[i,0], twomass_bands_k[i,1])
@@ -182,23 +195,28 @@ if __name__ == "__main__":
     dat_file[:,8] = twomass_err_j_mjy
     dat_file[:,9] = twomass_err_h_mjy
     dat_file[:,10] = twomass_err_k_mjy
-    replacement_j = np.where((ukidss_j_mjy != 0) & (dat_file[:, 0] < 30) & (ukidss_err_j_mjy != 0))
-    replacement_h = np.where((ukidss_h_mjy != 0) & (dat_file[:, 1] < 15) & (ukidss_err_h_mjy != 0))
-    replacement_k = np.where((ukidss_k_mjy != 0) & (dat_file[:, 2] < 15) & (ukidss_err_k_mjy != 0))
-    dat_file[replacement_j, 0] = ukidss_j_mjy[replacement_j]
-    dat_file[replacement_h, 1] = ukidss_h_mjy[replacement_h]
-    dat_file[replacement_k, 2] = ukidss_k_mjy[replacement_k]
-    dat_file[replacement_j, 8] = ukidss_err_j_mjy[replacement_j]
-    dat_file[replacement_h, 9] = ukidss_err_h_mjy[replacement_h]
-    dat_file[replacement_k, 10] = ukidss_err_k_mjy[replacement_k]
+    if name_ukidss_catalog != "skip":
+        '''
+        replacement_j = np.where((ukidss_j_mjy != 0) & (dat_file[:, 0] < 30) & (ukidss_err_j_mjy != 0))
+        replacement_h = np.where((ukidss_h_mjy != 0) & (dat_file[:, 1] < 15) & (ukidss_err_h_mjy != 0))
+        '''
+        replacement_k = np.where((ukidss_k_mjy != 0) & (dat_file[:, 2] < 15) & (ukidss_err_k_mjy != 0))
+        dat_file[replacement_k, 0] = ukidss_j_mjy[replacement_k]
+        dat_file[replacement_k, 1] = ukidss_h_mjy[replacement_k]
+        dat_file[replacement_k, 2] = ukidss_k_mjy[replacement_k]
+        dat_file[replacement_k, 8] = ukidss_err_j_mjy[replacement_k]
+        dat_file[replacement_k, 9] = ukidss_err_h_mjy[replacement_k]
+        dat_file[replacement_k, 10] = ukidss_err_k_mjy[replacement_k]
+        '''
+        np.save("replaced_with_j_in_ukidss_{0}.npy".format(name_dat_file[:-4]), replacement_j[0])
+        np.savetxt("replaced_with_j_in_ukidss_{0}.txt".format(name_dat_file[:-4]), replacement_j[0])
+        np.save("replaced_with_h_in_ukidss_{0}.npy".format(name_dat_file[:-4]), replacement_h[0])
+        np.savetxt("replaced_with_h_in_ukidss_{0}.txt".format(name_dat_file[:-4]), replacement_h[0])
+        '''
+        np.save("replaced_with_k_in_ukidss_{0}.npy".format(name_dat_file[:-4]), replacement_k[0])
+        np.savetxt("replaced_with_k_in_ukidss_{0}.txt".format(name_dat_file[:-4]), replacement_k[0])
     np.save("{0}_u.npy".format(name_dat_file[:-4]), dat_file)
     np.savetxt("{0}_u.txt".format(name_dat_file[:-4]), dat_file)
-    np.save("replaced_with_j_in_ukidss_{0}.npy".format(name_dat_file[:-4]), replacement_j[0])
-    np.savetxt("replaced_with_j_in_ukidss_{0}.txt".format(name_dat_file[:-4]), replacement_j[0])
-    np.save("replaced_with_h_in_ukidss_{0}.npy".format(name_dat_file[:-4]), replacement_h[0])
-    np.savetxt("replaced_with_h_in_ukidss_{0}.txt".format(name_dat_file[:-4]), replacement_h[0])
-    np.save("replaced_with_k_in_ukidss_{0}.npy".format(name_dat_file[:-4]), replacement_k[0])
-    np.savetxt("replaced_with_k_in_ukidss_{0}.txt".format(name_dat_file[:-4]), replacement_k[0])
     #-----------------------------------
     # measuring time
     elapsed_time = time.time() - start_time

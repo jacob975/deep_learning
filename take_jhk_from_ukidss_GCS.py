@@ -94,10 +94,6 @@ if __name__ == "__main__":
     bands_k1 = catalogs[:,18:20]
     for i in range(5):
         print (bands_k1[i])
-    print('### K2 ###')
-    bands_k2 = catalogs[:,20:22]
-    for i in range(5):
-        print (bands_k2[i])
     # read id, distance, and coordinate
     global ids
     ids = catalogs[:,0]
@@ -133,13 +129,6 @@ if __name__ == "__main__":
     # print and check
     for i in range(11,20):
         print ("{0}: {1}, {2}".format(ids[i], k1_mjy[i], err_k1_mjy[i]))
-    print('### K2 ###')
-    k2_mjy = []
-    err_k2_mjy = []
-    k2_mjy, err_k2_mjy =  mag_to_mjy(bands_k2, 'K2')
-    # print and check
-    for i in range(11,20):
-        print ("{0}: {1}, {2}".format(ids[i], k2_mjy[i], err_k2_mjy[i]))
     #-----------------------------------
     # save each band and coord respectively
     j = np.stack((j_mjy, err_j_mjy))
@@ -154,10 +143,6 @@ if __name__ == "__main__":
     k1 = np.transpose(k1)
     np.save("ukidss_k1_{0}.npy".format(label), k1)
     np.savetxt("ukidss_k1_{0}.txt".format(label), k1)
-    k2 = np.stack((k2_mjy, err_k2_mjy))
-    k2 = np.transpose(k2)
-    np.save("ukidss_k2_{0}.npy".format(label), k2)
-    np.savetxt("ukidss_k2_{0}.txt".format(label), k2)
     np.save("ukidss_coords_{0}.npy".format(label), coords)
     np.savetxt("ukidss_coords_{0}.txt".format(label), coords)
     #-----------------------------------
