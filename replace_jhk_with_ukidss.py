@@ -49,7 +49,7 @@ def readfile(filename):
 
 # this function is used to convert magnitude to mini Janskey
 # take j band as example
-def mag_to_mjy(bands, band, distances, system):
+def mag_to_mjy_numpy(bands, band, distances, system):
     # initialize variables
     mjy_array = []
     err_mjy_array = []
@@ -62,11 +62,35 @@ def mag_to_mjy(bands, band, distances, system):
         # if the distance is larger than 1 beam size of irac...
         elif distances[i] > 0.6:
             mjy = err_mjy = 0.0
+        elif bands[i,0] == 0 or bands[i,1] == 0: 
+            mjy = err_mjy = 0.0
         else:
-            try:
-                mjy, err_mjy = convert_lib.mag_to_mJy(system[band][2], bands[i].n, bands[i].s)
-            except:
-                mjy, err_mjy = convert_lib.mag_to_mJy(system[band][2], bands[i,0], bands[i,1])
+            mjy, err_mjy = convert_lib.mag_to_mJy(system[band][2], bands[i,0], bands[i,1])
+        mjy_array.append(mjy)
+        err_mjy_array.append(err_mjy)
+    mjy_array = np.nan_to_num(mjy_array)
+    err_mjy_array = np.nan_to_num(err_mjy_array)
+    return np.array(mjy_array), np.array(err_mjy_array)
+
+# this function is used to convert magnitude to mini Janskey
+# take j band as example
+def mag_to_mjy_ufloat(bands, band, distances, system):
+    # initialize variables
+    mjy_array = []
+    err_mjy_array = []
+    print("zeropoint: {0}".format(ukirt_system[band][2]))
+    # convert
+    for i in range(len(bands)):
+        # if JHK is not found...
+        if distances[i] == 0.0:
+            mjy = err_mjy = 0.0
+        # if the distance is larger than 1 beam size of irac...
+        elif distances[i] > 0.6:
+            mjy = err_mjy = 0.0
+        elif bands[i].n == 0 or bands[i].s == 0:
+            mjy = err_mjy = 0.0
+        else:
+            mjy, err_mjy = convert_lib.mag_to_mJy(system[band][2], bands[i].n, bands[i].s)
         mjy_array.append(mjy)
         err_mjy_array.append(err_mjy)
     mjy_array = np.nan_to_num(mjy_array)
@@ -132,9 +156,9 @@ if __name__ == "__main__":
         # convert mag to mJy
         ukirt_system = convert_lib.set_ukirt()
         print("### converting from magnitude to mJy ###")
-        ukidss_j_mjy, ukidss_err_j_mjy =  mag_to_mjy(ukidss_bands_j, 'J', ukidss_distances, ukirt_system)
-        ukidss_h_mjy, ukidss_err_h_mjy =  mag_to_mjy(ukidss_bands_h, 'H', ukidss_distances, ukirt_system)
-        ukidss_k_mjy, ukidss_err_k_mjy =  mag_to_mjy(ukidss_bands_k, 'K', ukidss_distances, ukirt_system)
+        ukidss_j_mjy, ukidss_err_j_mjy =  mag_to_mjy_numpy(ukidss_bands_j, 'J', ukidss_distances, ukirt_system)
+        ukidss_h_mjy, ukidss_err_h_mjy =  mag_to_mjy_numpy(ukidss_bands_h, 'H', ukidss_distances, ukirt_system)
+        ukidss_k_mjy, ukidss_err_k_mjy =  mag_to_mjy_numpy(ukidss_bands_k, 'K', ukidss_distances, ukirt_system)
         # wipe out non-physical values
         wipe_out_non_physical_numbers(ukidss_j_mjy)
         wipe_out_non_physical_numbers(ukidss_h_mjy)
@@ -201,9 +225,9 @@ if __name__ == "__main__":
     # convert mag to mJy
     ukirt_system = convert_lib.set_ukirt()
     print("--- In mJy ---")
-    twomass_j_mjy, twomass_err_j_mjy =  mag_to_mjy(twomass_bands_ju, 'J', twomass_distances, ukirt_system)
-    twomass_h_mjy, twomass_err_h_mjy =  mag_to_mjy(twomass_bands_hu, 'H', twomass_distances, ukirt_system)
-    twomass_k_mjy, twomass_err_k_mjy =  mag_to_mjy(twomass_bands_ku, 'K', twomass_distances, ukirt_system)
+    twomass_j_mjy, twomass_err_j_mjy =  mag_to_mjy_ufloat(twomass_bands_ju, 'J', twomass_distances, ukirt_system)
+    twomass_h_mjy, twomass_err_h_mjy =  mag_to_mjy_ufloat(twomass_bands_hu, 'H', twomass_distances, ukirt_system)
+    twomass_k_mjy, twomass_err_k_mjy =  mag_to_mjy_ufloat(twomass_bands_ku, 'K', twomass_distances, ukirt_system)
     # save the converted file of ukidss jhk bands
     twomass_flux = np.stack((twomass_j_mjy, twomass_h_mjy, twomass_k_mjy, twomass_err_j_mjy, twomass_err_h_mjy, twomass_err_k_mjy))
     twomass_flux = np.transpose(twomass_flux)

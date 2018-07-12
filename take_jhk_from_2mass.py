@@ -51,11 +51,10 @@ def mag_to_mjy(bands, band, system):
             mjy = err_mjy = 0.0
         elif distances[i] > 0.6:
             mjy = err_mjy = 0.0
+        elif bands[i].n == 0 or bands[i].s == 0:
+            mjy = err_mjy = 0.0
         else:
-            try:
-                mjy, err_mjy = convert_lib.mag_to_mJy(system[band][2], bands[i].n, bands[i].s)
-            except:
-                mjy, err_mjy = convert_lib.mag_to_mJy(system[band][2], bands[i,0], bands[i,1])
+            mjy, err_mjy = convert_lib.mag_to_mJy(system[band][2], bands[i].n, bands[i].s)
         j_mjy.append(mjy)
         err_j_mjy.append(err_mjy)
     j_mjy = np.nan_to_num(j_mjy)
@@ -85,7 +84,7 @@ if __name__ == "__main__":
     VERBOSE = 0
     # measure times
     start_time = time.time()
-    init = 1000
+    init = 0
     #-----------------------------------    
     # check argv
     if len(argv) != 4:

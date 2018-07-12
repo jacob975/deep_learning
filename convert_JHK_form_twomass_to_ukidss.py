@@ -41,23 +41,46 @@ def readfile(filename):
     f.close
     return np.array(data)
 
-# this function is used to convert magnitude to mini Janskey
-def mag_to_mjy(mag, band, system):
+def mag_to_mjy(mags, band, system):
+    # initialize variables
+    j_mjy = []
+    err_j_mjy = []
     print("zeropoint: {0} mJy".format(system[band][2]))
-    mjy, err_mjy = convert_lib.mag_to_mJy(system[band][2], mag[:,0], mag[:,1])
-    mjy = np.nan_to_num(mjy)
-    err_mjy = np.nan_to_num(err_mjy)
-    mjy = np.transpose(np.stack((mjy, err_mjy)))
-    return np.array(mjy)
+    for i in range(len(mags)):
+        # If no observation, put 0 as value
+        if mags[i,0] == 0 or mags[i,1] == 0:
+            mjy = err_mjy = 0.0
+        # Convert
+        else:
+            mjy, err_mjy = convert_lib.mag_to_mJy(system[band][2], mags[i,0], mags[i,1])
+        j_mjy.append(mjy)
+        err_j_mjy.append(err_mjy)
+    # Remove exotic answers
+    j_mjy = np.nan_to_num(j_mjy)
+    err_j_mjy = np.nan_to_num(err_j_mjy)
+    j_mjy = np.transpose(np.stack((j_mjy, err_j_mjy)))
+    return np.array(j_mjy)
 
 # This function for converting mini Janskey to magnitude
-def mjy_to_mag(mjy, band, system):
+def mjy_to_mag(mjys, band, system):
+    # initialize variables
+    j_mag = []
+    err_j_mag = []
     print("zeropoint: {0} mJy".format(system[band][2]))
-    mag, err_mag = convert_lib.mJy_to_mag(system[band][2], mjy[:,0], mjy[:,1])
-    mag = np.nan_to_num(mag)
-    err_mag = np.nan_to_num(err_mag)
-    mag = np.transpose(np.stack((mag, err_mag)))
-    return np.array(mag)
+    for i in range(len(mjys)):
+        # If no observation, put 0 as value.
+        if mjys[i,0] == 0 or mjys[i,1] == 0:
+            mag = err_mag = 0.0
+        # Convert
+        else:
+            mag, err_mag = convert_lib.mJy_to_mag(system[band][2], mjys[i,0], mjys[i,1])
+        j_mag.append(mag)
+        err_j_mag.append(err_mag)
+    # Remove exotic answers
+    j_mag = np.nan_to_num(j_mag)
+    err_j_mag = np.nan_to_num(err_j_mag)
+    j_mag = np.transpose(np.stack((j_mag, err_j_mag)))
+    return np.array(j_mag)
 
 def wipe_out_non_physical_numbers(target_list):
     # remove inf
@@ -90,7 +113,8 @@ if __name__ == "__main__":
     h_mjy[h_mjy == -9.99e+02] = 0.0
     k_mjy[k_mjy == -9.99e+02] = 0.0
     # print something for check
-    print("j = {0}+/-{1}, h = {2}+/-{3} k = {4}+/-{5}".format(j_mjy[0, 0], j_mjy[0, 1], h_mjy[0,0], h_mjy[0,1], k_mjy[0, 0], k_mjy[0, 1]))
+    for i in range(10):
+        print("j = {0}+/-{1}, h = {2}+/-{3} k = {4}+/-{5}".format(j_mjy[i, 0], j_mjy[i, 1], h_mjy[i,0], h_mjy[i,1], k_mjy[i, 0], k_mjy[i, 1]))
     # convert from flux to 2MASS bands system
     twomass_system = convert_lib.set_twomass()
     j_mag =  mjy_to_mag(j_mjy, 'J', twomass_system)
@@ -101,7 +125,8 @@ if __name__ == "__main__":
     h_mag = fill_up_error(h_mag)
     k_mag = fill_up_error(k_mag)
     # print something for check
-    print("j = {0}+/-{1}, h = {2}+/-{3} k = {4}+/-{5}".format(j_mjy[0, 0], j_mjy[0, 1], h_mjy[0,0], h_mjy[0,1], k_mjy[0, 0], k_mjy[0, 1]))
+    for i in range(10):
+        print("j = {0}+/-{1}, h = {2}+/-{3} k = {4}+/-{5}".format(j_mag[i, 0], j_mag[i, 1], h_mag[i,0], h_mag[i,1], k_mag[i, 0], k_mag[i, 1]))
     # convert from 2MASS bands system to UKIDSS bands system
     ukirt_system = convert_lib.set_ukirt()
     j_mjy_u =  mag_to_mjy(j_mag, 'J', ukirt_system)
@@ -114,7 +139,8 @@ if __name__ == "__main__":
     dat_file[:,9] = h_mjy_u[:,1]
     dat_file[:,10] =k_mjy_u[:,1]
     # print something for check
-    print("j = {0}+/-{1}, h = {2}+/-{3} k = {4}+/-{5}".format(j_mjy[0, 0], j_mjy[0, 1], h_mjy[0,0], h_mjy[0,1], k_mjy[0, 0], k_mjy[0, 1]))
+    for i in range(10):
+        print("j = {0}+/-{1}, h = {2}+/-{3} k = {4}+/-{5}".format(j_mjy_u[i, 0], j_mjy_u[i, 1], h_mjy_u[i,0], h_mjy_u[i,1], k_mjy_u[i, 0], k_mjy_u[i, 1]))
     np.save("{0}_u.npy".format(name_dat_file[:-4]), dat_file)
     np.savetxt("{0}_u.txt".format(name_dat_file[:-4]), dat_file)
     #-----------------------------------

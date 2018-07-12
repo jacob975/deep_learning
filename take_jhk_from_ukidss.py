@@ -48,18 +48,17 @@ def mag_to_mjy(bands_j, band):
     # initialize variables
     j_mjy = []
     err_j_mjy = []
-    print("zeropoint: {0}".format(ukirt_system[band][2]))
+    print("zeropoint: {0} mjy".format(ukirt_system[band][2]))
     # convert
     for i in range(len(bands_j)):
-        '''
         # if the distance is larger than 1 beam size of irac...
-        elif distances[i] > 1.2:
-            mjy = err_mjy = 0.0
-        '''
         # if JHK is not found...
         if distances[i] == 0.0:
             mjy = err_mjy = 0.0
         elif distances[i] > 0.6:
+            mjy = err_mjy = 0.0
+        # If no observation, put 0 as value
+        elif bands_j[i,0] == 0 or bands_j[i,1] == 0:
             mjy = err_mjy = 0.0
         else:
             mjy, err_mjy = convert_lib.mag_to_mJy(ukirt_system[band][2], bands_j[i,0], bands_j[i,1])
