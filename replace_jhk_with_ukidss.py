@@ -22,6 +22,8 @@ update log
     1. Add a func for replace with 2MASS data
     2. Ensemble version for DXS, GPS, GCS
     3. fill up error with median value
+20180716 version alpha 3
+    1. Add a func for skip
 '''
 import time
 import numpy as np
@@ -114,7 +116,7 @@ if __name__ == "__main__":
     if len(argv) != 5:
         print("Error\nreplace_jhk_with_ukidss.py [Type of UKIDSS catalog] [ukidss catalog file] [twomass catalog file] [target dat file]")
         print("Available type of UKIDSS catalog: DXS, GCS, GPS")
-        print("If you want to skip ukidss catalog, you can use keyword 'skip'.")
+        print("If you want to skip ukidss or twomass catalog, you can use keyword 'skip'.")
         exit()
     type_ukidss_catalog = argv[1]
     name_ukidss_catalog = argv[2]
@@ -173,76 +175,84 @@ if __name__ == "__main__":
         np.savetxt("{0}_flux.txt".format(name_ukidss_catalog[:-4]), ukidss_flux)
     #-----------------------------------
     # read the Database 2MASS as a catalog
-    twomass_catalogs = np.loadtxt(name_twomass_catalog, skiprows = 79, dtype = np.str)
-    # split into J, H, and Ks bands.
-    twomass_bands_j = twomass_catalogs[:,11:13]
-    twomass_bands_j[twomass_bands_j == 'null'] = '0.0'
-    twomass_bands_j = np.array(twomass_bands_j, dtype = np.float64)
-    twomass_bands_h = twomass_catalogs[:,15:17]
-    twomass_bands_h[twomass_bands_h == 'null'] = '0.0'
-    twomass_bands_h = np.array(twomass_bands_h, dtype = np.float64)
-    twomass_bands_k = twomass_catalogs[:,19:21]
-    twomass_bands_k[twomass_bands_k == 'null'] = '0.0'
-    twomass_bands_k = np.array(twomass_bands_k, dtype = np.float64)
-    # convert from 2MASS bands system to UKIDSS bands system
-    twomass_bands_ju = []
-    twomass_bands_hu = []
-    twomass_bands_ku = []
-    # fill up empty error
-    twomass_bands_j = fill_up_error(twomass_bands_j)
-    twomass_bands_h = fill_up_error(twomass_bands_h)
-    twomass_bands_k = fill_up_error(twomass_bands_k)
-    for i in range(len(twomass_catalogs)):
-        twomass_band_j = ufloat(twomass_bands_j[i,0], twomass_bands_j[i,1])
-        twomass_band_h = ufloat(twomass_bands_h[i,0], twomass_bands_h[i,1])
-        twomass_band_k = ufloat(twomass_bands_k[i,0], twomass_bands_k[i,1])
-        TwotoU = TWOMASS_to_UKIDSS(twomass_band_j, twomass_band_h, twomass_band_k)
-        if (twomass_band_j.n != 0.0) and (twomass_band_h.n != 0.0):
-            twomass_band_ju = TwotoU.Jw
-            twomass_band_hu = TwotoU.Hw
-        else:
-            twomass_band_ju = ufloat(0.0, 0.0)
-            twomass_band_hu = ufloat(0.0, 0.0)
-        if (twomass_band_j.n != 0.0) and (twomass_band_k.n != 0.0):
-            twomass_band_ku = TwotoU.Kw
-        else:
-            twomass_band_ku = ufloat(0.0, 0.0)
-        # append
-        twomass_bands_ju.append(twomass_band_ju)
-        twomass_bands_hu.append(twomass_band_hu)
-        twomass_bands_ku.append(twomass_band_ku)
-    # convert mag to flux
-    twomass_j_mjy = []
-    twomass_err_j_mjy = []
-    twomass_h_mjy = []
-    twomass_err_h_mjy = []
-    twomass_k_mjy = []
-    twomass_err_k_mjy = []
-    # grab distance of target and table
-    twomass_distances = twomass_catalogs[:,1]
-    twomass_distances[twomass_distances == 'null'] = '999.0'
-    twomass_distances = np.array(twomass_distances, dtype = np.float64)
-    # convert mag to mJy
-    ukirt_system = convert_lib.set_ukirt()
-    print("--- In mJy ---")
-    twomass_j_mjy, twomass_err_j_mjy =  mag_to_mjy_ufloat(twomass_bands_ju, 'J', twomass_distances, ukirt_system)
-    twomass_h_mjy, twomass_err_h_mjy =  mag_to_mjy_ufloat(twomass_bands_hu, 'H', twomass_distances, ukirt_system)
-    twomass_k_mjy, twomass_err_k_mjy =  mag_to_mjy_ufloat(twomass_bands_ku, 'K', twomass_distances, ukirt_system)
-    # save the converted file of ukidss jhk bands
-    twomass_flux = np.stack((twomass_j_mjy, twomass_h_mjy, twomass_k_mjy, twomass_err_j_mjy, twomass_err_h_mjy, twomass_err_k_mjy))
-    twomass_flux = np.transpose(twomass_flux)
-    np.save("{0}_flux.npy".format(name_twomass_catalog[:-4]), twomass_flux)
-    np.savetxt("{0}_flux.txt".format(name_twomass_catalog[:-4]), twomass_flux)
+    twomass_j_mjy = None 
+    twomass_h_mjy = None 
+    twomass_k_mjy = None 
+    twomass_err_j_mjy = None 
+    twomass_err_h_mjy = None
+    twomass_err_k_mjy = None
+    if name_twomass_catalog != 'skip':
+        twomass_catalogs = np.loadtxt(name_twomass_catalog, skiprows = 79, dtype = np.str)
+        # split into J, H, and Ks bands.
+        twomass_bands_j = twomass_catalogs[:,11:13]
+        twomass_bands_j[twomass_bands_j == 'null'] = '0.0'
+        twomass_bands_j = np.array(twomass_bands_j, dtype = np.float64)
+        twomass_bands_h = twomass_catalogs[:,15:17]
+        twomass_bands_h[twomass_bands_h == 'null'] = '0.0'
+        twomass_bands_h = np.array(twomass_bands_h, dtype = np.float64)
+        twomass_bands_k = twomass_catalogs[:,19:21]
+        twomass_bands_k[twomass_bands_k == 'null'] = '0.0'
+        twomass_bands_k = np.array(twomass_bands_k, dtype = np.float64)
+        # convert from 2MASS bands system to UKIDSS bands system
+        twomass_bands_ju = []
+        twomass_bands_hu = []
+        twomass_bands_ku = []
+        # fill up empty error
+        twomass_bands_j = fill_up_error(twomass_bands_j)
+        twomass_bands_h = fill_up_error(twomass_bands_h)
+        twomass_bands_k = fill_up_error(twomass_bands_k)
+        for i in range(len(twomass_catalogs)):
+            twomass_band_j = ufloat(twomass_bands_j[i,0], twomass_bands_j[i,1])
+            twomass_band_h = ufloat(twomass_bands_h[i,0], twomass_bands_h[i,1])
+            twomass_band_k = ufloat(twomass_bands_k[i,0], twomass_bands_k[i,1])
+            TwotoU = TWOMASS_to_UKIDSS(twomass_band_j, twomass_band_h, twomass_band_k)
+            if (twomass_band_j.n != 0.0) and (twomass_band_h.n != 0.0):
+                twomass_band_ju = TwotoU.Jw
+                twomass_band_hu = TwotoU.Hw
+            else:
+                twomass_band_ju = ufloat(0.0, 0.0)
+                twomass_band_hu = ufloat(0.0, 0.0)
+            if (twomass_band_j.n != 0.0) and (twomass_band_k.n != 0.0):
+                twomass_band_ku = TwotoU.Kw
+            else:
+                twomass_band_ku = ufloat(0.0, 0.0)
+            # append
+            twomass_bands_ju.append(twomass_band_ju)
+            twomass_bands_hu.append(twomass_band_hu)
+            twomass_bands_ku.append(twomass_band_ku)
+        # convert mag to flux
+        twomass_j_mjy = []
+        twomass_err_j_mjy = []
+        twomass_h_mjy = []
+        twomass_err_h_mjy = []
+        twomass_k_mjy = []
+        twomass_err_k_mjy = []
+        # grab distance of target and table
+        twomass_distances = twomass_catalogs[:,1]
+        twomass_distances[twomass_distances == 'null'] = '999.0'
+        twomass_distances = np.array(twomass_distances, dtype = np.float64)
+        # convert mag to mJy
+        ukirt_system = convert_lib.set_ukirt()
+        print("--- In mJy ---")
+        twomass_j_mjy, twomass_err_j_mjy =  mag_to_mjy_ufloat(twomass_bands_ju, 'J', twomass_distances, ukirt_system)
+        twomass_h_mjy, twomass_err_h_mjy =  mag_to_mjy_ufloat(twomass_bands_hu, 'H', twomass_distances, ukirt_system)
+        twomass_k_mjy, twomass_err_k_mjy =  mag_to_mjy_ufloat(twomass_bands_ku, 'K', twomass_distances, ukirt_system)
+        # save the converted file of ukidss jhk bands
+        twomass_flux = np.stack((twomass_j_mjy, twomass_h_mjy, twomass_k_mjy, twomass_err_j_mjy, twomass_err_h_mjy, twomass_err_k_mjy))
+        twomass_flux = np.transpose(twomass_flux)
+        np.save("{0}_flux.npy".format(name_twomass_catalog[:-4]), twomass_flux)
+        np.savetxt("{0}_flux.txt".format(name_twomass_catalog[:-4]), twomass_flux)
     #-----------------------------------
     # replace the small signals in 2MASS with signals in UKIDSS in bands JHK
     str_dat_file = read_well_known_data(name_dat_file)
     dat_file = np.array(str_dat_file, dtype = np.float64)
-    dat_file[:,0] = twomass_j_mjy
-    dat_file[:,1] = twomass_h_mjy
-    dat_file[:,2] = twomass_k_mjy
-    dat_file[:,8] = twomass_err_j_mjy
-    dat_file[:,9] = twomass_err_h_mjy
-    dat_file[:,10] = twomass_err_k_mjy
+    if name_twomass_catalog != 'skip':
+        dat_file[:,0] = twomass_j_mjy
+        dat_file[:,1] = twomass_h_mjy
+        dat_file[:,2] = twomass_k_mjy
+        dat_file[:,8] = twomass_err_j_mjy
+        dat_file[:,9] = twomass_err_h_mjy
+        dat_file[:,10] = twomass_err_k_mjy
     if name_ukidss_catalog != "skip":
         '''
         replacement_j = np.where((ukidss_j_mjy != 0) & (dat_file[:, 0] < 30) & (ukidss_err_j_mjy != 0))
