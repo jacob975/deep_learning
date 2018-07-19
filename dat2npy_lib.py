@@ -159,6 +159,24 @@ def normalize_0_r_noJHK(inp):
     outp.reshape(-1, data_width)
     return outp
 
+def normalize_0_r_noH78(inp):
+    # take norm
+    h = len(inp)
+    # remove band H, IRAC 4, MIPS 1 
+    inp[:,1] = 0.0
+    inp[:,9] = 0.0
+    inp[:,6] = 0.0
+    inp[:,14]= 0.0
+    inp[:,7] = 0.0
+    inp[:,15]= 0.0
+    norm = np.amax(inp, axis=1)
+    outp = inp / norm.reshape(h,1)
+    # make each no observation having the same value
+    outp[inp == -9.99e+02] = 0.0
+    outp[inp == 0.0] = 0.0
+    outp.reshape(-1, data_width)
+    return outp
+
 #------------------------------------------------------
 def no_observation_filter_smaller_than_or_eq_0(inp, maximun):
     # set up MaxLoss filter
