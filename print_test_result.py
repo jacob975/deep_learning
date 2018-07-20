@@ -3,7 +3,7 @@
 Abstract:
     This is a program to show the basic result of AI testing.
 Usage:
-    print_test_result.py [keyword]
+    print_test_result.py [keyword fo test set]
 Example:
     print_test_result.py MaxLoss15
 Editor:
@@ -43,11 +43,11 @@ if __name__ == "__main__":
     #----------------------------------------
     # load argv
     if len(argv) != 2:
-        print ("Error!\nUsage: print_test_result.py [keyword]")
+        print ("Error!\nUsage: print_test_result.py [keyword for test set]")
         exit()
     keyword = argv[1]
     #----------------------------------------
-    data_list = glob("AI*test_on*")
+    data_list = glob("AI*test_on*{0}".format(keyword))
     for directory in data_list:
         print ("#################################")
         print ("start to loading data saved in {0}".format(directory))
