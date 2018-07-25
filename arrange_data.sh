@@ -10,7 +10,7 @@
 if [ "$#" -ne 1 ]; then
     echo "Illegal number of parameters"
     echo "Usage: ${0##*/} [option]"
-    echo "Available options: data_Au_OPHu_CHA_II, data_A_OPH_CHA_II, SERu, PERu, CHA_II, LUP_I, LUP_III, LUP_IV"
+    echo "Available options: data_Au_OPHu_CHA_II, data_A_OPH_CHA_II, SERu, SER, PERu, PER, CHA_II, LUP_I, LUP_III, LUP_IV"
     exit 1
 fi
 
@@ -121,14 +121,14 @@ if [ "${option}" = "data_A_OPH_CHA_II" ]; then
     echo "ELAIS N1 done."
     # convert 2MASS band system to UKIDSS band system 
     echo "Convert 2MASS band system to UKIDSS band system"
-    convert_JHK_from_twomass_to_ukidss.py ELAIS_N1_star_sed.dat
-    convert_JHK_from_twomass_to_ukidss.py ELAIS_N1_gala_sed.dat
-    convert_JHK_from_twomass_to_ukidss.py OPH_star_sed.dat
-    convert_JHK_from_twomass_to_ukidss.py OPH_gala_sed.dat
-    convert_JHK_from_twomass_to_ukidss.py OPH_ysos_sed.dat
-    convert_JHK_from_twomass_to_ukidss.py CHA_II_star_sed.dat
-    convert_JHK_from_twomass_to_ukidss.py CHA_II_gala_sed.dat
-    convert_JHK_from_twomass_to_ukidss.py CHA_II_ysos_sed.dat
+    replace_jhk_with_ukidss.py DXS skip ELAIS_N1_2mass/star_2mass.dat ELAIS_N1_star_sed.dat
+    replace_jhk_with_ukidss.py DXS skip ELAIS_N1_2mass/gala_2mass.dat ELAIS_N1_gala_sed.dat
+    replace_jhk_with_ukidss.py GCS skip OPH_2mass/star_2mass.dat OPH_star_sed.dat
+    replace_jhk_with_ukidss.py GCS skip OPH_2mass/gala_2mass.dat OPH_gala_sed.dat
+    replace_jhk_with_ukidss.py GCS skip OPH_2mass/ysos_2mass.dat OPH_ysos_sed.dat
+    replace_jhk_with_ukidss.py DXS skip CHA_II_2mass/star_2mass.dat CHA_II_star_sed.dat
+    replace_jhk_with_ukidss.py DXS skip CHA_II_2mass/gala_2mass.dat CHA_II_gala_sed.dat
+    replace_jhk_with_ukidss.py DXS skip CHA_II_2mass/ysos_2mass.dat CHA_II_ysos_sed.dat
     echo done
     # stack all data
     echo "Stack all data"
@@ -160,6 +160,21 @@ if [ "${option}" = "SERu" ]; then
     exit 0
 fi
 
+if [ "${option}" = "SER" ]; then
+    # Cut data from dataset
+    echo "Cut data from catalog."
+    get_catalog.sh catalog-SER-HREL.tbl star
+    get_catalog.sh catalog-SER-HREL.tbl galaxy
+    get_catalog.sh catalog-SER-HREL.tbl yso
+    echo "done."
+    echo "Replace JHK with UKIDSS data"
+    replace_jhk_with_ukidss.py GPS skip SER_2mass/star_2mass.dat star_sed.dat
+    replace_jhk_with_ukidss.py GPS skip SER_2mass/gala_2mass.dat gala_sed.dat
+    replace_jhk_with_ukidss.py GPS skip SER_2mass/ysos_2mass.dat ysos_sed.dat
+    echo "done."
+    exit 0
+fi
+
 if [ "${option}" = "PERu" ]; then
     # Cut data from dataset
     echo "Cut data from catalog."
@@ -178,6 +193,21 @@ if [ "${option}" = "PERu" ]; then
     exit 0
 fi
 
+if [ "${option}" = "PER" ]; then
+    # Cut data from dataset
+    echo "Cut data from catalog."
+    get_catalog.sh catalog-PER-HREL.tbl star
+    get_catalog.sh catalog-PER-HREL.tbl galaxy
+    get_catalog.sh catalog-PER-HREL.tbl yso
+    echo "done."
+    echo "Replace JHK with UKIDSS data"
+    replace_jhk_with_ukidss.py GCS skip PER_2mass/star_2mass.dat star_sed.dat
+    replace_jhk_with_ukidss.py GCS skip PER_2mass/gala_2mass.dat gala_sed.dat
+    replace_jhk_with_ukidss.py GCS skip PER_2mass/ysos_2mass.dat ysos_sed.dat
+    echo "done."
+    exit 0
+fi
+
 if [ "${option}" = "CHA_II" ]; then
     # Cut data from dataset
     echo "Cut data from catalog."
@@ -187,9 +217,9 @@ if [ "${option}" = "CHA_II" ]; then
     echo "done."
     # convert 2MASS band system to UKIDSS band system 
     echo "Convert 2MASS band system to UKIDSS band system"
-    convert_JHK_from_twomass_to_ukidss.py star_sed.dat
-    convert_JHK_from_twomass_to_ukidss.py gala_sed.dat
-    convert_JHK_from_twomass_to_ukidss.py ysos_sed.dat
+    replace_jhk_with_ukidss.py GCS skip CHA_II_2mass/star_2mass.dat star_sed.dat
+    replace_jhk_with_ukidss.py GCS skip CHA_II_2mass/gala_2mass.dat gala_sed.dat
+    replace_jhk_with_ukidss.py GCS skip CHA_II_2mass/ysos_2mass.dat ysos_sed.dat
     echo "done."
     exit 0
 fi
@@ -203,9 +233,9 @@ if [ "${option}" = "LUP_I" ]; then
     echo "done."
     # convert 2MASS band system to UKIDSS band system 
     echo "Convert 2MASS band system to UKIDSS band system"
-    convert_JHK_from_twomass_to_ukidss.py star_sed.dat
-    convert_JHK_from_twomass_to_ukidss.py gala_sed.dat
-    convert_JHK_from_twomass_to_ukidss.py ysos_sed.dat
+    replace_jhk_with_ukidss.py GCS skip LUP_I_2mass/star_2mass.dat star_sed.dat
+    replace_jhk_with_ukidss.py GCS skip LUP_I_2mass/gala_2mass.dat gala_sed.dat
+    replace_jhk_with_ukidss.py GCS skip LUP_I_2mass/ysos_2mass.dat ysos_sed.dat
     echo "done."
     exit 0
 fi
@@ -219,9 +249,9 @@ if [ "${option}" = "LUP_III" ]; then
     echo "done."
     # convert 2MASS band system to UKIDSS band system 
     echo "Convert 2MASS band system to UKIDSS band system"
-    convert_JHK_from_twomass_to_ukidss.py star_sed.dat
-    convert_JHK_from_twomass_to_ukidss.py gala_sed.dat
-    convert_JHK_from_twomass_to_ukidss.py ysos_sed.dat
+    replace_jhk_with_ukidss.py GCS skip LUP_III_2mass/star_2mass.dat star_sed.dat
+    replace_jhk_with_ukidss.py GCS skip LUP_III_2mass/gala_2mass.dat gala_sed.dat
+    replace_jhk_with_ukidss.py GCS skip LUP_III_2mass/ysos_2mass.dat ysos_sed.dat
     echo "done."
     exit 0
 fi
@@ -235,14 +265,14 @@ if [ "${option}" = "LUP_IV" ]; then
     echo "done."
     # convert 2MASS band system to UKIDSS band system 
     echo "Convert 2MASS band system to UKIDSS band system"
-    convert_JHK_from_twomass_to_ukidss.py star_sed.dat
-    convert_JHK_from_twomass_to_ukidss.py gala_sed.dat
-    convert_JHK_from_twomass_to_ukidss.py ysos_sed.dat
+    replace_jhk_with_ukidss.py GCS skip LUP_IV_2mass/star_2mass.dat star_sed.dat
+    replace_jhk_with_ukidss.py GCS skip LUP_IV_2mass/gala_2mass.dat gala_sed.dat
+    replace_jhk_with_ukidss.py GCS skip LUP_IV_2mass/ysos_2mass.dat ysos_sed.dat
     echo "done."
     exit 0
 fi
 
 
 echo "No match parameters"
-echo "Available options: data_Au_OPHu_CHA_II, data_A_OPH_CHA_II, SERu, PERu, CHA_II, LUP_I, LUP_III, LUP_IV"
+echo "Available options: data_Au_OPHu_CHA_II, data_A_OPH_CHA_II, SERu, SER, PERu, PER, CHA_II, LUP_I, LUP_III, LUP_IV"
 exit 1
