@@ -57,3 +57,13 @@ awk '$17~/Galc/ && $17!~/dust/ { print $1" "$3 }' catalog-SWIRE-v3.tbl > coord_o
 # J_w = J_2 - 0.065(J_2 - H_2)
 # H_w = H_2 + 0.070(J_2 - H_2) - 0.030
 # K_w = K_2 + 0.010(J_2 - K_2)
+#
+###############################################
+# 20180724
+# The keywords of statistial property of data set
+# 
+# allOBS: Imply the dataset of data with all observations.
+#   old name: noloss
+# noXXX : band XXX won't be count into numbers of observations or no observations, and infos on band XXX will be mask.
+# maskXXX: infos on band XXX will be mask.
+# 

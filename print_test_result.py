@@ -27,6 +27,7 @@ import time
 from load_lib import confusion_matrix_infos, load_arrangement, load_labels_pred, load_cls_true 
 from sys import argv
 from glob import glob
+import os
 
 #--------------------------------------------
 # main code
@@ -35,18 +36,20 @@ if __name__ == "__main__":
     # measure times
     start_time = time.time()
     #----------------------------------------
-    # initialize variables and constants
+    # Initialize variables and constants
     data = None
     tracer = None
     cls_pred = None
     cls_true = None
     #----------------------------------------
-    # load argv
+    # Load argv
     if len(argv) != 2:
         print ("Error!\nUsage: print_test_result.py [keyword for test set]")
         exit()
     keyword = argv[1]
     #----------------------------------------
+    # Load data
+    print (os.getcwd())
     data_list = glob("AI*test_on*{0}".format(keyword))
     for directory in data_list:
         print ("#################################")
