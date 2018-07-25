@@ -172,10 +172,10 @@ def read_data_sets(images_name,
                    seed=None):
 
   # load data, label, and coords
-  images = numpy.load(images_name)
+  images = numpy.loadtxt(images_name)
   images = images.reshape((len(images), len(images[0]), 1, 1))
-  labels = numpy.load(labels_name)
-  coords = numpy.load(coords_name)
+  labels = numpy.loadtxt(labels_name)
+  coords = numpy.loadtxt(coords_name)
   '''
   if not 0 <= validation_size <= len(images):
     raise ValueError('Validation size should be between 0 and {}. Received: {}.'.format(len(images), validation_size))

@@ -38,13 +38,13 @@ do
     mkdir -p "AI_${AI_NAME}_test_on_${keyword_set}"
     if [ "${keyword_AI}" -eq "0" ];then
         echo "MaxLoss${iters}"
-        sed_test_AI_64_8.py source_sed_${keyword_set}.npy source_id_${keyword_set}.npy source_coord_${keyword_set}.npy \
+        sed_test_AI_64_8.py source_sed_${keyword_set}.txt source_id_${keyword_set}.txt source_coord_${keyword_set}.txt \
                             "AI_${AI_NAME}_test_on_${keyword_set}"\
                             "${each}checkpoint_AI_64_8_source_sed_MaxLoss${iters}" \
                             > "AI_${AI_NAME}_test_on_${keyword_set}/result_of_AI_test"
         ((iters++))
     else
-        sed_test_AI_64_8.py source_sed_${keyword_set}.npy source_id_${keyword_set}.npy source_coord_${keyword_set}.npy\
+        sed_test_AI_64_8.py source_sed_${keyword_set}.txt source_id_${keyword_set}.txt source_coord_${keyword_set}.txt\
                             "AI_${AI_NAME}_test_on_${keyword_set}"\
                             "${each}checkpoint_AI_64_8_source_sed_${keyword_AI}" \
                             > "AI_${AI_NAME}_test_on_${keyword_set}/result_of_AI_test"

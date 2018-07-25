@@ -12,7 +12,7 @@ do
         # time stamp is used as identification
         timestamp=`date --rfc-3339=seconds`
         mkdir "${timestamp}_trained_by_MaxLoss${iter}"
-        sed_04_64_8.py source_sed_MaxLoss${iter}.npy source_id_MaxLoss${iter}.npy source_coord_MaxLoss${iter}.npy \
+        sed_04_64_8.py source_sed_MaxLoss${iter}.txt source_id_MaxLoss${iter}.txt source_coord_MaxLoss${iter}.txt \
                         "${timestamp}_trained_by_MaxLoss${iter}" > "${timestamp}_trained_by_MaxLoss${iter}/Iter_log"
         (( iter++ ))
 done
