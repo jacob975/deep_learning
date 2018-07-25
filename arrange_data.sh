@@ -1,5 +1,5 @@
 #!/bin/bash
-# The program is used to setup frequently used data arrangements 
+# The program is used to save common data arrangements
 
 # Usage: arrange_data.sh [options]
 
@@ -10,7 +10,7 @@
 if [ "$#" -ne 1 ]; then
     echo "Illegal number of parameters"
     echo "Usage: ${0##*/} [option]"
-    echo "Available options: data_Au_OPHu_CHA_II, data_A_OPH_CHA_II, data_SERu"
+    echo "Available options: data_Au_OPHu_CHA_II, data_A_OPH_CHA_II, SERu, PERu, CHA_II, LUP_I, LUP_III, LUP_IV"
     exit 1
 fi
 
@@ -145,7 +145,7 @@ if [ "${option}" = "data_A_OPH_CHA_II" ]; then
     exit 0
 fi
 
-if [ "${option}" = "data_SERu" ]; then
+if [ "${option}" = "SERu" ]; then
     # Cut data from dataset
     echo "Cut data from catalog."
     get_catalog.sh catalog-SER-HREL.tbl star
@@ -160,8 +160,89 @@ if [ "${option}" = "data_SERu" ]; then
     exit 0
 fi
 
+if [ "${option}" = "PERu" ]; then
+    # Cut data from dataset
+    echo "Cut data from catalog."
+    get_catalog.sh catalog-PER-HREL.tbl star
+    get_catalog.sh catalog-PER-HREL.tbl galaxy
+    get_catalog.sh catalog-PER-HREL.tbl yso
+    echo "done."
+    echo "Replace JHK with UKIDSS data"
+    replace_jhk_with_ukidss.py GCS PER_ukidss/PER_GCS_source_table_star_WSA.csv PER_2mass/star_2mass.dat star_sed.dat
+    replace_jhk_with_ukidss.py GCS PER_ukidss/PER_GCS_source_table_gala_WSA.csv PER_2mass/gala_2mass.dat gala_sed.dat
+    replace_jhk_with_ukidss.py GCS PER_ukidss/PER_GCS_source_table_ysos_WSA.csv PER_2mass/ysos_2mass.dat ysos_sed.dat
+    replace_jhk_with_ukidss.py GPS PER_ukidss/PER_GPS_source_table_star_WSA.csv skip star_sed_u.txt
+    replace_jhk_with_ukidss.py GPS PER_ukidss/PER_GPS_source_table_gala_WSA.csv skip gala_sed_u.txt
+    replace_jhk_with_ukidss.py GPS PER_ukidss/PER_GPS_source_table_ysos_WSA.csv skip ysos_sed_u.txt
+    echo "done."
+    exit 0
+fi
+
+if [ "${option}" = "CHA_II" ]; then
+    # Cut data from dataset
+    echo "Cut data from catalog."
+    get_catalog.sh catalog-CHA_II-HREL.tbl star
+    get_catalog.sh catalog-CHA_II-HREL.tbl galaxy
+    get_catalog.sh catalog-CHA_II-HREL.tbl yso
+    echo "done."
+    # convert 2MASS band system to UKIDSS band system 
+    echo "Convert 2MASS band system to UKIDSS band system"
+    convert_JHK_from_twomass_to_ukidss.py star_sed.dat
+    convert_JHK_from_twomass_to_ukidss.py gala_sed.dat
+    convert_JHK_from_twomass_to_ukidss.py ysos_sed.dat
+    echo "done."
+    exit 0
+fi
+
+if [ "${option}" = "LUP_I" ]; then
+    # Cut data from dataset
+    echo "Cut data from catalog."
+    get_catalog.sh catalog-LUP_I-HREL.tbl star
+    get_catalog.sh catalog-LUP_I-HREL.tbl galaxy
+    get_catalog.sh catalog-LUP_I-HREL.tbl yso
+    echo "done."
+    # convert 2MASS band system to UKIDSS band system 
+    echo "Convert 2MASS band system to UKIDSS band system"
+    convert_JHK_from_twomass_to_ukidss.py star_sed.dat
+    convert_JHK_from_twomass_to_ukidss.py gala_sed.dat
+    convert_JHK_from_twomass_to_ukidss.py ysos_sed.dat
+    echo "done."
+    exit 0
+fi
+
+if [ "${option}" = "LUP_III" ]; then
+    # Cut data from dataset
+    echo "Cut data from catalog."
+    get_catalog.sh catalog-LUP_III-HREL.tbl star
+    get_catalog.sh catalog-LUP_III-HREL.tbl galaxy
+    get_catalog.sh catalog-LUP_III-HREL.tbl yso
+    echo "done."
+    # convert 2MASS band system to UKIDSS band system 
+    echo "Convert 2MASS band system to UKIDSS band system"
+    convert_JHK_from_twomass_to_ukidss.py star_sed.dat
+    convert_JHK_from_twomass_to_ukidss.py gala_sed.dat
+    convert_JHK_from_twomass_to_ukidss.py ysos_sed.dat
+    echo "done."
+    exit 0
+fi
+
+if [ "${option}" = "LUP_IV" ]; then
+    # Cut data from dataset
+    echo "Cut data from catalog."
+    get_catalog.sh catalog-LUP_IV-HREL.tbl star
+    get_catalog.sh catalog-LUP_IV-HREL.tbl galaxy
+    get_catalog.sh catalog-LUP_IV-HREL.tbl yso
+    echo "done."
+    # convert 2MASS band system to UKIDSS band system 
+    echo "Convert 2MASS band system to UKIDSS band system"
+    convert_JHK_from_twomass_to_ukidss.py star_sed.dat
+    convert_JHK_from_twomass_to_ukidss.py gala_sed.dat
+    convert_JHK_from_twomass_to_ukidss.py ysos_sed.dat
+    echo "done."
+    exit 0
+fi
 
 
 echo "No match parameters"
-echo "Available options: data_Au_OPHu_CHA_II"
+echo "Available options: data_Au_OPHu_CHA_II, data_A_OPH_CHA_II, SERu, PERu, CHA_II, LUP_I, LUP_III, LUP_IV"
 exit 1
