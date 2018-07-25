@@ -3,7 +3,7 @@
 Abstract:
     This is a program for converting band system from 2MASS to UKIDSS
 Usage:
-    convert_JHK_form_twomass_to_ukidss.py [dat file name]
+    convert_JHK_from_twomass_to_ukidss.py [dat file name]
 Editor:
     Jacob975
 
@@ -112,9 +112,11 @@ if __name__ == "__main__":
     j_mjy[j_mjy == -9.99e+02] = 0.0
     h_mjy[h_mjy == -9.99e+02] = 0.0
     k_mjy[k_mjy == -9.99e+02] = 0.0
+    '''
     # print something for check
     for i in range(10):
         print("j = {0}+/-{1}, h = {2}+/-{3} k = {4}+/-{5}".format(j_mjy[i, 0], j_mjy[i, 1], h_mjy[i,0], h_mjy[i,1], k_mjy[i, 0], k_mjy[i, 1]))
+    '''
     # convert from flux to 2MASS bands system
     twomass_system = convert_lib.set_twomass()
     j_mag =  mjy_to_mag(j_mjy, 'J', twomass_system)
@@ -124,9 +126,11 @@ if __name__ == "__main__":
     j_mag = fill_up_error(j_mag)
     h_mag = fill_up_error(h_mag)
     k_mag = fill_up_error(k_mag)
+    '''
     # print something for check
     for i in range(10):
         print("j = {0}+/-{1}, h = {2}+/-{3} k = {4}+/-{5}".format(j_mag[i, 0], j_mag[i, 1], h_mag[i,0], h_mag[i,1], k_mag[i, 0], k_mag[i, 1]))
+    '''
     # convert from 2MASS bands system to UKIDSS bands system
     ukirt_system = convert_lib.set_ukirt()
     j_mjy_u =  mag_to_mjy(j_mag, 'J', ukirt_system)
@@ -138,9 +142,11 @@ if __name__ == "__main__":
     dat_file[:,8] = j_mjy_u[:,1]
     dat_file[:,9] = h_mjy_u[:,1]
     dat_file[:,10] =k_mjy_u[:,1]
+    '''
     # print something for check
     for i in range(10):
         print("j = {0}+/-{1}, h = {2}+/-{3} k = {4}+/-{5}".format(j_mjy_u[i, 0], j_mjy_u[i, 1], h_mjy_u[i,0], h_mjy_u[i,1], k_mjy_u[i, 0], k_mjy_u[i, 1]))
+    '''
     np.save("{0}_u.npy".format(name_dat_file[:-4]), dat_file)
     np.savetxt("{0}_u.txt".format(name_dat_file[:-4]), dat_file)
     #-----------------------------------
