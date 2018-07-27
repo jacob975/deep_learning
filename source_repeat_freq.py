@@ -3,9 +3,9 @@
 Abstract:
     This is a program to show the data with different true and prediction 
 Usage:
-    true_and_pred.py [keyword] [true label] [pred label]
+    source_repeat_freq.py [keyword] [true label] [pred label]
 Example:
-    true_and_pred.py MaxLoss15 1 2
+    source_repeat_freq.py MaxLoss15 1 2
 Editor:
     Jacob975
 
@@ -51,7 +51,7 @@ if __name__ == "__main__":
     #----------------------------------------
     # load argv
     if len(argv) != 4:
-        print ("Error!\nUsage: true_and_pred.py [keyword] [true label] [pred label]")
+        print ("Error!\nUsage: source_repeat_freq.py [keyword] [true label] [pred label]")
         exit()
     keyword = argv[1]
     true_label = int(argv[2])

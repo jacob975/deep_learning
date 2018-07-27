@@ -162,7 +162,8 @@ def load_coords(sub_name, directory):
 def confusion_matrix(cls_true, cls_pred):
     from sklearn.metrics import confusion_matrix
     cm = confusion_matrix(y_true=cls_true,
-                          y_pred=cls_pred)
+                          y_pred=cls_pred,
+                          labels = range(3))
     return 0, cm
 
 def print_accuracy(y_true, y_pred):
