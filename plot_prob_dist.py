@@ -29,14 +29,42 @@ import prettytensor as pt
 import itertools
 from colour import Color
 
-def degenerate(labels):
-    jhk_linescales = np.asarray(list(itertools.product(np.arange(0.1, 1.1, 0.2), repeat=3)))
-    answer = np.zeros((len(jhk_linescales), 3))
-    for i in range(len(jhk_linescales)):
+def degenerate(data, labels, sort_order):
+    # sort by sort_order 
+    extend_data = np.append(data, labels, axis = 1)
+    # set data type of each column
+    extend_dtype = [('J', float), 
+                    ('H', float), 
+                    ('K', float), 
+                    ('IRAC1', float), 
+                    ('IRAC2', float), 
+                    ('IRAC3', float), 
+                    ('IRAC4', float), 
+                    ('MIPS1', float), 
+                    ('err_J', float), 
+                    ('err_H', float), 
+                    ('err_K', float), 
+                    ('err_IRAC1', float), 
+                    ('err_IRAC2', float), 
+                    ('err_IRAC3', float), 
+                    ('err_IRAC4', float), 
+                    ('err_MIPS1', float), 
+                    ('Star_prob', float), 
+                    ('Gala_prob', float), 
+                    ('YSOs_prob', float)]
+    extend_data = extend_data.view(dtype = extend_dtype)
+    extend_data = extend_data.reshape(extend_data.shape[:-1])
+    extend_data = np.sort(extend_data, order = sort_order) 
+    linescales = np.asarray(list(itertools.product(np.arange(0.1, 1.1, 0.2), repeat=3)))
+    answer = np.zeros((len(linescales), 3))
+    for i in range(len(linescales)):
         ini = i * np.power(5, 5)
         fin = (i+1) * np.power(5, 5)
-        answer[i] = np.mean(labels[ini:fin], axis = 0)
-    return answer
+        star_pred = np.mean(extend_data['Star_prob'][ini:fin])
+        gala_pred = np.mean(extend_data['Gala_prob'][ini:fin])
+        ysos_pred = np.mean(extend_data['YSOs_prob'][ini:fin])
+        answer[i] = np.array([star_pred, gala_pred, ysos_pred]) 
+    return linescales, answer
 
 # Assign RGB color to represent stars, galaxies, and YSOs.
 def assign_color(color_code):
@@ -51,7 +79,7 @@ def assign_color(color_code):
     for i, code in enumerate(green_code):
         gala_color[i] = Color(rgb = (0, code, 0)).hex_l
     for i, code in enumerate(blue_code):
-        ysos_color[i] = Color(rgb = (0, 0, code)).hex_l
+        ysos_color[i] = Color(rgb = (code, code, 0)).hex_l
     return star_color, gala_color, ysos_color
     
 def predict_label(images):
@@ -63,6 +91,32 @@ def predict_label(images):
     # process 
     label_pred = session.run(y_pred, feed_dict=feed_dict)
     return label_pred
+
+def plot_prob(arti_data, star_color, gala_color, ysos_color, sort_order):
+    fig = plt.figure()
+    # Star
+    ax = fig.add_subplot(221, projection='3d')
+    ax.scatter(xs = arti_data[:,0], ys = arti_data[:,1], zs = arti_data[:,2], zdir='z', s=100, c=star_color, depthshade=False)
+    ax.set_title("Star probability")
+    ax.set_xlabel(sort_order[0])
+    ax.set_ylabel(sort_order[1])
+    ax.set_zlabel(sort_order[2])
+    # Galaxy
+    ax = fig.add_subplot(222, projection='3d')
+    ax.scatter(xs = arti_data[:,0], ys = arti_data[:,1], zs = arti_data[:,2], zdir='z', s=100, c=gala_color, depthshade=False)
+    ax.set_title("Galaxy probability")
+    ax.set_xlabel(sort_order[0])
+    ax.set_ylabel(sort_order[1])
+    ax.set_zlabel(sort_order[2])
+    # YSOs
+    ax = fig.add_subplot(223, projection='3d')
+    ax.scatter(xs = arti_data[:,0], ys = arti_data[:,1], zs = arti_data[:,2], zdir='z', s=100, c=ysos_color, depthshade=False)
+    ax.set_title("YSO probability")
+    ax.set_xlabel(sort_order[0])
+    ax.set_ylabel(sort_order[1])
+    ax.set_zlabel(sort_order[2])
+    fig.show()
+    return
 
 #--------------------------------------------
 # main code
@@ -134,34 +188,35 @@ if __name__ == "__main__":
     arti_data = np.asarray(list(itertools.product(np.arange(0.1, 1.1, 0.2), repeat=8)))
     arti_data = np.append(arti_data, np.full((len(arti_data), 8), 0.1), axis = 1)
     label_pred = predict_label(arti_data)
-    print (arti_data[:10])
     print ("length of arti_data = {0}".format(len(arti_data)))
-    print (label_pred[:10])
     print ("length of label_pred = {0}".format(len(label_pred)))
     # degenerate data and pred_labels to band JHK
     print ('--- degenerate data and pred_labels to band JHK ---')
-    arti_data_JHK = np.asarray(list(itertools.product(np.arange(0.1, 1.1, 0.2), repeat = 3))) 
-    arti_data_JHK = np.append(arti_data_JHK, np.full((len(arti_data_JHK), 5), 0.5), axis = 1)
-    arti_data_JHK = np.append(arti_data_JHK, np.full((len(arti_data_JHK), 8), 0.1), axis = 1)
-    label_pred_JHK = degenerate(label_pred)
-    print (arti_data_JHK[:10])
-    print ("length of arti_data_JHK = {0}".format(len(arti_data_JHK)))
-    print (label_pred_JHK)
-    print ("length of label_pred_JHK = {0}".format(len(label_pred_JHK)))
-    star_color, gala_color, ysos_color = assign_color(label_pred_JHK)
+    sort_order_jhk = ['J', 'H', 'K']
+    arti_data_JHK, label_pred_JHK = degenerate(arti_data, label_pred, sort_order_jhk)
+    star_color_jhk, gala_color_jhk, ysos_color_jhk = assign_color(label_pred_JHK)
+    # degenerate data and pred_labels to band IRAC1, IRAC3, and MIPS1
+    print ('--- degenerate data and pred_labels to band IRAC1, IRAC3, and MIPS1 ---')
+    sort_order_468 = ['IRAC1', 'IRAC3', 'MIPS1']
+    arti_data_468, label_pred_468 = degenerate(arti_data, label_pred, sort_order_468)
+    star_color_468, gala_color_468, ysos_color_468 = assign_color(label_pred_468)
+    # degenerate data and pred_labels to band H, IRAC2, and MIPS1
+    print ('--- degenerate data and pred_labels to band H, IRAC2, and MIPS1 ---')
+    sort_order_258 = ['H', 'IRAC2', 'MIPS1']
+    arti_data_258, label_pred_258 = degenerate(arti_data, label_pred, sort_order_258)
+    star_color_258, gala_color_258, ysos_color_258 = assign_color(label_pred_258)
+    # degenerate data and pred_labels to band IRAC3, IRAC4, and MIPS1
+    print ('--- degenerate data and pred_labels to band IRAC3, IRAC4, and MIPS1 ---')
+    sort_order_678 = ['IRAC3', 'IRAC4', 'MIPS1']
+    arti_data_678, label_pred_678 = degenerate(arti_data, label_pred, sort_order_678)
+    star_color_678, gala_color_678, ysos_color_678 = assign_color(label_pred_678)
     #-----------------------------------
     # Plot 3D distribution
-    fig = plt.figure()
-    # Star
-    ax = fig.add_subplot(221, projection='3d')
-    ax.scatter(xs = arti_data_JHK[:,0], ys = arti_data_JHK[:,1], zs = arti_data_JHK[:,2], zdir='z', s=20, c=star_color, depthshade=False)
-    # Galaxy
-    ax = fig.add_subplot(222, projection='3d')
-    ax.scatter(xs = arti_data_JHK[:,0], ys = arti_data_JHK[:,1], zs = arti_data_JHK[:,2], zdir='z', s=20, c=gala_color, depthshade=False)
-    # YSOs
-    ax = fig.add_subplot(223, projection='3d')
-    ax.scatter(xs = arti_data_JHK[:,0], ys = arti_data_JHK[:,1], zs = arti_data_JHK[:,2], zdir='z', s=20, c=ysos_color, depthshade=False)
-    fig.show()
+    plot_prob(arti_data_JHK, star_color_jhk, gala_color_jhk, ysos_color_jhk, sort_order_jhk)
+    plot_prob(arti_data_468, star_color_468, gala_color_468, ysos_color_468, sort_order_468)
+    plot_prob(arti_data_258, star_color_258, gala_color_258, ysos_color_258, sort_order_258)
+    plot_prob(arti_data_678, star_color_678, gala_color_678, ysos_color_678, sort_order_678)
+    input()
     #-----------------------------------
     # Close session
     session.close()
