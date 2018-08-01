@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 '''
 Abstract:
-    This is a program to take band JHK form 2mass catalog
+    This is a program to take band JHK from 2mass catalog
 Usage:
     take_jhk_from_2mass.py [2mass catalog file] [band system] [label]
 Editor:
