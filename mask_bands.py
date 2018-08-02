@@ -27,12 +27,13 @@ if __name__ == "__main__":
     VERBOSE = 0
     # measure time
     start_time = time.time()
+    options = ['noJHK', 'noH', 'noH78', 'no78']
     #-----------------------------------
     # Load argv
     if len(argv) != 3:
         print ("Wrong numbers of arguments")
         print ("Usage: mask_bands.py [mod] [data]")
-        print ("Available mod: noJHK, noH, noH78.")
+        print ("Available mod: {0}".format(", ".join('%s'%x for x in options)))
         exit(0)
     mod = argv[1]
     data_name = argv[2]
@@ -46,6 +47,8 @@ if __name__ == "__main__":
         from dat2npy_lib import normalize_0_r_noH as normalize
     if mod == 'noH78':
         from dat2npy_lib import normalize_0_r_noH78 as normalize
+    if mod == 'no78':
+        from dat2npy_lib import normalize_0_r_no78 as normalize
     # mask dataset with chosen mask, then normalize to the maximun flux equals 1.
     masked_data = normalize(data)
     # Save masked data set

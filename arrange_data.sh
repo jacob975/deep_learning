@@ -57,8 +57,8 @@ if [ "${option}" = "data_Au_OPHu_CHA_II" ]; then
     echo "ELAIS N1 done."
     # replace old data with ukidss data and 2mass data
     echo "Replace JHK with UKIDSS data"
-    replace_jhk_with_ukidss.py DXS ELAIS_N1_DXS_source_table_star_WSA.csv ELAIS_N1_2mass/star_2mass.txt ELAIS_N1_star_sed.dat
-    replace_jhk_with_ukidss.py DXS ELAIS_N1_DXS_source_table_gala_WSA.csv ELAIS_N1_2mass/gala_2mass.txt ELAIS_N1_gala_sed.dat
+    replace_jhk_with_ukidss.py DXS ELAIS_N1_DXS_source_table_star_WSA.csv ELAIS_N1_2mass/star_2mass.dat ELAIS_N1_star_sed.dat
+    replace_jhk_with_ukidss.py DXS ELAIS_N1_DXS_source_table_gala_WSA.csv ELAIS_N1_2mass/gala_2mass.dat ELAIS_N1_gala_sed.dat
     replace_jhk_with_ukidss.py GCS OPH_GCS_source_table_star_WSA.csv OPH_2mass/star_2mass.dat OPH_star_sed.dat
     replace_jhk_with_ukidss.py GCS OPH_GCS_source_table_gala_WSA.csv OPH_2mass/gala_2mass.dat OPH_gala_sed.dat
     replace_jhk_with_ukidss.py GCS OPH_GCS_source_table_ysos_WSA.csv OPH_2mass/ysos_2mass.dat OPH_ysos_sed.dat

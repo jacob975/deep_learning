@@ -67,7 +67,7 @@ if __name__ == "__main__":
     # measure times
     start_time = time.time()
     # initialize
-    options = ['0_r', '0_r_noH', '0_r_noMIPS', '0_r_noH_noMIPS', '0_r_noJHK', '0_r_noH78', '1_1', '1_0', '1_r', '0_0']
+    options = ['0_r', '0_r_noH', '0_r_noMIPS', '0_r_noH_noMIPS', '0_r_noJHK', '0_r_noH78', '0_r_no78', '1_1', '1_0', '1_r', '0_0']
     #----------------------------------
     # check argv is right
     if len(argv) < 3:
@@ -95,6 +95,9 @@ if __name__ == "__main__":
         from dat2npy_lib import no_observation_filter_eq_0 as no_observation_filter
     elif mod == '0_r_noH78':
         from dat2npy_lib import normalize_0_r_noH78 as normalize
+        from dat2npy_lib import no_observation_filter_eq_0 as no_observation_filter
+    elif mod == '0_r_no78':
+        from dat2npy_lib import normalize_0_r_no78 as normalize
         from dat2npy_lib import no_observation_filter_eq_0 as no_observation_filter
     elif mod == '1_1':
         from dat2npy_lib import normalize_1_1 as normalize
