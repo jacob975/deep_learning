@@ -115,7 +115,7 @@ def plot_prob(arti_data, star_color, gala_color, ysos_color, sort_order):
     ax.set_xlabel(sort_order[0])
     ax.set_ylabel(sort_order[1])
     ax.set_zlabel(sort_order[2])
-    fig.show()
+    plt.savefig('probability_distribution_{0}_{1}_{2}.png'.format(sort_order[0], sort_order[1], sort_order[2]))
     return
 
 #--------------------------------------------
@@ -126,10 +126,12 @@ if __name__ == "__main__":
     start_time = time.time()    
     #-----------------------------------
     # Load argv
-    if len(argv) != 2:
-        print ("Error! Usage: plot_prob_distribution.py [AI dir]")
+    if len(argv) != 3:
+        print ("Error! Usage: plot_prob_distribution.py [AI dir] [mask]")
+        print ("Available mask: allOBS, maskJHK, mask78")
         exit(1)
     AI_saved_dir = argv[1]
+    mask = argv[2]
     #-----------------------------------
     # Load AI
     # Dimension setup
@@ -187,7 +189,26 @@ if __name__ == "__main__":
     # Calculate the probability distribution of labels
     arti_data = np.asarray(list(itertools.product(np.arange(0.1, 1.1, 0.2), repeat=8)))
     arti_data = np.append(arti_data, np.full((len(arti_data), 8), 0.1), axis = 1)
-    label_pred = predict_label(arti_data)
+    # Load data mask
+    test_arti_data = arti_data[:]
+    if mask == "allOBS":
+        pass
+    elif mask == "maskJHK":
+        test_arti_data[:,0] = 0.
+        test_arti_data[:,8] = 0.
+        test_arti_data[:,1] = 0.
+        test_arti_data[:,9] = 0.
+        test_arti_data[:,2] = 0.
+        test_arti_data[:,10] = 0.
+    elif mask == "mask78":
+        test_arti_data[:,6] = 0.
+        test_arti_data[:,14] = 0.
+        test_arti_data[:,7] = 0.
+        test_arti_data[:,15] = 0.
+    else:
+        print ("Wrong mask")
+        exit(1)
+    label_pred = predict_label(test_arti_data)
     print ("length of arti_data = {0}".format(len(arti_data)))
     print ("length of label_pred = {0}".format(len(label_pred)))
     # degenerate data and pred_labels to band JHK
@@ -216,7 +237,6 @@ if __name__ == "__main__":
     plot_prob(arti_data_468, star_color_468, gala_color_468, ysos_color_468, sort_order_468)
     plot_prob(arti_data_258, star_color_258, gala_color_258, ysos_color_258, sort_order_258)
     plot_prob(arti_data_678, star_color_678, gala_color_678, ysos_color_678, sort_order_678)
-    input()
     #-----------------------------------
     # Close session
     session.close()
