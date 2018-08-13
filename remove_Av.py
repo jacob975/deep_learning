@@ -24,25 +24,26 @@ from numpy import arcsin
 from sys import argv
 import time
 import numpy as np
+from uncertainties import ufloat
 
-def find_the_closest_extinction_position(source, catalog):
+def find_the_closest_extinction_position(source, extinction_table):
     # Initialize
     # Read central position of source
-    RA_degree  = source[0]
-    DEC_degree = source[2]
+    RA_degree  = float(source[2])
+    DEC_degree = float(source[4])
     # Convert degree to radian
     RA_enoch  = RA_degree/360*2*pi
     DEC_enoch = DEC_degree/360*2*pi
     # The radius of an extinction region in unit degree
     tolerance_radius = 0.05
-    RA_ca  = np.divide(catalog[:,0], 360) * 2 * pi
-    DEC_ca = np.divide(catalog[:,1], 360) * 2 * pi
+    RA_ca  = np.divide(extinction_table[:,0], 360) * 2 * pi
+    DEC_ca = np.divide(extinction_table[:,1], 360) * 2 * pi
     diff_X = np.cos(RA_enoch) * np.cos(DEC_enoch) - np.cos(RA_ca) * np.cos(DEC_ca) 
     diff_Y = np.cos(RA_enoch) * np.sin(DEC_enoch) - np.cos(RA_ca) * np.sin(DEC_ca)
     diff_Z = np.sin(DEC_enoch) * np.sin(DEC_ca)
-    square_distance_array = np.power(diff_X, 2) + np.power(diff_Y, 2) + np.power(diff_Z, 2)
-    min_square_distance = np.min(square_distance_array)
-    index_min_square_distance = np.argmin(square_distance_array) 
+    distance_array = np.sqrt(np.power(diff_X, 2) + np.power(diff_Y, 2) + np.power(diff_Z, 2))
+    min_square_distance = np.min(distance_array)
+    index_min_square_distance = np.argmin(distance_array) 
     return min_square_distance, index_min_square_distance
 
 #--------------------------------------------
@@ -59,44 +60,71 @@ if __name__ == "__main__":
     extinction_table_name = argv[1]
     source_table_name = argv[2]
     #--------------------------------------------
-    # Load tables
+    # Load data
     # The table of extinction map.
-    extinction_table = np.loadtxt(extinction_table_name, dtype = float, comment = "#")
+    extinction_table = np.loadtxt(extinction_table_name, dtype = float, comments = "#")
     # The source to be corrected
-    source_table = np.loadtxt(source_table_name, dtype = float, comment = "#")
-    # Citation needed
-    parameter =[['J'  ,33 ,0.2741],
-                ['H'  ,54 ,0.1622],
-                ['K'  ,75 ,0.1119],
-                ['IR1',96 ,0.0671],
-                ['IR2',117,0.0543],
-                ['IR3',138,0.0444],
-                ['IR4',159,0.0463],
-                ['MP1',180,0.0259],
-                ['MP2',201,0.     ]]
-    for source in source_table:
+    source_table = np.loadtxt(source_table_name, dtype = object, skiprows = 7,comments = "#")
+    intrinsic_source_table = source_table[:] 
+    # Define the extinction curves
+    from extinction_curves_lib import WD_31B, WD_55B
+    for index, source in enumerate(intrinsic_source_table):
+        #------------------------------------------------
+        # Find Av
+        Av = 0.0
+        err_Av = 0.0
+        # If the label of source is star and Av exists, just apply it.
+        print (source[14])
+        if source[14] == 'star' and Av != -9.99e02:
+            Av = float(source[15])
+            err_Av = float(source[16])
         # Find the closest extinction position for sources.
-        minSQ, index_min = find_the_closest_extinction_position(source, extinction_table)
-        # Show angular size, the distance in arc second.
-        ars_dis=arcsin(minSQ**0.5/2)/(2*pi)*360*60*60
-        print (ars_dis)
-        if ars_dis > 0.05:
-            # do something
-        # Read the Av of the selected extinction point.
-        Av = extinction_table[index_min, 6]
+        else:
+            min_distance, index_min = find_the_closest_extinction_position(source, extinction_table)
+            # Show angular size, the distance in arc second.
+            # This equation might be wrong
+            ars_dis=arcsin(min_distance/2)/(2*pi)*360*60*60
+            if ars_dis > 0.05:
+                Av = 0.0
+                err_Av = 0.0
+            else:
+                # Read the Av of the selected extinction point.
+                Av = extinction_table[index_min, 6]
+                err_Av = extinction_table[index_min, 7]
+                intrinsic_source_table[index, 16] = Av
+                intrinsic_source_table[index, 17] = err_Av
         print ("Av = {0}".format(Av))
+        #------------------------------------------------
         # Apply extinction correction on source.
-        source[17]=Av
-        for band in parameter:
-            flux = source[band[1]]
-            C_av = band[2]
-            if flux<0:
-                new_far_flux = flux
-            if flux>=0:
-                new_far_flux = flux*10**(C_av*Av/2.5)
-            source[band[1]]=new_far_flux
+        if Av == 0.0 or Av == -9.99e+02:
+            continue
+        elif Av > 1.0:
+            for band in WD_55B:
+                flux = float(source[band[1]])
+                err_flux = float(source[band[2]])
+                C_av = band[3]
+                # If both flux and Av are valid, apply it!
+                if flux > 0.0 and err_flux > 0.0:
+                    # error propagation are needed
+                    uflux = ufloat(flux, err_flux)
+                    uAv   = ufloat(Av  , err_Av)
+                    intrinsic_flux = uflux*10**(C_av*uAv/2.5)
+                    intrinsic_source_table[index, band[1]] = intrinsic_flux.n
+                    intrinsic_source_table[index, band[2]] = intrinsic_flux.s
+        elif Av < 1.0 and Av > 0.0:
+            for band in WD_31B:
+                flux = float(source[band[1]])
+                err_flux = float(source[band[2]])
+                C_av = band[3]
+                # If both flux and Av are valid, apply it!
+                if flux > 0.0 and err_flux > 0.0:
+                    # error propagation are needed
+                    uflux = ufloat(flux, err_flux)
+                    uAv   = ufloat(Av  , err_Av)
+                    intrinsic_source_table[index, band[1]] = intrinsic_flux.n
+                    intrinsic_source_table[index, band[2]] = intrinsic_flux.s
     # Save the table
-    np.savetxt("{0}_intrinsic.tbl".format(source_table_name), source_table)
+    np.savetxt("{0}_intrinsic.tbl".format(source_table_name), intrinsic_source_table)
     #-----------------------------------
     # measure time
     elapsed_time = time.time() - start_time
