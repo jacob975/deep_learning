@@ -2,9 +2,11 @@
 '''
 Abstract:
     This is a program for remove Av and show the intrinsic flux of sources. 
+    This correction can only apply on molecular cloud CHA, LUP, OPH, PER, SER
+    Citations: Chapman et al. (2009)
 Usage:
-    remove_Av.py [extinction table] [source table]
-    Example: Remove_Av.py table source_table.tbl
+    remove_Av.py [extinction table] [source table] [Av table] [coord table]
+    Example: remove_Av.py extinction_table sed_table.txt Av.txt coord.txt
 Editor:
     T.H. Heish, Jacob
 
@@ -26,11 +28,11 @@ import time
 import numpy as np
 from uncertainties import ufloat
 
-def find_the_closest_extinction_position(source, extinction_table):
+def find_the_closest_extinction_position(coord, extinction_table):
     # Initialize
     # Read central position of source
-    RA_degree  = float(source[2])
-    DEC_degree = float(source[4])
+    RA_degree  = coord[0]
+    DEC_degree = coord[1]
     # Convert degree to radian
     RA_enoch  = RA_degree/360*2*pi
     DEC_enoch = DEC_degree/360*2*pi
@@ -53,34 +55,40 @@ if __name__ == "__main__":
     start_time = time.time()
     #--------------------------------------------
     # Load argv
-    if len(argv) != 3:
-        print ("Error!\nUsage: Remove_Av.py [extinction table] [source table]") 
-        print ("Example: Remove_Av.py extinction_table source_table.tbl")
+    if len(argv) != 5:
+        print ("Error!\nUsage: Remove_Av.py [extinction table] [sed table] [Av table] [coord table]") 
+        print ("Example: remove_Av.py extinction_table sed_table.txt Av.txt coord.txt")
         exit()
     extinction_table_name = argv[1]
-    source_table_name = argv[2]
+    sed_table_name = argv[2]
+    Av_table_name = argv[3]
+    coord_table_name = argv[4]
     #--------------------------------------------
     # Load data
     # The table of extinction map.
-    extinction_table = np.loadtxt(extinction_table_name, dtype = float, comments = "#")
+    extinction_table = np.loadtxt(extinction_table_name, dtype = float)
     # The source to be corrected
-    source_table = np.loadtxt(source_table_name, dtype = object, skiprows = 7,comments = "#")
-    intrinsic_source_table = source_table[:] 
+    sed_table = np.loadtxt(sed_table_name, dtype = float)
+    # Av of each sources if known.
+    Av_table = np.loadtxt(Av_table_name, dtype = float)
+    # coord of each sources
+    coord_table = np.loadtxt(coord_table_name, dtype = float)
     # Define the extinction curves
-    from extinction_curves_lib import WD_31B, WD_55B
-    for index, source in enumerate(intrinsic_source_table):
+    from extinction_curves_lib import WD_55B
+    for index, source in enumerate(sed_table):
         #------------------------------------------------
         # Find Av
         Av = 0.0
         err_Av = 0.0
         # If the label of source is star and Av exists, just apply it.
-        print (source[14])
-        if source[14] == 'star' and Av != -9.99e02:
-            Av = float(source[15])
-            err_Av = float(source[16])
+        if Av_table[index, 0] > 0.0:
+            Av = Av_table[index, 0]
+            err_Av = Av_table[index, 1]
         # Find the closest extinction position for sources.
         else:
-            min_distance, index_min = find_the_closest_extinction_position(source, extinction_table)
+            Av_table[index, 0] = 0.0 
+            Av_table[index, 1] = 0.0
+            min_distance, index_min = find_the_closest_extinction_position(coord_table[index], extinction_table)
             # Show angular size, the distance in arc second.
             # This equation might be wrong
             ars_dis=arcsin(min_distance/2)/(2*pi)*360*60*60
@@ -91,17 +99,16 @@ if __name__ == "__main__":
                 # Read the Av of the selected extinction point.
                 Av = extinction_table[index_min, 6]
                 err_Av = extinction_table[index_min, 7]
-                intrinsic_source_table[index, 16] = Av
-                intrinsic_source_table[index, 17] = err_Av
-        print ("Av = {0}".format(Av))
+                Av_table[index, 0] = Av
+                Av_table[index, 1] = err_Av
         #------------------------------------------------
         # Apply extinction correction on source.
-        if Av == 0.0 or Av == -9.99e+02:
+        if Av == 0.0:
             continue
-        elif Av > 1.0:
+        else :
             for band in WD_55B:
-                flux = float(source[band[1]])
-                err_flux = float(source[band[2]])
+                flux = source[band[1]]
+                err_flux = source[band[2]]
                 C_av = band[3]
                 # If both flux and Av are valid, apply it!
                 if flux > 0.0 and err_flux > 0.0:
@@ -109,22 +116,10 @@ if __name__ == "__main__":
                     uflux = ufloat(flux, err_flux)
                     uAv   = ufloat(Av  , err_Av)
                     intrinsic_flux = uflux*10**(C_av*uAv/2.5)
-                    intrinsic_source_table[index, band[1]] = intrinsic_flux.n
-                    intrinsic_source_table[index, band[2]] = intrinsic_flux.s
-        elif Av < 1.0 and Av > 0.0:
-            for band in WD_31B:
-                flux = float(source[band[1]])
-                err_flux = float(source[band[2]])
-                C_av = band[3]
-                # If both flux and Av are valid, apply it!
-                if flux > 0.0 and err_flux > 0.0:
-                    # error propagation are needed
-                    uflux = ufloat(flux, err_flux)
-                    uAv   = ufloat(Av  , err_Av)
-                    intrinsic_source_table[index, band[1]] = intrinsic_flux.n
-                    intrinsic_source_table[index, band[2]] = intrinsic_flux.s
+                    sed_table[index, band[1]] = intrinsic_flux.n
+                    sed_table[index, band[2]] = intrinsic_flux.s
     # Save the table
-    np.savetxt("{0}_intrinsic.tbl".format(source_table_name), intrinsic_source_table)
+    np.savetxt("{0}_intrinsic.txt".format(sed_table_name[:-4]), sed_table)
     #-----------------------------------
     # measure time
     elapsed_time = time.time() - start_time

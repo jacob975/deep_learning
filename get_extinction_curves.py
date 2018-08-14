@@ -54,7 +54,8 @@ if __name__ == "__main__":
     table_name = argv[1]
     #-----------------------------------
     # Load table
-    extinction_table = np.loadtxt(table_name, comments = "#")
+    extinction_table = np.loadtxt(table_name, dtype = float, comments = "#")
+    extinction_table = extinction_table[extinction_table[:,0].argsort()]
     # Initialize
     band_freq_list = [[  'V', 0.546, 0.0],
                       [  'J', 1.235, 0.0],
