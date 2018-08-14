@@ -95,7 +95,7 @@ if __name__ == "__main__":
             if ars_dis > 0.05:
                 Av = 0.0
                 err_Av = 0.0
-            else:
+            elif extinction_table[index_min, 6] > 0.0:
                 # Read the Av of the selected extinction point.
                 Av = extinction_table[index_min, 6]
                 err_Av = extinction_table[index_min, 7]
@@ -104,7 +104,11 @@ if __name__ == "__main__":
         #------------------------------------------------
         # Apply extinction correction on source.
         if Av == 0.0:
-            continue
+            # If extinction is not detected and not covered by extinction map
+            # remove this sources
+            for band in WD_55B:
+                sed_table[index,band[1]] = 0.0
+                sed_table[index,band[2]] = 0.0
         else :
             for band in WD_55B:
                 flux = source[band[1]]
