@@ -56,6 +56,8 @@ if __name__ == "__main__":
     # Load table
     extinction_table = np.loadtxt(table_name, dtype = float, comments = "#")
     extinction_table = extinction_table[extinction_table[:,0].argsort()]
+    #-----------------------------------
+    # For 2MASS, IRAC, and MIPS
     # Initialize
     band_freq_list = [[  'V', 0.546, 0.0],
                       [  'J', 1.235, 0.0],
@@ -72,6 +74,31 @@ if __name__ == "__main__":
         band[2] = interpolation(extinction_table, band[1], index, index - 1)
     band_freq_array = np.array(band_freq_list, dtype = object)
     band_freq_array[:,2] = np.divide( band_freq_array[:,2], band_freq_array[0,2])
+    print ("-------------------------")
+    print ("For 2MASS, IRAC, and MIPS")
+    print ("name wave_length A_lambda/A_v")
+    for band in band_freq_array:
+        print ("{0} {1} {2:.4f}".format(band[0], band[1], band[2]))
+    #-----------------------------------
+    # For UKIDSS, IRAC, and MIPS 
+    # Initialize
+    band_freq_list = [[  'V', 0.546, 0.0],
+                      [  'J', 1.248, 0.0],
+                      [  'H', 1.631, 0.0],
+                      [  'K', 2.201, 0.0],
+                      ['IR1', 3.6  , 0.0],
+                      ['IR2', 4.5  , 0.0],
+                      ['IR3', 5.8  , 0.0],
+                      ['IR4', 8.0  , 0.0],
+                      ['MP1', 24.  , 0.0]]
+    # Calculate the result
+    for band in band_freq_list:
+        index = match_freq(extinction_table, band[1])
+        band[2] = interpolation(extinction_table, band[1], index, index - 1)
+    band_freq_array = np.array(band_freq_list, dtype = object)
+    band_freq_array[:,2] = np.divide( band_freq_array[:,2], band_freq_array[0,2])
+    print ("--------------------------")
+    print ("For UKIDSS, IRAC, and MIPS")
     print ("name wave_length A_lambda/A_v")
     for band in band_freq_array:
         print ("{0} {1} {2:.4f}".format(band[0], band[1], band[2]))

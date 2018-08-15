@@ -46,8 +46,7 @@ if __name__ == "__main__":
     plt.xlabel("Av")
     plt.ylabel("# of sources")
     plt.bar(np.arange(-9.5, 49.5, 1), Av_hist[0])
-    Av_hist_plot.show()
-    input()
+    Av_hist_plot.savefig("Av_hist.png")
     #-----------------------------------
     # measure time
     elapsed_time = time.time() - start_time

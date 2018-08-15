@@ -4,7 +4,7 @@ Program:
 This is a table of environment variable of deep learning python.
 Usage:
 
-    import conf.py       // in your deep learning python program
+    import DL_conf.py       // in your deep learning python program
 
 editor Jacob975
 20180123
@@ -27,3 +27,8 @@ path_of_python = "/usr/bin/python3"
 # code path means where do you install these code about DL.
 # recommand: /home/username/bin/DL_python
 path_of_source_code = "/home/Jacob975/bin/deep_learning"
+
+#--------------- Setting data path ---------------------
+# Where you save your data.
+# recommand: /mazu/users/Jacob975/AI_data/ELAIS_N1_NICER_control_image
+path_of_data = "/mazu/users/Jacob975/AI_data" 

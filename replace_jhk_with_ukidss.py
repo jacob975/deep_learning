@@ -201,6 +201,13 @@ if __name__ == "__main__":
         twomass_bands_j = fill_up_error(twomass_bands_j)
         twomass_bands_h = fill_up_error(twomass_bands_h)
         twomass_bands_k = fill_up_error(twomass_bands_k)
+        # save band JHK in twomass for checking
+        twomass_bands = np.array([twomass_bands_j[:,0], twomass_bands_h[:,0], twomass_bands_k[:,0]])
+        twomass_bands = np.transpose(twomass_bands)
+        err_twomass_bands = np.array([twomass_bands_j[:,1], twomass_bands_h[:,1], twomass_bands_k[:,1]])
+        err_twomass_bands = np.transpose(err_twomass_bands)
+        np.savetxt("twomass_mag.txt", twomass_bands)
+        np.savetxt("err_twomass_mag.txt", err_twomass_bands)
         for i in range(len(twomass_catalogs)):
             twomass_band_j = ufloat(twomass_bands_j[i,0], twomass_bands_j[i,1])
             twomass_band_h = ufloat(twomass_bands_h[i,0], twomass_bands_h[i,1])
@@ -254,10 +261,6 @@ if __name__ == "__main__":
         dat_file[:,9] = twomass_err_h_mjy
         dat_file[:,10] = twomass_err_k_mjy
     if name_ukidss_catalog != "skip":
-        '''
-        replacement_j = np.where((ukidss_j_mjy != 0) & (dat_file[:, 0] < 30) & (ukidss_err_j_mjy != 0))
-        replacement_h = np.where((ukidss_h_mjy != 0) & (dat_file[:, 1] < 15) & (ukidss_err_h_mjy != 0))
-        '''
         replacement_k = np.where((ukidss_k_mjy != 0) & (dat_file[:, 2] < 15) & (ukidss_err_k_mjy != 0))
         dat_file[replacement_k, 0] = ukidss_j_mjy[replacement_k]
         dat_file[replacement_k, 1] = ukidss_h_mjy[replacement_k]
@@ -265,12 +268,6 @@ if __name__ == "__main__":
         dat_file[replacement_k, 8] = ukidss_err_j_mjy[replacement_k]
         dat_file[replacement_k, 9] = ukidss_err_h_mjy[replacement_k]
         dat_file[replacement_k, 10] = ukidss_err_k_mjy[replacement_k]
-        '''
-        np.save("replaced_with_j_in_ukidss_{0}.npy".format(name_dat_file[:-4]), replacement_j[0])
-        np.savetxt("replaced_with_j_in_ukidss_{0}.txt".format(name_dat_file[:-4]), replacement_j[0])
-        np.save("replaced_with_h_in_ukidss_{0}.npy".format(name_dat_file[:-4]), replacement_h[0])
-        np.savetxt("replaced_with_h_in_ukidss_{0}.txt".format(name_dat_file[:-4]), replacement_h[0])
-        '''
         np.save("replaced_with_k_in_ukidss_{0}.npy".format(name_dat_file[:-4]), replacement_k[0])
         np.savetxt("replaced_with_k_in_ukidss_{0}.txt".format(name_dat_file[:-4]), replacement_k[0])
     np.save("{0}_u.npy".format(name_dat_file[:-4]), dat_file)
