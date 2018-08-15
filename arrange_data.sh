@@ -10,7 +10,7 @@
 if [ "$#" -ne 1 ]; then
     echo "Illegal number of parameters"
     echo "Usage: ${0##*/} [option]"
-    echo "Available options: data_Au_OPHu_CHA_II, data_A_OPH_CHA_II, data_A, SERu, SER, PERu, PER, CHA_II, LUP_I, LUP_III, LUP_IV"
+    echo "Available options: data_Au_OPHu_CHA_II, data_A_OPH_CHA_II, ELAIS_N1u, ELAIS_N1, SERu, SER, PERu, PER, CHA_II, LUP_I, LUP_III, LUP_IV"
     exit 1
 fi
 
@@ -145,12 +145,12 @@ if [ "${option}" = "data_A_OPH_CHA_II" ]; then
     exit 0
 fi
 
-if [ "${option}" = "data_A" ]; then
+if [ "${option}" = "ELAIS_N1" ]; then
     # Cut data from dataset
     echo "Cut data from catalog."
     get_catalog_data_A.sh star
     get_catalog_data_A.sh galaxy
-    echo "ELAIS N1 done."
+    echo "done."
     # convert 2MASS band system to UKIDSS band system 
     echo "Convert 2MASS band system to UKIDSS band system"
     replace_jhk_with_ukidss.py DXS skip ELAIS_N1_2mass/star_2mass.dat star_sed.dat
@@ -159,6 +159,19 @@ if [ "${option}" = "data_A" ]; then
     exit 0
 fi
 
+if [ "${option}" = "ELAIS_N1u" ]; then
+    # Cut data from dataset
+    echo "Cut data from catalog."
+    get_catalog_data_A.sh star
+    get_catalog_data_A.sh galaxy
+    echo done
+    # replace old data with ukidss data and 2mass data
+    echo "Replace JHK with UKIDSS data"
+    replace_jhk_with_ukidss.py DXS ELAIS_N1_DXS_source_table_star_WSA.csv ELAIS_N1_2mass/star_2mass.dat star_sed.dat
+    replace_jhk_with_ukidss.py DXS ELAIS_N1_DXS_source_table_gala_WSA.csv ELAIS_N1_2mass/gala_2mass.dat gala_sed.dat
+    echo done
+    exit 0
+fi
 
 if [ "${option}" = "SERu" ]; then
     # Cut data from dataset
@@ -289,5 +302,5 @@ fi
 
 
 echo "No match parameters"
-echo "Available options: data_Au_OPHu_CHA_II, data_A_OPH_CHA_II, SERu, SER, PERu, PER, CHA_II, LUP_I, LUP_III, LUP_IV"
+echo "Available options: data_Au_OPHu_CHA_II, data_A_OPH_CHA_II, ELAIS_N1, ELAIS_N1u, SERu, SER, PERu, PER, CHA_II, LUP_I, LUP_III, LUP_IV"
 exit 1
