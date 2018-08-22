@@ -25,8 +25,8 @@ import numpy as np
 import time
 from sys import argv
 import os
-import prettytensor as pt
 import itertools
+import prettytensor as pt
 from colour import Color
 
 def degenerate(data, labels, sort_order):
@@ -55,32 +55,46 @@ def degenerate(data, labels, sort_order):
     extend_data = extend_data.view(dtype = extend_dtype)
     extend_data = extend_data.reshape(extend_data.shape[:-1])
     extend_data = np.sort(extend_data, order = sort_order) 
+    # Calculate the probability of each data point
     linescales = np.asarray(list(itertools.product(np.arange(0.1, 1.1, 0.2), repeat=3)))
     answer = np.zeros((len(linescales), 3))
     for i in range(len(linescales)):
         ini = i * np.power(5, 5)
         fin = (i+1) * np.power(5, 5)
-        star_pred = np.mean(extend_data['Star_prob'][ini:fin])
-        gala_pred = np.mean(extend_data['Gala_prob'][ini:fin])
-        ysos_pred = np.mean(extend_data['YSOs_prob'][ini:fin])
-        answer[i] = np.array([star_pred, gala_pred, ysos_pred]) 
+        # Pick high reliable data (one of prob over 90%) only.
+        sectional_data = extend_data[:][ini:fin]
+        high_star_prob = np.where(sectional_data['Star_prob'] > 0.9)
+        high_gala_prob = np.where(sectional_data['Gala_prob'] > 0.9)
+        high_ysos_prob = np.where(sectional_data['YSOs_prob'] > 0.9)
+        index_high_prob_data = list(set(high_star_prob[0]) | set(high_gala_prob[0]) | set(high_ysos_prob[0]))
+        index_high_prob_data = np.asarray([index_high_prob_data])
+        high_prob_data = sectional_data[ index_high_prob_data ]
+        if len(high_prob_data) == 0:
+            answer[i] = np.array([-999, -999, -999])
+        else:
+            star_pred = np.mean(high_prob_data['Star_prob'])
+            gala_pred = np.mean(high_prob_data['Gala_prob'])
+            ysos_pred = np.mean(high_prob_data['YSOs_prob'])
+            answer[i] = np.array([star_pred, gala_pred, ysos_pred]) 
     return linescales, answer
 
 # Assign RGB color to represent stars, galaxies, and YSOs.
 def assign_color(color_code):
-    red_code = color_code[:,0]
-    green_code = color_code[:,1]
-    blue_code = color_code[:,2]
+    star_code = color_code[:,0]
+    gala_code = color_code[:,1]
+    ysos_code = color_code[:,2]
+    high_reliable = np.where(star_code != -999)
     star_color = [ None for i in range(len(color_code)) ] 
     gala_color = [ None for i in range(len(color_code)) ] 
     ysos_color = [ None for i in range(len(color_code)) ] 
-    for i, code in enumerate(red_code):
-        star_color[i] = Color(rgb = (code, 0, 0)).hex_l
-    for i, code in enumerate(green_code):
-        gala_color[i] = Color(rgb = (0, code, 0)).hex_l
-    for i, code in enumerate(blue_code):
-        ysos_color[i] = Color(rgb = (code, code, 0)).hex_l
-    return star_color, gala_color, ysos_color
+    for i in range(len(star_code)):
+        if star_code[i] == -999:
+            star_color[i] = gala_color[i] = ysos_color[i] = 'skip'
+        else:
+            star_color[i] = Color(rgb = (star_code[i], 0, 0)).hex_l
+            gala_color[i] = Color(rgb = (gala_code[i], 0, 0)).hex_l
+            ysos_color[i] = Color(rgb = (ysos_code[i], 0, 0)).hex_l
+    return high_reliable, np.array(star_color), np.array(gala_color), np.array(ysos_color)
     
 def predict_label(images):
     # Number of images.
@@ -92,25 +106,43 @@ def predict_label(images):
     label_pred = session.run(y_pred, feed_dict=feed_dict)
     return label_pred
 
-def plot_prob(arti_data, star_color, gala_color, ysos_color, sort_order):
+def plot_prob(index_high_prob_data, arti_data, star_color, gala_color, ysos_color, sort_order):
     fig = plt.figure()
     # Star
     ax = fig.add_subplot(221, projection='3d')
-    ax.scatter(xs = arti_data[:,0], ys = arti_data[:,1], zs = arti_data[:,2], zdir='z', s=100, c=star_color, depthshade=False)
+    ax.scatter( xs = arti_data[index_high_prob_data, 0], 
+                ys = arti_data[index_high_prob_data, 1], 
+                zs = arti_data[index_high_prob_data, 2], 
+                zdir='z', 
+                s=100, 
+                c = star_color[index_high_prob_data],
+                depthshade=False)
     ax.set_title("Star probability")
     ax.set_xlabel(sort_order[0])
     ax.set_ylabel(sort_order[1])
     ax.set_zlabel(sort_order[2])
     # Galaxy
     ax = fig.add_subplot(222, projection='3d')
-    ax.scatter(xs = arti_data[:,0], ys = arti_data[:,1], zs = arti_data[:,2], zdir='z', s=100, c=gala_color, depthshade=False)
+    ax.scatter( xs = arti_data[index_high_prob_data, 0], 
+                ys = arti_data[index_high_prob_data, 1], 
+                zs = arti_data[index_high_prob_data, 2], 
+                zdir='z', 
+                s=100, 
+                c = gala_color[index_high_prob_data], 
+                depthshade=False)
     ax.set_title("Galaxy probability")
     ax.set_xlabel(sort_order[0])
     ax.set_ylabel(sort_order[1])
     ax.set_zlabel(sort_order[2])
     # YSOs
     ax = fig.add_subplot(223, projection='3d')
-    ax.scatter(xs = arti_data[:,0], ys = arti_data[:,1], zs = arti_data[:,2], zdir='z', s=100, c=ysos_color, depthshade=False)
+    ax.scatter( xs = arti_data[index_high_prob_data, 0], 
+                ys = arti_data[index_high_prob_data, 1], 
+                zs = arti_data[index_high_prob_data, 2], 
+                zdir='z', 
+                s=100, 
+                c = ysos_color[index_high_prob_data], 
+                depthshade=False)
     ax.set_title("YSO probability")
     ax.set_xlabel(sort_order[0])
     ax.set_ylabel(sort_order[1])
@@ -119,10 +151,10 @@ def plot_prob(arti_data, star_color, gala_color, ysos_color, sort_order):
     return
 
 #--------------------------------------------
-# main code
+# Main code
 if __name__ == "__main__":
     VERBOSE = 0
-    # measure times
+    # Measure times
     start_time = time.time()    
     #-----------------------------------
     # Load argv
@@ -183,8 +215,6 @@ if __name__ == "__main__":
     session = tf.Session()
     # restore previous weight
     saver.restore(sess=session, save_path=save_path)
-    batch_size = 512
-    print ("batch_size = {0}".format(batch_size))
     #-----------------------------------
     # Calculate the probability distribution of labels
     arti_data = np.asarray(list(itertools.product(np.arange(0.1, 1.1, 0.2), repeat=8)))
@@ -212,31 +242,31 @@ if __name__ == "__main__":
     print ("length of arti_data = {0}".format(len(arti_data)))
     print ("length of label_pred = {0}".format(len(label_pred)))
     # degenerate data and pred_labels to band JHK
-    print ('--- degenerate data and pred_labels to band JHK ---')
     sort_order_jhk = ['J', 'H', 'K']
+    print ('--- degenerate data and pred_labels to band {0}, {1}, and {2} ---'.format(*sort_order_jhk))
     arti_data_JHK, label_pred_JHK = degenerate(arti_data, label_pred, sort_order_jhk)
-    star_color_jhk, gala_color_jhk, ysos_color_jhk = assign_color(label_pred_JHK)
+    high_reliable_jhk, star_color_jhk, gala_color_jhk, ysos_color_jhk = assign_color(label_pred_JHK)
     # degenerate data and pred_labels to band IRAC1, IRAC3, and MIPS1
-    print ('--- degenerate data and pred_labels to band IRAC1, IRAC3, and MIPS1 ---')
     sort_order_468 = ['IRAC1', 'IRAC3', 'MIPS1']
+    print ('--- degenerate data and pred_labels to band {0}, {1}, and {2} ---'.format(*sort_order_468))
     arti_data_468, label_pred_468 = degenerate(arti_data, label_pred, sort_order_468)
-    star_color_468, gala_color_468, ysos_color_468 = assign_color(label_pred_468)
+    high_reliable_468, star_color_468, gala_color_468, ysos_color_468 = assign_color(label_pred_468)
     # degenerate data and pred_labels to band H, IRAC2, and MIPS1
-    print ('--- degenerate data and pred_labels to band H, IRAC2, and MIPS1 ---')
     sort_order_258 = ['H', 'IRAC2', 'MIPS1']
+    print ('--- degenerate data and pred_labels to band {0}, {1}, and {2} ---'.format(*sort_order_258))
     arti_data_258, label_pred_258 = degenerate(arti_data, label_pred, sort_order_258)
-    star_color_258, gala_color_258, ysos_color_258 = assign_color(label_pred_258)
+    high_reliable_258, star_color_258, gala_color_258, ysos_color_258 = assign_color(label_pred_258)
     # degenerate data and pred_labels to band IRAC3, IRAC4, and MIPS1
-    print ('--- degenerate data and pred_labels to band IRAC3, IRAC4, and MIPS1 ---')
     sort_order_678 = ['IRAC3', 'IRAC4', 'MIPS1']
+    print ('--- degenerate data and pred_labels to band {0}, {1}, and {2} ---'.format(*sort_order_678))
     arti_data_678, label_pred_678 = degenerate(arti_data, label_pred, sort_order_678)
-    star_color_678, gala_color_678, ysos_color_678 = assign_color(label_pred_678)
+    high_reliable_678, star_color_678, gala_color_678, ysos_color_678 = assign_color(label_pred_678)
     #-----------------------------------
     # Plot 3D distribution
-    plot_prob(arti_data_JHK, star_color_jhk, gala_color_jhk, ysos_color_jhk, sort_order_jhk)
-    plot_prob(arti_data_468, star_color_468, gala_color_468, ysos_color_468, sort_order_468)
-    plot_prob(arti_data_258, star_color_258, gala_color_258, ysos_color_258, sort_order_258)
-    plot_prob(arti_data_678, star_color_678, gala_color_678, ysos_color_678, sort_order_678)
+    plot_prob(high_reliable_jhk, arti_data_JHK, star_color_jhk, gala_color_jhk, ysos_color_jhk, sort_order_jhk)
+    plot_prob(high_reliable_468, arti_data_468, star_color_468, gala_color_468, ysos_color_468, sort_order_468)
+    plot_prob(high_reliable_258, arti_data_258, star_color_258, gala_color_258, ysos_color_258, sort_order_258)
+    plot_prob(high_reliable_678, arti_data_678, star_color_678, gala_color_678, ysos_color_678, sort_order_678)
     #-----------------------------------
     # Close session
     session.close()
