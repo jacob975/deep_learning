@@ -101,6 +101,7 @@ if __name__ == "__main__":
                 continue
             failure, cm = confusion_matrix(bob_cls_pred_in_elements[i][j], alice_cls_pred_in_elements[i][j])
             print (cm)
+    '''
     #-----------------------------------
     # print for test
     # This SED is printed as reference.
@@ -140,8 +141,8 @@ if __name__ == "__main__":
             axes2[2].errorbar(range(1,9), sed[:8], yerr = sed[8:], linestyle = "-", alpha = 0.5 )
     fig.show()
     fig2.show()
-    
     input()
+    '''
     #-----------------------------------
     # measure time
     elapsed_time = time.time() - start_time

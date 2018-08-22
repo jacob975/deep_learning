@@ -21,18 +21,20 @@ update log
     Move to python3 instead of python2
 20180320 version alpha 3
     1. add  a "This is python3" warning
+20180821 version alpha 4
+    1. Make all sentence with initial upper case letter.
 '''
 import tensorflow as tf
 import time
 
 #--------------------------------------------
-# main code
+# Main code
 if __name__ == "__main__":
     VERBOSE = 0
-    # measure time
+    # Measure time
     start_time = time.time()
     #-----------------------------------
-    # compare the difference between normal variable and tensorflow node.
+    # Compare the difference between normal variable and tensorflow node.
     x = 1
     y = x + 9
     print (y)
@@ -44,6 +46,6 @@ if __name__ == "__main__":
     sess.run(model)
     print (sess.run(y))
     #-----------------------------------
-    # measure time
+    # Measure time
     elapsed_time = time.time() - start_time
     print ("Exiting Main Program, spending ", elapsed_time, "seconds.")
