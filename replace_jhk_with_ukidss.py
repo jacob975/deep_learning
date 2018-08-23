@@ -206,8 +206,8 @@ if __name__ == "__main__":
         twomass_bands = np.transpose(twomass_bands)
         err_twomass_bands = np.array([twomass_bands_j[:,1], twomass_bands_h[:,1], twomass_bands_k[:,1]])
         err_twomass_bands = np.transpose(err_twomass_bands)
-        np.savetxt("twomass_mag.txt", twomass_bands)
-        np.savetxt("err_twomass_mag.txt", err_twomass_bands)
+        np.savetxt("{0}_twomass_mag.txt".format(name_dat_file[:-4]), twomass_bands)
+        np.savetxt("{0}_err_twomass_mag.txt".format(name_dat_file[:-4]), err_twomass_bands)
         for i in range(len(twomass_catalogs)):
             twomass_band_j = ufloat(twomass_bands_j[i,0], twomass_bands_j[i,1])
             twomass_band_h = ufloat(twomass_bands_h[i,0], twomass_bands_h[i,1])

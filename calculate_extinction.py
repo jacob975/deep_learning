@@ -81,18 +81,22 @@ if __name__ == "__main__":
                 extvec = extvec,
                 coordinates = control_coord,
                 names = mag_names)
-    science_color = science.mag2color()
-    control_color = control.mag2color()
     ext_nicer = science.nicer(control=control)
-    print (ext_nicer.extinction)
+    #--------------------------------------------
+    # Save the result
+    Av_nicer=ext_nicer.extinction
+    var_Av_nicer = ext_nicer.variance
+    std_Av_nicer = np.sqrt(var_Av_nicer)
+    Av = np.array([Av_nicer , std_Av_nicer])
+    Av = np.transpose(Av)
+    np.savetxt('star_Av_nicer.dat', Av)
     #--------------------------------------------
     # Plot
     #                                pixel size(degree)                   gaussian in pixel
-    nicer_emap = ext_nicer.build_map(bandwidth=5./60., metric="gaussian", sampling=3        , use_fwhm=True)
+    nicer_emap = ext_nicer.build_map(bandwidth=4./60., metric="gaussian", sampling=5        , use_fwhm=True)
     # Extinction map
     nicer_emap.save_fits(path="./emap_nicer.fits")
     # Histogram
-    Av_nicer=ext_nicer.extinction
     Av_hist = np.histogram(Av_nicer, np.arange(-10, 20))
     Av_hist_plot = plt.figure("Av histogram")
     plt.title("Av histogram")
@@ -100,9 +104,6 @@ if __name__ == "__main__":
     plt.ylabel("# of sources")
     plt.bar(np.arange(-9.5, 19.5, 1), Av_hist[0])
     Av_hist_plot.savefig("Av_hist.png")
-    #--------------------------------------------
-    # save the result
-    np.savetxt('Av_nicer.dat',Av_nicer)
     #-----------------------------------
     # measure time
     elapsed_time = time.time() - start_time

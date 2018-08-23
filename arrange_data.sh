@@ -10,7 +10,7 @@
 if [ "$#" -ne 1 ]; then
     echo "Illegal number of parameters"
     echo "Usage: ${0##*/} [option]"
-    echo "Available options: data_Au_OPHu_CHA_II, data_A_OPH_CHA_II, ELAIS_N1u, ELAIS_N1, SERu, SER, PERu, PER, CHA_II, LUP_I, LUP_III, LUP_IV"
+    echo "Available options: data_Au_OPHu_CHA_II, data_A_OPH_CHA_II, ELAIS_N1u, ELAIS_N1, OPHu, OPH, SERu, SER, PERu, PER, CHA_II, LUP_I, LUP_III, LUP_IV"
     exit 1
 fi
 
@@ -141,6 +141,38 @@ if [ "${option}" = "data_A_OPH_CHA_II" ]; then
     cat ELAIS_N1_star_tracer.dat OPH_star_tracer.dat CHA_II_star_tracer.dat > star_tracer.dat
     cat ELAIS_N1_gala_tracer.dat OPH_gala_tracer.dat CHA_II_gala_tracer.dat > gala_tracer.dat
     cat OPH_ysos_tracer.dat CHA_II_ysos_tracer.dat > ysos_tracer.dat
+    echo done
+    exit 0
+fi
+
+if [ "${option}" = "OPHu" ]; then
+    # Cut data from dataset
+    echo "Cut data from catalog."
+    get_catalog.sh catalog-OPH-HREL.tbl star
+    get_catalog.sh catalog-OPH-HREL.tbl galaxy
+    get_catalog.sh catalog-OPH-HREL.tbl yso
+    echo "OPH done."
+    # replace old data with ukidss data and 2mass data
+    echo "Replace JHK with UKIDSS data"
+    replace_jhk_with_ukidss.py GCS OPH_GCS_source_table_star_WSA.csv OPH_2mass/star_2mass.dat star_sed.dat
+    replace_jhk_with_ukidss.py GCS OPH_GCS_source_table_gala_WSA.csv OPH_2mass/gala_2mass.dat gala_sed.dat
+    replace_jhk_with_ukidss.py GCS OPH_GCS_source_table_ysos_WSA.csv OPH_2mass/ysos_2mass.dat ysos_sed.dat
+    echo done
+    exit 0
+fi
+
+if [ "${option}" = "OPH" ]; then
+    # Cut data from dataset
+    echo "Cut data from catalog."
+    get_catalog.sh catalog-OPH-HREL.tbl star
+    get_catalog.sh catalog-OPH-HREL.tbl galaxy
+    get_catalog.sh catalog-OPH-HREL.tbl yso
+    echo "OPH done."
+    # convert 2MASS band system to UKIDSS band system 
+    echo "Convert 2MASS band system to UKIDSS band system"
+    replace_jhk_with_ukidss.py GCS skip OPH_2mass/star_2mass.dat star_sed.dat
+    replace_jhk_with_ukidss.py GCS skip OPH_2mass/gala_2mass.dat gala_sed.dat
+    replace_jhk_with_ukidss.py GCS skip OPH_2mass/ysos_2mass.dat ysos_sed.dat
     echo done
     exit 0
 fi
@@ -302,5 +334,5 @@ fi
 
 
 echo "No match parameters"
-echo "Available options: data_Au_OPHu_CHA_II, data_A_OPH_CHA_II, ELAIS_N1, ELAIS_N1u, SERu, SER, PERu, PER, CHA_II, LUP_I, LUP_III, LUP_IV"
+echo "Available options: data_Au_OPHu_CHA_II, data_A_OPH_CHA_II, ELAIS_N1, ELAIS_N1u, OPHu, OPH, SERu, SER, PERu, PER, CHA_II, LUP_I, LUP_III, LUP_IV"
 exit 1
