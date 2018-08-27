@@ -5,8 +5,9 @@ Abstract:
     This correction can only apply on molecular cloud CHA, LUP, OPH, PER, SER
     Citations: Chapman et al. (2009)
 Usage:
-    remove_Av.py [extinction table] [source table] [Av table] [coord table]
-    Example: remove_Av.py extinction_table sed_table.txt Av.txt coord.txt
+    remove_Av.py [band system] [extinction table] [source table] [Av table] [coord table]
+    Available band systems: ukidss, twomass
+    Example: remove_Av.py ukidss extinction_table sed_table.txt Av.txt coord.txt
 Editor:
     T.H. Heish, Jacob
 
@@ -21,32 +22,25 @@ update log
 20180807 version alpha 1
     1. The code works
 '''
-from math import pi
-from numpy import arcsin
 from sys import argv
 import time
 import numpy as np
 from uncertainties import ufloat
+from astropy.coordinates import SkyCoord
+from astropy import units as u
 
 def find_the_closest_extinction_position(coord, extinction_table):
     # Initialize
     # Read central position of source
-    RA_degree  = coord[0]
-    DEC_degree = coord[1]
-    # Convert degree to radian
-    RA_enoch  = RA_degree/360*2*pi
-    DEC_enoch = DEC_degree/360*2*pi
-    # The radius of an extinction region in unit degree
-    tolerance_radius = 0.05
-    RA_ca  = np.divide(extinction_table[:,0], 360) * 2 * pi
-    DEC_ca = np.divide(extinction_table[:,1], 360) * 2 * pi
-    diff_X = np.cos(RA_enoch) * np.cos(DEC_enoch) - np.cos(RA_ca) * np.cos(DEC_ca) 
-    diff_Y = np.cos(RA_enoch) * np.sin(DEC_enoch) - np.cos(RA_ca) * np.sin(DEC_ca)
-    diff_Z = np.sin(DEC_enoch) * np.sin(DEC_ca)
-    distance_array = np.sqrt(np.power(diff_X, 2) + np.power(diff_Y, 2) + np.power(diff_Z, 2))
-    min_square_distance = np.min(distance_array)
-    index_min_square_distance = np.argmin(distance_array) 
-    return min_square_distance, index_min_square_distance
+    source_coord = SkyCoord(coord[0], coord[1], unit = 'deg') 
+    extinction_coord = SkyCoord(extinction_table[:,0], extinction_table[:,1], unit = 'deg')
+    # Calculate the distance
+    distance_object_array = extinction_coord.separation(source_coord)
+    distance_array = distance_object_array.deg
+    # Pick the nearest one
+    min_distance = np.min(distance_array)
+    index_min_distance = np.argmin(distance_array) 
+    return min_distance, index_min_distance
 
 #--------------------------------------------
 # Main code
@@ -55,18 +49,21 @@ if __name__ == "__main__":
     start_time = time.time()
     #--------------------------------------------
     # Load argv
-    if len(argv) != 5:
-        print ("Error!\nUsage: Remove_Av.py [extinction table] [sed table] [Av table] [coord table]") 
-        print ("Example: remove_Av.py extinction_table sed_table.txt Av.txt coord.txt")
+    if len(argv) != 6:
+        print ("Error!\nUsage: Remove_Av.py [band system] [extinction table] [sed table] [Av table] [coord table]") 
+        print ("Available band systems: ukidss, twomass")
+        print ("Example: remove_Av.py ukidss extinction_table sed_table.txt Av.txt coord.txt")
         exit()
-    extinction_table_name = argv[1]
-    sed_table_name = argv[2]
-    Av_table_name = argv[3]
-    coord_table_name = argv[4]
+    band_system = argv[1]
+    extinction_table_name = argv[2]
+    sed_table_name = argv[3]
+    Av_table_name = argv[4]
+    coord_table_name = argv[5]
     #--------------------------------------------
     # Load data
     # The table of extinction map.
     extinction_table = np.loadtxt(extinction_table_name, dtype = float)
+    extinction_table = extinction_table[~np.isnan(extinction_table[:,2])]
     # The source to be corrected
     sed_table = np.loadtxt(sed_table_name, dtype = float)
     # Av of each sources if known.
@@ -74,7 +71,12 @@ if __name__ == "__main__":
     # coord of each sources
     coord_table = np.loadtxt(coord_table_name, dtype = float)
     # Define the extinction curves
-    from extinction_curves_lib import WD_55B
+    if band_system == 'ukidss':
+        from extinction_curves_lib import WD_55B_ukidss as WD_55B
+    if band_system == 'twomass':
+        from extinction_curves_lib import WD_55B_twomass as WD_55B
+    # The radius of an extinction region in unit degree
+    tolerance_radius = 6/60
     for index, source in enumerate(sed_table):
         #------------------------------------------------
         # Find Av
@@ -89,16 +91,13 @@ if __name__ == "__main__":
             Av_table[index, 0] = 0.0 
             Av_table[index, 1] = 0.0
             min_distance, index_min = find_the_closest_extinction_position(coord_table[index], extinction_table)
-            # Show angular size, the distance in arc second.
-            # This equation might be wrong
-            ars_dis=arcsin(min_distance/2)/(2*pi)*360*60*60
-            if ars_dis > 0.05:
+            if min_distance > tolerance_radius:
                 Av = 0.0
                 err_Av = 0.0
-            elif extinction_table[index_min, 6] > 0.0:
+            elif extinction_table[index_min, 2] > 0.0:
                 # Read the Av of the selected extinction point.
-                Av = extinction_table[index_min, 6]
-                err_Av = extinction_table[index_min, 7]
+                Av = extinction_table[index_min, 2]
+                err_Av = extinction_table[index_min, 3]
                 Av_table[index, 0] = Av
                 Av_table[index, 1] = err_Av
         #------------------------------------------------

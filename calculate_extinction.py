@@ -3,7 +3,8 @@
 Abstract:
     This is a program for calculate the extinction of each source with NICER
 Usage:
-    calculate_extinction.py [coord_table] [mag_table] [err_mag_table]
+    calculate_extinction.py [coord_table] [mag_table] [err_mag_table] [Rv] [bin size]
+    Available Rv: WD55B, WD31B
 Editor:
     JW Wang, Jacob975
 
@@ -12,15 +13,19 @@ Editor:
 #   This code is made in python3 #
 ##################################
 
-20180104
+20180815
 ####################################
 update log
 20180815 version alpha 1
     1. The code works
+20180823 version alpha 2
+    2. Add a option for Rv
 '''
 import numpy as np
 from pnicer import ApparentMagnitudes as AM
 from astropy.coordinates import *
+from astropy.io import fits as pyfits
+from astropy import wcs
 import matplotlib.pyplot as plt
 from sys import argv
 import time
@@ -33,13 +38,16 @@ if __name__ == "__main__":
     start_time = time.time()
     #--------------------------------------------
     # Load argv
-    if len(argv) != 4:
+    if len(argv) != 6:
         print ("Wrong number of arguments")
-        print ("Usage: calculate_extinction.py [coord_table] [mag_table] [err_mag_table]")
+        print ("Usage: calculate_extinction.py [coord_table] [mag_table] [err_mag_table] [Rv] [bin size in arcmin]")
+        print ("Available Rv: WD55B, WD31B")
         exit(1)
     coord_table_name = argv[1]
     mag_table_name = argv[2]
     err_mag_table_name = argv[3]
+    Rv = argv[4]
+    bin_size = float(argv[5])/60.
     #--------------------------------------------
     # Load files
     science_coord = np.loadtxt(coord_table_name, dtype = float)
@@ -70,7 +78,15 @@ if __name__ == "__main__":
     # Calculate the extinction
     # Initialize
     mag_names = ["Ks"  , "H"   , "J"   ]
-    extvec =    [0.1193, 0.1847, 0.2939]
+    extvec = []
+    if Rv == 'WD55B':
+        extvec =[0.1117, 0.1619, 0.2738]
+    elif Rv == 'WD31B':
+        extvec =[0.1193, 0.1847, 0.2939] 
+    else:
+        print ('Wrong Rv value')
+        print ('Available Rv: WD55B, WD31B')
+        exit()
     science = AM(magnitudes = science_mag,
                 errors = science_err_mag,
                 extvec = extvec,
@@ -90,13 +106,12 @@ if __name__ == "__main__":
     Av = np.array([Av_nicer , std_Av_nicer])
     Av = np.transpose(Av)
     np.savetxt('star_Av_nicer.dat', Av)
-    #--------------------------------------------
-    # Plot
-    #                                pixel size(degree)                   gaussian in pixel
-    nicer_emap = ext_nicer.build_map(bandwidth=4./60., metric="gaussian", sampling=5        , use_fwhm=True)
-    # Extinction map
-    nicer_emap.save_fits(path="./emap_nicer.fits")
-    # Histogram
+    # Save extinction map
+    #                                pixel size(degree)                       gaussian in pixel
+    nicer_emap = ext_nicer.build_map(bandwidth = bin_size, metric="gaussian", sampling=5        , use_fwhm=True)
+    nicer_emap_name = '{0}emap_{1:.0f}arcsec'.format(coord_table_name[:-9], bin_size * 3600)
+    nicer_emap.save_fits(path="./{0}.fits".format(nicer_emap_name))
+    # Plot a histogram
     Av_hist = np.histogram(Av_nicer, np.arange(-10, 20))
     Av_hist_plot = plt.figure("Av histogram")
     plt.title("Av histogram")
@@ -104,6 +119,31 @@ if __name__ == "__main__":
     plt.ylabel("# of sources")
     plt.bar(np.arange(-9.5, 19.5, 1), Av_hist[0])
     Av_hist_plot.savefig("Av_hist.png")
+    #----------------------------------
+    # Convert extinction map to extinction table
+    # Load data
+    hdu = pyfits.open('{0}.fits'.format(nicer_emap_name))
+    header = hdu[1].header
+    emap = hdu[1].data
+    err_emap = hdu[2].data
+    # reshape data
+    x_pix = range(emap.shape[1])
+    y_pix = range(emap.shape[0])
+    xv_pix, yv_pix = np.meshgrid(x_pix, y_pix)
+    xv_pix = xv_pix.flatten()
+    yv_pix = yv_pix.flatten()
+    emap = emap.flatten()
+    err_emap = err_emap.flatten()
+    # Convert pixel to wcs
+    w = wcs.WCS(header)
+    pixcrd = np.array([xv_pix, yv_pix])
+    pixcrd = np.transpose(pixcrd)
+    world = w.wcs_pix2world(pixcrd, 1)
+    world = np.transpose(world)
+    emap_table = np.array([world[0], world[1], emap, err_emap])
+    emap_table = np.transpose(emap_table)
+    # Save Av and position into table.
+    np.savetxt("{0}.txt".format(nicer_emap_name), emap_table, fmt = '%s')
     #-----------------------------------
     # measure time
     elapsed_time = time.time() - start_time

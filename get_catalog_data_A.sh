@@ -19,7 +19,7 @@ case ${1} in
             $35"," $56"," $77"," $98"," $119"," $140"," $161"," $182"],"}' catalog-SWIRE-v3.tbl > star_sed.dat
         awk '$17~/star/ && $17!~/dust/ {print FNR }' catalog-SWIRE-v3.tbl > star_tracer.dat
         awk '$17~/star/ && $17!~/dust/ {print $1" "$3 }' catalog-SWIRE-v3.tbl > star_coord.txt
-        awk '$17~/star/ && $17!~/dust/ {print $18" "$19 }' catalog-SWIRE-v3.tbl > star_Av.txt
+        awk '$17~/star/ && $17!~/dust/ {print $18" "$19 }' catalog-SWIRE-v3.tbl > star_Av.dat
         exit 0
         ;;
     
@@ -29,7 +29,7 @@ case ${1} in
             $35"," $56"," $77"," $98"," $119"," $140"," $161"," $182"],"}' catalog-SWIRE-v3.tbl > gala_sed.dat
 	    awk '$17~/Galc/   {print FNR }' catalog-SWIRE-v3.tbl > gala_tracer.dat
 	    awk '$17~/Galc/   {print $1" "$3 }' catalog-SWIRE-v3.tbl > gala_coord.txt
-	    awk '$17~/Galc/   {print $18" "$19 }' catalog-SWIRE-v3.tbl > gala_Av.txt
+	    awk '$17~/Galc/   {print $18" "$19 }' catalog-SWIRE-v3.tbl > gala_Av.dat
         exit 0
         ;;
     "yso")
