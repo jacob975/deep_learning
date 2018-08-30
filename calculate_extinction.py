@@ -109,7 +109,7 @@ if __name__ == "__main__":
     all_Av = np.zeros(science_coord_shape)
     all_Av[index_science_allOBS, 0] = Av_nicer
     all_Av[index_science_allOBS, 1] = std_Av_nicer
-    np.savetxt('{0}_Av.dat'.format(coord_table_name[:4]), all_Av)
+    np.savetxt('{0}_Av.dat'.format(coord_table_name[:-10]), all_Av)
     # Save extinction map
     #                                pixel size(degree)                       gaussian in pixel
     nicer_emap = ext_nicer.build_map(bandwidth = bin_size, metric="gaussian", sampling=5        , use_fwhm=True)
