@@ -51,6 +51,7 @@ if __name__ == "__main__":
     #--------------------------------------------
     # Load files
     science_coord = np.loadtxt(coord_table_name, dtype = float)
+    science_coord_shape = science_coord.shape
     science_coord = SkyCoord(science_coord, frame='icrs', unit='deg')
     science_mag = np.loadtxt(mag_table_name, dtype = float)
     science_err_mag = np.loadtxt(err_mag_table_name, dtype = float)
@@ -99,13 +100,16 @@ if __name__ == "__main__":
                 names = mag_names)
     ext_nicer = science.nicer(control=control)
     #--------------------------------------------
-    # Save the result
+    # Save the Av of each sources
     Av_nicer=ext_nicer.extinction
     var_Av_nicer = ext_nicer.variance
     std_Av_nicer = np.sqrt(var_Av_nicer)
     Av = np.array([Av_nicer , std_Av_nicer])
     Av = np.transpose(Av)
-    np.savetxt('star_Av_nicer.dat', Av)
+    all_Av = np.zeros(science_coord_shape)
+    all_Av[index_science_allOBS, 0] = Av_nicer
+    all_Av[index_science_allOBS, 1] = std_Av_nicer
+    np.savetxt('{0}_Av.dat'.format(coord_table_name[:4]), all_Av)
     # Save extinction map
     #                                pixel size(degree)                       gaussian in pixel
     nicer_emap = ext_nicer.build_map(bandwidth = bin_size, metric="gaussian", sampling=5        , use_fwhm=True)

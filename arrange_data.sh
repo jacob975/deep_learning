@@ -10,7 +10,7 @@
 if [ "$#" -ne 1 ]; then
     echo "Illegal number of parameters"
     echo "Usage: ${0##*/} [option]"
-    echo "Available options: data_Au_OPHu_CHA_II, data_A_OPH_CHA_II, ELAIS_N1ui_OPHui_CHA_IIi, ELAIS_N1i_OPHi_CHA_IIi, ELAIS_N1u, ELAIS_N1, OPHu, OPH, SERui, SERi, SERu, SER, PERu, PER, CHA_II, LUP_I, LUP_III, LUP_IV"
+    echo "Available options: ELAIS_N1u_OPHu_CHA_II, ELAIS_N1_OPH_CHA_II, ELAIS_N1ui_OPHui_CHA_IIi, ELAIS_N1i_OPHi_CHA_IIi, ELAIS_N1ui, ELAIS_N1u, ELAIS_N1i, ELAIS_N1, OPHui, OPHu, OPHi, OPH, SERui, SERi, SERu, SER, PERui, PERu, PERi, PER, CHA_IIi, CHA_II, LUP_Ii, LUP_I, LUP_IIIi, LUP_III, LUP_IVi, LUP_IV"
     exit 1
 fi
 
@@ -83,15 +83,15 @@ if [ "${option}" = "ELAIS_N1ui_OPHui_CHA_IIi" ]; then
     echo "done."
     echo "Do extinction correction with extinction map."
     remove_Av.py ukidss OPH_star_emap_360arcsec.txt OPH_star_sed_u.txt OPH_star_Av.dat OPH_star_coord.dat
-    remove_Av.py ukidss OPH_star_emap_360arcsec.txt OPH_gala_sed_u.txt OPH_gala_Av.dat OPH_gala_coord.dat
-    remove_Av.py ukidss OPH_star_emap_360arcsec.txt OPH_ysos_sed_u.txt OPH_ysos_Av.dat OPH_ysos_coord.dat
+    remove_Av.py ukidss OPH_star_emap_360arcsec.txt OPH_gala_sed_u.txt skip OPH_gala_coord.dat
+    remove_Av.py ukidss OPH_star_emap_360arcsec.txt OPH_ysos_sed_u.txt skip OPH_ysos_coord.dat
     echo "OPH done."
     remove_Av.py ukidss CHA_II_star_emap_180arcsec.txt CHA_II_star_sed_u.txt CHA_II_star_Av.dat CHA_II_star_coord.dat
-    remove_Av.py ukidss CHA_II_star_emap_180arcsec.txt CHA_II_gala_sed_u.txt CHA_II_gala_Av.dat CHA_II_gala_coord.dat
-    remove_Av.py ukidss CHA_II_star_emap_180arcsec.txt CHA_II_ysos_sed_u.txt CHA_II_ysos_Av.dat CHA_II_ysos_coord.dat
+    remove_Av.py ukidss CHA_II_star_emap_180arcsec.txt CHA_II_gala_sed_u.txt skip CHA_II_gala_coord.dat
+    remove_Av.py ukidss CHA_II_star_emap_180arcsec.txt CHA_II_ysos_sed_u.txt skip CHA_II_ysos_coord.dat
     echo "CHA_II done."
     remove_Av.py ukidss ELAIS_N1_star_emap_270arcsec.txt ELAIS_N1_star_sed_u.txt ELAIS_N1_star_Av.dat ELAIS_N1_star_coord.txt
-    remove_Av.py ukidss ELAIS_N1_star_emap_270arcsec.txt ELAIS_N1_gala_sed_u.txt ELAIS_N1_gala_Av.dat ELAIS_N1_gala_coord.txt
+    remove_Av.py ukidss ELAIS_N1_star_emap_270arcsec.txt ELAIS_N1_gala_sed_u.txt skip ELAIS_N1_gala_coord.txt
     echo "ELAIS N1 done."
     # stack all data
     echo "Stack all data"
@@ -108,7 +108,7 @@ if [ "${option}" = "ELAIS_N1ui_OPHui_CHA_IIi" ]; then
     exit 0
 fi
 
-if [ "${option}" = "data_Au_OPHu_CHA_II" ]; then
+if [ "${option}" = "ELAIS_N1u_OPHu_CHA_II" ]; then
     # Cut data from dataset
     echo "Cut data from catalog."
     get_catalog.sh catalog-CHA_II-HREL.tbl star
@@ -237,15 +237,15 @@ if [ "${option}" = "ELAIS_N1i_OPHi_CHA_IIi" ]; then
     echo "done."
     echo "Do extinction correction with extinction map."
     remove_Av.py ukidss OPH_star_emap_360arcsec.txt OPH_star_sed_u.txt OPH_star_Av.dat OPH_star_coord.dat
-    remove_Av.py ukidss OPH_star_emap_360arcsec.txt OPH_gala_sed_u.txt OPH_gala_Av.dat OPH_gala_coord.dat
-    remove_Av.py ukidss OPH_star_emap_360arcsec.txt OPH_ysos_sed_u.txt OPH_ysos_Av.dat OPH_ysos_coord.dat
+    remove_Av.py ukidss OPH_star_emap_360arcsec.txt OPH_gala_sed_u.txt skip OPH_gala_coord.dat
+    remove_Av.py ukidss OPH_star_emap_360arcsec.txt OPH_ysos_sed_u.txt skip OPH_ysos_coord.dat
     echo "OPH done."
     remove_Av.py ukidss CHA_II_star_emap_180arcsec.txt CHA_II_star_sed_u.txt CHA_II_star_Av.dat CHA_II_star_coord.dat
-    remove_Av.py ukidss CHA_II_star_emap_180arcsec.txt CHA_II_gala_sed_u.txt CHA_II_gala_Av.dat CHA_II_gala_coord.dat
-    remove_Av.py ukidss CHA_II_star_emap_180arcsec.txt CHA_II_ysos_sed_u.txt CHA_II_ysos_Av.dat CHA_II_ysos_coord.dat
+    remove_Av.py ukidss CHA_II_star_emap_180arcsec.txt CHA_II_gala_sed_u.txt skip CHA_II_gala_coord.dat
+    remove_Av.py ukidss CHA_II_star_emap_180arcsec.txt CHA_II_ysos_sed_u.txt skip CHA_II_ysos_coord.dat
     echo "CHA_II done."
     remove_Av.py ukidss ELAIS_N1_star_emap_270arcsec.txt ELAIS_N1_star_sed_u.txt ELAIS_N1_star_Av.dat ELAIS_N1_star_coord.txt
-    remove_Av.py ukidss ELAIS_N1_star_emap_270arcsec.txt ELAIS_N1_gala_sed_u.txt ELAIS_N1_gala_Av.dat ELAIS_N1_gala_coord.txt
+    remove_Av.py ukidss ELAIS_N1_star_emap_270arcsec.txt ELAIS_N1_gala_sed_u.txt skip ELAIS_N1_gala_coord.txt
     echo "ELAIS N1 done."
     # stack all data
     echo "Stack all data"
@@ -262,7 +262,7 @@ if [ "${option}" = "ELAIS_N1i_OPHi_CHA_IIi" ]; then
     exit 0
 fi
 
-if [ "${option}" = "data_A_OPH_CHA_II" ]; then
+if [ "${option}" = "ELAIS_N1_OPH_CHA_II" ]; then
     # Cut data from dataset
     echo "Cut data from catalog."
     get_catalog.sh catalog-CHA_II-HREL.tbl star
@@ -326,6 +326,30 @@ if [ "${option}" = "data_A_OPH_CHA_II" ]; then
     exit 0
 fi
 
+if [ "${option}" = "OPHui" ]; then
+    # Cut data from dataset
+    echo "Cut data from catalog."
+    get_catalog.sh catalog-OPH-HREL.tbl star
+    get_catalog.sh catalog-OPH-HREL.tbl galaxy
+    get_catalog.sh catalog-OPH-HREL.tbl yso
+    echo "OPH done."
+    # replace old data with ukidss data and 2mass data
+    echo "Replace JHK with UKIDSS data"
+    replace_jhk_with_ukidss.py GCS OPH_GCS_source_table_star_WSA.csv OPH_2mass/star_2mass.dat star_sed.dat
+    replace_jhk_with_ukidss.py GCS OPH_GCS_source_table_gala_WSA.csv OPH_2mass/gala_2mass.dat gala_sed.dat
+    replace_jhk_with_ukidss.py GCS OPH_GCS_source_table_ysos_WSA.csv OPH_2mass/ysos_2mass.dat ysos_sed.dat
+    echo done
+    echo "Make an extinction map."
+    calculate_extinction.py star_coord.dat star_sed_twomass_mag.txt star_sed_err_twomass_mag.txt WD55B 6
+    echo "done."
+    echo "Do extinction correction with extinction map."
+    remove_Av.py ukidss star_emap_360arcsec.txt star_sed_u.txt star_Av.dat star_coord.dat
+    remove_Av.py ukidss star_emap_360arcsec.txt gala_sed_u.txt skip gala_coord.dat
+    remove_Av.py ukidss star_emap_360arcsec.txt ysos_sed_u.txt skip ysos_coord.dat
+    echo "done."
+    exit 0
+fi
+
 if [ "${option}" = "OPHu" ]; then
     # Cut data from dataset
     echo "Cut data from catalog."
@@ -342,6 +366,29 @@ if [ "${option}" = "OPHu" ]; then
     exit 0
 fi
 
+if [ "${option}" = "OPHi" ]; then
+    # Cut data from dataset
+    echo "Cut data from catalog."
+    get_catalog.sh catalog-OPH-HREL.tbl star
+    get_catalog.sh catalog-OPH-HREL.tbl galaxy
+    get_catalog.sh catalog-OPH-HREL.tbl yso
+    echo "done."
+    echo "Replace JHK with UKIDSS data."
+    replace_jhk_with_ukidss.py GCS skip OPH_2mass/star_2mass.dat star_sed.dat
+    replace_jhk_with_ukidss.py GCS skip OPH_2mass/gala_2mass.dat gala_sed.dat
+    replace_jhk_with_ukidss.py GCS skip OPH_2mass/ysos_2mass.dat ysos_sed.dat
+    echo "done."
+    echo "Make an extinction map."
+    calculate_extinction.py star_coord.dat star_sed_twomass_mag.txt star_sed_err_twomass_mag.txt WD55B 6
+    echo "done."
+    echo "Do extinction correction with extinction map."
+    remove_Av.py ukidss star_emap_360arcsec.txt star_sed_u.txt star_Av.dat star_coord.dat
+    remove_Av.py ukidss star_emap_360arcsec.txt gala_sed_u.txt skip gala_coord.dat
+    remove_Av.py ukidss star_emap_360arcsec.txt ysos_sed_u.txt skip ysos_coord.dat
+    echo "done."
+    exit 0
+fi
+
 if [ "${option}" = "OPH" ]; then
     # Cut data from dataset
     echo "Cut data from catalog."
@@ -355,6 +402,52 @@ if [ "${option}" = "OPH" ]; then
     replace_jhk_with_ukidss.py GCS skip OPH_2mass/gala_2mass.dat gala_sed.dat
     replace_jhk_with_ukidss.py GCS skip OPH_2mass/ysos_2mass.dat ysos_sed.dat
     echo done
+    exit 0
+fi
+
+if [ "${option}" = "ELAIS_N1ui" ]; then
+    # Cut data from dataset
+    echo "Cut data from catalog."
+    get_catalog_data_A.sh star
+    get_catalog_data_A.sh galaxy
+    echo done
+    # replace old data with ukidss data and 2mass data
+    echo "Replace JHK with UKIDSS data"
+    replace_jhk_with_ukidss.py DXS ELAIS_N1_DXS_source_table_star_WSA.csv ELAIS_N1_2mass/star_2mass.dat star_sed.dat
+    replace_jhk_with_ukidss.py DXS ELAIS_N1_DXS_source_table_gala_WSA.csv ELAIS_N1_2mass/gala_2mass.dat gala_sed.dat
+    echo done
+    # Make an extinction map
+    echo "Make an extinction map."
+    calculate_extinction.py star_coord.txt star_sed_twomass_mag.txt star_sed_err_twomass_mag.txt WD55B 4.5
+    echo "done."
+    # Do extinction correction with extinction map
+    echo "Do extinction correction with extinction map."
+    remove_Av.py ukidss star_emap_270arcsec.txt star_sed_u.txt star_Av.dat star_coord.txt
+    remove_Av.py ukidss star_emap_270arcsec.txt gala_sed_u.txt skip gala_coord.txt
+    echo "done."
+    exit 0
+fi
+
+if [ "${option}" = "ELAIS_N1i" ]; then
+    # Cut data from dataset
+    echo "Cut data from catalog."
+    get_catalog_data_A.sh star
+    get_catalog_data_A.sh galaxy
+    echo "done."
+    # convert 2MASS band system to UKIDSS band system 
+    echo "Convert 2MASS band system to UKIDSS band system"
+    replace_jhk_with_ukidss.py DXS skip ELAIS_N1_2mass/star_2mass.dat star_sed.dat
+    replace_jhk_with_ukidss.py DXS skip ELAIS_N1_2mass/gala_2mass.dat gala_sed.dat
+    echo done
+    # Make an extinction map
+    echo "Make an extinction map."
+    calculate_extinction.py star_coord.txt star_sed_twomass_mag.txt star_sed_err_twomass_mag.txt WD55B 4.5
+    echo "done."
+    # Do extinction correction with extinction map
+    echo "Do extinction correction with extinction map."
+    remove_Av.py ukidss star_emap_270arcsec.txt star_sed_u.txt star_Av.dat star_coord.txt
+    remove_Av.py ukidss star_emap_270arcsec.txt gala_sed_u.txt skip gala_coord.txt
+    echo "done."
     exit 0
 fi
 
@@ -403,8 +496,8 @@ if [ "${option}" = "SERui" ]; then
     echo "done."
     echo "Do extinction correction with extinction map."
     remove_Av.py ukidss star_emap_120arcsec.txt star_sed_u.txt star_Av.dat star_coord.dat
-    remove_Av.py ukidss star_emap_120arcsec.txt gala_sed_u.txt gala_Av.dat gala_coord.dat
-    remove_Av.py ukidss star_emap_120arcsec.txt ysos_sed_u.txt ysos_Av.dat ysos_coord.dat
+    remove_Av.py ukidss star_emap_120arcsec.txt gala_sed_u.txt skip gala_coord.dat
+    remove_Av.py ukidss star_emap_120arcsec.txt ysos_sed_u.txt skip ysos_coord.dat
     echo "done."
     exit 0
 fi
@@ -426,8 +519,8 @@ if [ "${option}" = "SERi" ]; then
     echo "done."
     echo "Do extinction correction with extinction map."
     remove_Av.py ukidss star_emap_120arcsec.txt star_sed_u.txt star_Av.dat star_coord.dat
-    remove_Av.py ukidss star_emap_120arcsec.txt gala_sed_u.txt gala_Av.dat gala_coord.dat
-    remove_Av.py ukidss star_emap_120arcsec.txt ysos_sed_u.txt ysos_Av.dat ysos_coord.dat
+    remove_Av.py ukidss star_emap_120arcsec.txt gala_sed_u.txt skip gala_coord.dat
+    remove_Av.py ukidss star_emap_120arcsec.txt ysos_sed_u.txt skip ysos_coord.dat
     echo "done."
     exit 0
 fi
@@ -462,6 +555,32 @@ if [ "${option}" = "SER" ]; then
     exit 0
 fi
 
+if [ "${option}" = "PERui" ]; then
+    # Cut data from dataset
+    echo "Cut data from catalog."
+    get_catalog.sh catalog-PER-HREL.tbl star
+    get_catalog.sh catalog-PER-HREL.tbl galaxy
+    get_catalog.sh catalog-PER-HREL.tbl yso
+    echo "done."
+    echo "Replace JHK with UKIDSS data"
+    replace_jhk_with_ukidss.py GCS PER_ukidss/PER_GCS_source_table_star_WSA.csv PER_2mass/star_2mass.dat star_sed.dat
+    replace_jhk_with_ukidss.py GCS PER_ukidss/PER_GCS_source_table_gala_WSA.csv PER_2mass/gala_2mass.dat gala_sed.dat
+    replace_jhk_with_ukidss.py GCS PER_ukidss/PER_GCS_source_table_ysos_WSA.csv PER_2mass/ysos_2mass.dat ysos_sed.dat
+    replace_jhk_with_ukidss.py GPS PER_ukidss/PER_GPS_source_table_star_WSA.csv skip star_sed_u.txt
+    replace_jhk_with_ukidss.py GPS PER_ukidss/PER_GPS_source_table_gala_WSA.csv skip gala_sed_u.txt
+    replace_jhk_with_ukidss.py GPS PER_ukidss/PER_GPS_source_table_ysos_WSA.csv skip ysos_sed_u.txt
+    echo "done."
+    echo "Make an extinction map."
+    calculate_extinction.py star_coord.dat star_sed_twomass_mag.txt star_sed_err_twomass_mag.txt WD55B 4 
+    echo "done."
+    echo "Do extinction correction with extinction map."
+    remove_Av.py ukidss star_emap_240arcsec.txt star_sed_u_u.txt star_Av.dat star_coord.dat
+    remove_Av.py ukidss star_emap_240arcsec.txt gala_sed_u_u.txt skip gala_coord.dat
+    remove_Av.py ukidss star_emap_240arcsec.txt ysos_sed_u_u.txt skip ysos_coord.dat
+    echo "done."
+    exit 0
+fi
+
 if [ "${option}" = "PERu" ]; then
     # Cut data from dataset
     echo "Cut data from catalog."
@@ -480,6 +599,29 @@ if [ "${option}" = "PERu" ]; then
     exit 0
 fi
 
+if [ "${option}" = "PERi" ]; then
+    # Cut data from dataset
+    echo "Cut data from catalog."
+    get_catalog.sh catalog-PER-HREL.tbl star
+    get_catalog.sh catalog-PER-HREL.tbl galaxy
+    get_catalog.sh catalog-PER-HREL.tbl yso
+    echo "done."
+    echo "Replace JHK with UKIDSS data."
+    replace_jhk_with_ukidss.py GCS skip PER_2mass/star_2mass.dat star_sed.dat
+    replace_jhk_with_ukidss.py GCS skip PER_2mass/gala_2mass.dat gala_sed.dat
+    replace_jhk_with_ukidss.py GCS skip PER_2mass/ysos_2mass.dat ysos_sed.dat
+    echo "done."
+    echo "Make an extinction map."
+    calculate_extinction.py star_coord.dat star_sed_twomass_mag.txt star_sed_err_twomass_mag.txt WD55B 4 
+    echo "done."
+    echo "Do extinction correction with extinction map."
+    remove_Av.py ukidss star_emap_240arcsec.txt star_sed_u.txt star_Av.dat star_coord.dat
+    remove_Av.py ukidss star_emap_240arcsec.txt gala_sed_u.txt skip gala_coord.dat
+    remove_Av.py ukidss star_emap_240arcsec.txt ysos_sed_u.txt skip ysos_coord.dat
+    echo "done."
+    exit 0
+fi
+
 if [ "${option}" = "PER" ]; then
     # Cut data from dataset
     echo "Cut data from catalog."
@@ -491,6 +633,29 @@ if [ "${option}" = "PER" ]; then
     replace_jhk_with_ukidss.py GCS skip PER_2mass/star_2mass.dat star_sed.dat
     replace_jhk_with_ukidss.py GCS skip PER_2mass/gala_2mass.dat gala_sed.dat
     replace_jhk_with_ukidss.py GCS skip PER_2mass/ysos_2mass.dat ysos_sed.dat
+    echo "done."
+    exit 0
+fi
+
+if [ "${option}" = "CHA_IIi" ]; then
+    # Cut data from dataset
+    echo "Cut data from catalog."
+    get_catalog.sh catalog-CHA_II-HREL.tbl star
+    get_catalog.sh catalog-CHA_II-HREL.tbl galaxy
+    get_catalog.sh catalog-CHA_II-HREL.tbl yso
+    echo "done."
+    echo "Replace JHK with UKIDSS data."
+    replace_jhk_with_ukidss.py GCS skip CHA_II_2mass/star_2mass.dat star_sed.dat
+    replace_jhk_with_ukidss.py GCS skip CHA_II_2mass/gala_2mass.dat gala_sed.dat
+    replace_jhk_with_ukidss.py GCS skip CHA_II_2mass/ysos_2mass.dat ysos_sed.dat
+    echo "done."
+    echo "Make an extinction map."
+    calculate_extinction.py star_coord.dat star_sed_twomass_mag.txt star_sed_err_twomass_mag.txt WD55B 2 
+    echo "done."
+    echo "Do extinction correction with extinction map."
+    remove_Av.py ukidss star_emap_120arcsec.txt star_sed_u.txt star_Av.dat star_coord.dat
+    remove_Av.py ukidss star_emap_120arcsec.txt gala_sed_u.txt skip gala_coord.dat
+    remove_Av.py ukidss star_emap_120arcsec.txt ysos_sed_u.txt skip ysos_coord.dat
     echo "done."
     exit 0
 fi
@@ -511,6 +676,29 @@ if [ "${option}" = "CHA_II" ]; then
     exit 0
 fi
 
+if [ "${option}" = "LUP_Ii" ]; then
+    # Cut data from dataset
+    echo "Cut data from catalog."
+    get_catalog.sh catalog-LUP_I-HREL.tbl star
+    get_catalog.sh catalog-LUP_I-HREL.tbl galaxy
+    get_catalog.sh catalog-LUP_I-HREL.tbl yso
+    echo "done."
+    echo "Replace JHK with UKIDSS data."
+    replace_jhk_with_ukidss.py GCS skip LUP_I_2mass/star_2mass.dat star_sed.dat
+    replace_jhk_with_ukidss.py GCS skip LUP_I_2mass/gala_2mass.dat gala_sed.dat
+    replace_jhk_with_ukidss.py GCS skip LUP_I_2mass/ysos_2mass.dat ysos_sed.dat
+    echo "done."
+    echo "Make an extinction map."
+    calculate_extinction.py star_coord.dat star_sed_twomass_mag.txt star_sed_err_twomass_mag.txt WD55B 3 
+    echo "done."
+    echo "Do extinction correction with extinction map."
+    remove_Av.py ukidss star_emap_180arcsec.txt star_sed_u.txt star_Av.dat star_coord.dat
+    remove_Av.py ukidss star_emap_180arcsec.txt gala_sed_u.txt skip gala_coord.dat
+    remove_Av.py ukidss star_emap_180arcsec.txt ysos_sed_u.txt skip ysos_coord.dat
+    echo "done."
+    exit 0
+fi
+
 if [ "${option}" = "LUP_I" ]; then
     # Cut data from dataset
     echo "Cut data from catalog."
@@ -527,6 +715,29 @@ if [ "${option}" = "LUP_I" ]; then
     exit 0
 fi
 
+if [ "${option}" = "LUP_IIIi" ]; then
+    # Cut data from dataset
+    echo "Cut data from catalog."
+    get_catalog.sh catalog-LUP_III-HREL.tbl star
+    get_catalog.sh catalog-LUP_III-HREL.tbl galaxy
+    get_catalog.sh catalog-LUP_III-HREL.tbl yso
+    echo "done."
+    echo "Replace JHK with UKIDSS data."
+    replace_jhk_with_ukidss.py GCS skip LUP_III_2mass/star_2mass.dat star_sed.dat
+    replace_jhk_with_ukidss.py GCS skip LUP_III_2mass/gala_2mass.dat gala_sed.dat
+    replace_jhk_with_ukidss.py GCS skip LUP_III_2mass/ysos_2mass.dat ysos_sed.dat
+    echo "done."
+    echo "Make an extinction map."
+    calculate_extinction.py star_coord.dat star_sed_twomass_mag.txt star_sed_err_twomass_mag.txt WD55B 2.5 
+    echo "done."
+    echo "Do extinction correction with extinction map."
+    remove_Av.py ukidss star_emap_150arcsec.txt star_sed_u.txt star_Av.dat star_coord.dat
+    remove_Av.py ukidss star_emap_150arcsec.txt gala_sed_u.txt skip gala_coord.dat
+    remove_Av.py ukidss star_emap_150arcsec.txt ysos_sed_u.txt skip ysos_coord.dat
+    echo "done."
+    exit 0
+fi
+
 if [ "${option}" = "LUP_III" ]; then
     # Cut data from dataset
     echo "Cut data from catalog."
@@ -539,6 +750,29 @@ if [ "${option}" = "LUP_III" ]; then
     replace_jhk_with_ukidss.py GCS skip LUP_III_2mass/star_2mass.dat star_sed.dat
     replace_jhk_with_ukidss.py GCS skip LUP_III_2mass/gala_2mass.dat gala_sed.dat
     replace_jhk_with_ukidss.py GCS skip LUP_III_2mass/ysos_2mass.dat ysos_sed.dat
+    echo "done."
+    exit 0
+fi
+
+if [ "${option}" = "LUP_IVi" ]; then
+    # Cut data from dataset
+    echo "Cut data from catalog."
+    get_catalog.sh catalog-LUP_IV-HREL.tbl star
+    get_catalog.sh catalog-LUP_IV-HREL.tbl galaxy
+    get_catalog.sh catalog-LUP_IV-HREL.tbl yso
+    echo "done."
+    echo "Replace JHK with UKIDSS data."
+    replace_jhk_with_ukidss.py GCS skip LUP_IV_2mass/star_2mass.dat star_sed.dat
+    replace_jhk_with_ukidss.py GCS skip LUP_IV_2mass/gala_2mass.dat gala_sed.dat
+    replace_jhk_with_ukidss.py GCS skip LUP_IV_2mass/ysos_2mass.dat ysos_sed.dat
+    echo "done."
+    echo "Make an extinction map."
+    calculate_extinction.py star_coord.dat star_sed_twomass_mag.txt star_sed_err_twomass_mag.txt WD55B 2.5 
+    echo "done."
+    echo "Do extinction correction with extinction map."
+    remove_Av.py ukidss star_emap_150arcsec.txt star_sed_u.txt star_Av.dat star_coord.dat
+    remove_Av.py ukidss star_emap_150arcsec.txt gala_sed_u.txt skip gala_coord.dat
+    remove_Av.py ukidss star_emap_150arcsec.txt ysos_sed_u.txt skip ysos_coord.dat
     echo "done."
     exit 0
 fi
@@ -561,5 +795,5 @@ fi
 
 
 echo "No match parameters"
-echo "Available options: data_Au_OPHu_CHA_II, data_A_OPH_CHA_II, ELAIS_N1ui_OPHui_CHA_IIi, ELAIS_N1i_OPHi_CHA_IIi, ELAIS_N1, ELAIS_N1u, OPHu, OPH, SERui, SERi, SERu, SER, PERu, PER, CHA_II, LUP_I, LUP_III, LUP_IV"
+echo "Available options: ELAIS_N1u_OPHu_CHA_II, ELAIS_N1_OPH_CHA_II, ELAIS_N1ui_OPHui_CHA_IIi, ELAIS_N1i_OPHi_CHA_IIi, ELAIS_N1ui, ELAIS_N1u, ELAIS_N1i, ELAIS_N1, OPHui, OPHu, OPHi, OPH, SERui, SERi, SERu, SER, PERui, PERu, PERi, PER, CHA_IIi, CHA_II, LUP_Ii, LUP_I, LUP_IIIi, LUP_III, LUP_IVi, LUP_IV"
 exit 1

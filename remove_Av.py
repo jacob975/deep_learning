@@ -7,6 +7,7 @@ Abstract:
 Usage:
     remove_Av.py [band system] [extinction table] [source table] [Av table] [coord table]
     Available band systems: ukidss, twomass
+    You can skip [Av table]
     Example: remove_Av.py ukidss extinction_table sed_table.txt Av.txt coord.txt
 Editor:
     T.H. Heish, Jacob
@@ -52,6 +53,7 @@ if __name__ == "__main__":
     if len(argv) != 6:
         print ("Error!\nUsage: Remove_Av.py [band system] [extinction table] [sed table] [Av table] [coord table]") 
         print ("Available band systems: ukidss, twomass")
+        print ("You can skip [Av table]")
         print ("Example: remove_Av.py ukidss extinction_table sed_table.txt Av.txt coord.txt")
         exit()
     band_system = argv[1]
@@ -67,7 +69,9 @@ if __name__ == "__main__":
     # The source to be corrected
     sed_table = np.loadtxt(sed_table_name, dtype = float)
     # Av of each sources if known.
-    Av_table = np.loadtxt(Av_table_name, dtype = float)
+    Av_table = None
+    if Av_table_name != "skip":
+        Av_table = np.loadtxt(Av_table_name, dtype = float)
     # coord of each sources
     coord_table = np.loadtxt(coord_table_name, dtype = float)
     # Define the extinction curves
@@ -77,19 +81,54 @@ if __name__ == "__main__":
         from extinction_curves_lib import WD_55B_twomass as WD_55B
     # The radius of an extinction region in unit degree
     tolerance_radius = 6/60
-    for index, source in enumerate(sed_table):
-        #------------------------------------------------
-        # Find Av
-        Av = 0.0
-        err_Av = 0.0
-        # If the label of source is star and Av exists, just apply it.
-        if Av_table[index, 0] > 0.0:
-            Av = Av_table[index, 0]
-            err_Av = Av_table[index, 1]
-        # Find the closest extinction position for sources.
-        else:
-            Av_table[index, 0] = 0.0 
-            Av_table[index, 1] = 0.0
+    if Av_table_name != "skip":
+        for index, source in enumerate(sed_table):
+            #------------------------------------------------
+            # Find Av
+            Av = 0.0
+            err_Av = 0.0
+            # If the label of source is star and Av exists, just apply it.
+            if Av_table[index, 0] > 0.0:
+                Av = Av_table[index, 0]
+                err_Av = Av_table[index, 1]
+            # Find the closest extinction position for sources.
+            else:
+                min_distance, index_min = find_the_closest_extinction_position(coord_table[index], extinction_table)
+                if min_distance > tolerance_radius:
+                    Av = 0.0
+                    err_Av = 0.0
+                elif extinction_table[index_min, 2] > 0.0:
+                    # Read the Av of the selected extinction point.
+                    Av = extinction_table[index_min, 2]
+                    err_Av = extinction_table[index_min, 3]
+            #------------------------------------------------
+            # Apply extinction correction on source.
+            if Av == 0.0:
+                # If extinction is not detected and not covered by extinction map
+                # remove this sources
+                for band in WD_55B:
+                    sed_table[index,band[1]] = 0.0
+                    sed_table[index,band[2]] = 0.0
+            else :
+                for band in WD_55B:
+                    flux = source[band[1]]
+                    err_flux = source[band[2]]
+                    C_av = band[3]
+                    # If both flux and Av are valid, apply it!
+                    if flux > 0.0 and err_flux > 0.0:
+                        # error propagation are needed
+                        uflux = ufloat(flux, err_flux)
+                        uAv   = ufloat(Av  , err_Av)
+                        intrinsic_flux = uflux*10**(C_av*uAv/2.5)
+                        sed_table[index, band[1]] = intrinsic_flux.n
+                        sed_table[index, band[2]] = intrinsic_flux.s
+    elif Av_table_name == "skip":
+        for index, source in enumerate(sed_table):
+            #------------------------------------------------
+            # Find Av
+            Av = 0.0
+            err_Av = 0.0
+            # Find the closest extinction position for sources.
             min_distance, index_min = find_the_closest_extinction_position(coord_table[index], extinction_table)
             if min_distance > tolerance_radius:
                 Av = 0.0
@@ -98,29 +137,27 @@ if __name__ == "__main__":
                 # Read the Av of the selected extinction point.
                 Av = extinction_table[index_min, 2]
                 err_Av = extinction_table[index_min, 3]
-                Av_table[index, 0] = Av
-                Av_table[index, 1] = err_Av
-        #------------------------------------------------
-        # Apply extinction correction on source.
-        if Av == 0.0:
-            # If extinction is not detected and not covered by extinction map
-            # remove this sources
-            for band in WD_55B:
-                sed_table[index,band[1]] = 0.0
-                sed_table[index,band[2]] = 0.0
-        else :
-            for band in WD_55B:
-                flux = source[band[1]]
-                err_flux = source[band[2]]
-                C_av = band[3]
-                # If both flux and Av are valid, apply it!
-                if flux > 0.0 and err_flux > 0.0:
-                    # error propagation are needed
-                    uflux = ufloat(flux, err_flux)
-                    uAv   = ufloat(Av  , err_Av)
-                    intrinsic_flux = uflux*10**(C_av*uAv/2.5)
-                    sed_table[index, band[1]] = intrinsic_flux.n
-                    sed_table[index, band[2]] = intrinsic_flux.s
+            #------------------------------------------------
+            # Apply extinction correction on source.
+            if Av == 0.0:
+                # If extinction is not detected and not covered by extinction map
+                # remove this sources
+                for band in WD_55B:
+                    sed_table[index,band[1]] = 0.0
+                    sed_table[index,band[2]] = 0.0
+            else :
+                for band in WD_55B:
+                    flux = source[band[1]]
+                    err_flux = source[band[2]]
+                    C_av = band[3]
+                    # If both flux and Av are valid, apply it!
+                    if flux > 0.0 and err_flux > 0.0:
+                        # error propagation are needed
+                        uflux = ufloat(flux, err_flux)
+                        uAv   = ufloat(Av  , err_Av)
+                        intrinsic_flux = uflux*10**(C_av*uAv/2.5)
+                        sed_table[index, band[1]] = intrinsic_flux.n
+                        sed_table[index, band[2]] = intrinsic_flux.s
     # Save the table
     np.savetxt("{0}_intrinsic.txt".format(sed_table_name[:-4]), sed_table)
     #-----------------------------------

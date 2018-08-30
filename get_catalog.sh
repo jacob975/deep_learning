@@ -19,7 +19,7 @@ case ${2} in
             $23"," $27"," $31"," $43"," $61"," $79"," $97"," $115"],"}' ${1} > star_sed.dat
         awk '$15~/star/ && $15!~/dust/ {print FNR }' ${1} > star_tracer.dat
         awk '$15~/star/ && $15!~/dust/ {print $3" "$5 }' ${1} > star_coord.dat
-        awk '$15~/star/ && $15!~/dust/ {print $16" "$17 }' ${1} > star_Av.dat
+        awk '$15~/star/ && $15!~/dust/ {print $16" "$17 }' ${1} > star_catalog_Av.dat
         exit 0
         ;;
     
@@ -29,7 +29,7 @@ case ${2} in
             $23"," $27"," $31"," $43"," $61"," $79"," $97"," $115"],"}' ${1} > gala_sed.dat
 	    awk '$15~/Galc/   {print FNR }' ${1} > gala_tracer.dat
         awk '$15~/Galc/ {print $3" "$5 }' ${1} > gala_coord.dat
-        awk '$15~/Galc/ {print $16" "$17 }' ${1} > gala_Av.dat
+        awk '$15~/Galc/ {print $16" "$17 }' ${1} > gala_catalog_Av.dat
         exit 0
         ;;
     "yso")
@@ -38,7 +38,7 @@ case ${2} in
             $23"," $27"," $31"," $43"," $61"," $79"," $97"," $115"],"}' ${1} > ysos_sed.dat
         awk '$15~/YSOc/  {print FNR}' ${1} > ysos_tracer.dat
         awk '$15~/YSOc/  {print $3" "$5}' ${1} > ysos_coord.dat
-        awk '$15~/YSOc/  {print $16" "$17}' ${1} > ysos_Av.dat
+        awk '$15~/YSOc/  {print $16" "$17}' ${1} > ysos_catalog_Av.dat
         exit 0
         ;;
     "others")
