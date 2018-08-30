@@ -27,15 +27,12 @@ if [ "${option}" = "ELAIS_N1ui_OPHui_CHA_IIi" ]; then
     mv star_sed.dat CHA_II_star_sed.dat
     mv star_tracer.dat CHA_II_star_tracer.dat
     mv star_coord.dat CHA_II_star_coord.dat
-    mv star_Av.dat CHA_II_star_Av.dat
     mv gala_coord.dat CHA_II_gala_coord.dat
     mv gala_sed.dat CHA_II_gala_sed.dat
     mv gala_tracer.dat CHA_II_gala_tracer.dat
-    mv gala_Av.dat CHA_II_gala_Av.dat
     mv ysos_coord.dat CHA_II_ysos_coord.dat
     mv ysos_sed.dat CHA_II_ysos_sed.dat
     mv ysos_tracer.dat CHA_II_ysos_tracer.dat
-    mv ysos_Av.dat CHA_II_ysos_Av.dat
     echo "CHA_II done."
     get_catalog.sh catalog-OPH-HREL.tbl star
     get_catalog.sh catalog-OPH-HREL.tbl galaxy
@@ -43,26 +40,21 @@ if [ "${option}" = "ELAIS_N1ui_OPHui_CHA_IIi" ]; then
     mv gala_coord.dat OPH_gala_coord.dat
     mv gala_sed.dat OPH_gala_sed.dat
     mv gala_tracer.dat OPH_gala_tracer.dat
-    mv gala_Av.dat OPH_gala_Av.dat
     mv star_coord.dat OPH_star_coord.dat
     mv star_sed.dat OPH_star_sed.dat
     mv star_tracer.dat OPH_star_tracer.dat
-    mv star_Av.dat OPH_star_Av.dat
     mv ysos_coord.dat OPH_ysos_coord.dat
     mv ysos_sed.dat OPH_ysos_sed.dat
     mv ysos_tracer.dat OPH_ysos_tracer.dat
-    mv ysos_Av.dat OPH_ysos_Av.dat
     echo "OPH done."
     get_catalog_data_A.sh star
     get_catalog_data_A.sh galaxy
     mv star_coord.txt ELAIS_N1_star_coord.txt
     mv star_sed.dat ELAIS_N1_star_sed.dat
     mv star_tracer.dat ELAIS_N1_star_tracer.dat
-    mv star_Av.dat ELAIS_N1_star_Av.dat
     mv gala_coord.txt ELAIS_N1_gala_coord.txt
     mv gala_sed.dat ELAIS_N1_gala_sed.dat
     mv gala_tracer.dat ELAIS_N1_gala_tracer.dat
-    mv gala_Av.dat ELAIS_N1_gala_Av.dat
     echo "ELAIS N1 done."
     # replace old data with ukidss data and 2mass data
     echo "Replace JHK with UKIDSS data"
@@ -78,8 +70,11 @@ if [ "${option}" = "ELAIS_N1ui_OPHui_CHA_IIi" ]; then
     # Make an extinction map
     echo "Make an extinction map."
     calculate_extinction.py OPH_star_coord.dat OPH_star_sed_twomass_mag.txt OPH_star_sed_err_twomass_mag.txt WD55B 6
+    mv star_Av.dat OPH_star_Av.dat
     calculate_extinction.py CHA_II_star_coord.dat CHA_II_star_sed_twomass_mag.txt CHA_II_star_sed_err_twomass_mag.txt WD55B 3
+    mv star_Av.dat CHA_II_star_Av.dat
     calculate_extinction.py ELAIS_N1_star_coord.txt ELAIS_N1_star_sed_twomass_mag.txt ELAIS_N1_star_sed_err_twomass_mag.txt WD55B 4.5
+    mv star_Av.dat ELAIS_N1_star_Av.dat
     echo "done."
     echo "Do extinction correction with extinction map."
     remove_Av.py ukidss OPH_star_emap_360arcsec.txt OPH_star_sed_u.txt OPH_star_Av.dat OPH_star_coord.dat
