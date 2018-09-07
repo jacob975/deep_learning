@@ -81,6 +81,8 @@ if __name__ == "__main__":
         from extinction_curves_lib import WD_55B_twomass as WD_55B
     # The radius of an extinction region in unit degree
     tolerance_radius = 6/60
+    # The list for final Av of each source
+    final_Av = []
     if Av_table_name != "skip":
         for index, source in enumerate(sed_table):
             #------------------------------------------------
@@ -104,12 +106,14 @@ if __name__ == "__main__":
             #------------------------------------------------
             # Apply extinction correction on source.
             if Av == 0.0:
+                final_Av.append([0.0, 0.0])
                 # If extinction is not detected and not covered by extinction map
                 # remove this sources
                 for band in WD_55B:
                     sed_table[index,band[1]] = 0.0
                     sed_table[index,band[2]] = 0.0
             else :
+                final_Av.append([Av, err_Av])
                 for band in WD_55B:
                     flux = source[band[1]]
                     err_flux = source[band[2]]
@@ -140,12 +144,14 @@ if __name__ == "__main__":
             #------------------------------------------------
             # Apply extinction correction on source.
             if Av == 0.0:
+                final_Av.append([0.0, 0.0])
                 # If extinction is not detected and not covered by extinction map
                 # remove this sources
                 for band in WD_55B:
                     sed_table[index,band[1]] = 0.0
                     sed_table[index,band[2]] = 0.0
             else :
+                final_Av.append([Av, err_Av])
                 for band in WD_55B:
                     flux = source[band[1]]
                     err_flux = source[band[2]]
@@ -160,6 +166,7 @@ if __name__ == "__main__":
                         sed_table[index, band[2]] = intrinsic_flux.s
     # Save the table
     np.savetxt("{0}_intrinsic.txt".format(sed_table_name[:-4]), sed_table)
+    np.savetxt("{0}_appended_Av.txt".format(sed_table_name[:-4]), final_Av)
     #-----------------------------------
     # measure time
     elapsed_time = time.time() - start_time
