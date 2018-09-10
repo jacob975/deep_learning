@@ -106,7 +106,7 @@ def normalize_0_r_noH(inp):
     # remove band H
     inp[:,1] = 0.0
     inp[:,9] = 0.0
-    norm = np.amax(inp[:,:8], axis=1)
+    norm = np.amax(inp, axis=1)
     outp = inp / norm.reshape(h,1)
     # make each no observation having the same value
     outp[inp == -9.99e+02] = 0.0
@@ -120,7 +120,7 @@ def normalize_0_r_noMIPS(inp):
     # remove band MIPS 24 um
     inp[:,7] = 0.0
     inp[:,15] = 0.0
-    norm = np.amax(inp[:,:8], axis=1)
+    norm = np.amax(inp, axis=1)
     outp = inp / norm.reshape(h,1)
     # make each no observation having the same value
     outp[inp == -9.99e+02] = 0.0
@@ -137,7 +137,7 @@ def normalize_0_r_noH_noMIPS(inp):
     # remove band MIPS 24 um
     inp[:,7] = 0.0
     inp[:,15] = 0.0
-    norm = np.amax(inp[:,:8] axis=1)
+    norm = np.amax(inp, axis=1)
     outp = inp / norm.reshape(h,1)
     # make each no observation having the same value
     outp[inp == -9.99e+02] = 0.0
@@ -151,7 +151,7 @@ def normalize_0_r_noJHK(inp):
     # remove band JHK
     inp[:,0:3] = 0.0
     inp[:,8:11] = 0.0
-    norm = np.amax(inp[:,:8] axis=1)
+    norm = np.amax(inp, axis=1)
     outp = inp / norm.reshape(h,1)
     # make each no observation having the same value
     outp[inp == -9.99e+02] = 0.0
@@ -165,7 +165,7 @@ def normalize_0_r_noJHK4(inp):
     # remove band JHK
     inp[:,0:4] = 0.0
     inp[:,8:12] = 0.0
-    norm = np.amax(inp[:,:8] axis=1)
+    norm = np.amax(inp, axis=1)
     outp = inp / norm.reshape(h,1)
     # make each no observation having the same value
     outp[inp == -9.99e+02] = 0.0
@@ -179,7 +179,7 @@ def normalize_0_r_no4(inp):
     # remove band JHK
     inp[:,3] = 0.0
     inp[:,11] = 0.0
-    norm = np.amax(inp[:,:8] axis=1)
+    norm = np.amax(inp, axis=1)
     outp = inp / norm.reshape(h,1)
     # make each no observation having the same value
     outp[inp == -9.99e+02] = 0.0
@@ -197,7 +197,7 @@ def normalize_0_r_noH78(inp):
     inp[:,14]= 0.0
     inp[:,7] = 0.0
     inp[:,15]= 0.0
-    norm = np.amax(inp[:,:8] axis=1)
+    norm = np.amax(inp, axis=1)
     outp = inp / norm.reshape(h,1)
     # make each no observation having the same value
     outp[inp == -9.99e+02] = 0.0
@@ -213,7 +213,7 @@ def normalize_0_r_no78(inp):
     inp[:,14]= 0.0
     inp[:,7] = 0.0
     inp[:,15]= 0.0
-    norm = np.amax(inp[:,:8] axis=1)
+    norm = np.amax(inp, axis=1)
     outp = inp / norm.reshape(h,1)
     # make each no observation having the same value
     outp[inp == -9.99e+02] = 0.0
