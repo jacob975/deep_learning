@@ -16,6 +16,10 @@ Editor:
 ####################################
 update log
 20180724 version alpha 1
+    1. The code works
+20180910 version alpha 2
+    1. replace name 'no' with 'mask'.
+    2. Add new options: mask JHK4, and mask 4.
 '''
 from sys import argv
 import time
@@ -27,7 +31,7 @@ if __name__ == "__main__":
     VERBOSE = 0
     # measure time
     start_time = time.time()
-    options = ['noJHK', 'noH', 'noH78', 'no78']
+    options = ['maskJHK', 'maskH', 'maskH78', 'mask78', 'maskJHK4', 'mask4']
     #-----------------------------------
     # Load argv
     if len(argv) != 3:
@@ -41,14 +45,18 @@ if __name__ == "__main__":
     # Load data
     data = np.loadtxt(data_name, dtype = np.float64)
     # Choose mask with bands set
-    if mod == 'noJHK':
+    if mod == 'maskJHK':
         from dat2npy_lib import normalize_0_r_noJHK as normalize
-    if mod == 'noH':
+    if mod == 'maskH':
         from dat2npy_lib import normalize_0_r_noH as normalize
-    if mod == 'noH78':
+    if mod == 'maskH78':
         from dat2npy_lib import normalize_0_r_noH78 as normalize
-    if mod == 'no78':
+    if mod == 'mask78':
         from dat2npy_lib import normalize_0_r_no78 as normalize
+    if mod == 'maskJHK4':
+        from dat2npy_lib import normalize_0_r_noJHK4 as normalize
+    if mod == 'mask4':
+        from dat2npy_lib import normalize_0_r_no4 as normalize
     # mask dataset with chosen mask, then normalize to the maximun flux equals 1.
     masked_data = normalize(data)
     # Save masked data set
