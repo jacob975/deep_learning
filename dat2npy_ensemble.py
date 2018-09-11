@@ -70,10 +70,13 @@ if __name__ == "__main__":
     options = [ '0_r', 
                 '0_r_noH', 
                 '0_r_no4', 
+                '0_r_no5', 
                 '0_r_noMIPS', 
                 '0_r_noH_noMIPS', 
                 '0_r_noJHK', 
                 '0_r_noJHK4', 
+                '0_r_noJHK5', 
+                '0_r_noJHK45', 
                 '0_r_noH78', 
                 '0_r_no78', 
                 '1_1', 
@@ -102,6 +105,9 @@ if __name__ == "__main__":
     elif mod == '0_r_no4':
         from dat2npy_lib import normalize_0_r_no4 as normalize
         from dat2npy_lib import no_observation_filter_eq_0 as no_observation_filter
+    elif mod == '0_r_no5':
+        from dat2npy_lib import normalize_0_r_no5 as normalize
+        from dat2npy_lib import no_observation_filter_eq_0 as no_observation_filter
     elif mod == '0_r_noMIPS':
         from dat2npy_lib import normalize_0_r_noMIPS as normalize
         from dat2npy_lib import no_observation_filter_eq_0 as no_observation_filter
@@ -110,6 +116,12 @@ if __name__ == "__main__":
         from dat2npy_lib import no_observation_filter_eq_0 as no_observation_filter
     elif mod == '0_r_noJHK4':
         from dat2npy_lib import normalize_0_r_noJHK4 as normalize
+        from dat2npy_lib import no_observation_filter_eq_0 as no_observation_filter
+    elif mod == '0_r_noJHK5':
+        from dat2npy_lib import normalize_0_r_noJHK5 as normalize
+        from dat2npy_lib import no_observation_filter_eq_0 as no_observation_filter
+    elif mod == '0_r_noJHK45':
+        from dat2npy_lib import normalize_0_r_noJHK45 as normalize
         from dat2npy_lib import no_observation_filter_eq_0 as no_observation_filter
     elif mod == '0_r_noH78':
         from dat2npy_lib import normalize_0_r_noH78 as normalize

@@ -187,6 +187,50 @@ def normalize_0_r_no4(inp):
     outp.reshape(-1, data_width)
     return outp
 
+def normalize_0_r_noJHK45(inp):
+    # take norm
+    h = len(inp)
+    # remove band JHK
+    inp[:,0:5] = 0.0
+    inp[:,8:13] = 0.0
+    norm = np.amax(inp, axis=1)
+    outp = inp / norm.reshape(h,1)
+    # make each no observation having the same value
+    outp[inp == -9.99e+02] = 0.0
+    outp[inp == 0.0] = 0.0
+    outp.reshape(-1, data_width)
+    return outp
+
+def normalize_0_r_noJHK5(inp):
+    # take norm
+    h = len(inp)
+    # remove band JHK
+    inp[:,0:3] = 0.0
+    inp[:,8:11] = 0.0
+    inp[:,4] = 0.0
+    inp[:,12] = 0.0
+    norm = np.amax(inp, axis=1)
+    outp = inp / norm.reshape(h,1)
+    # make each no observation having the same value
+    outp[inp == -9.99e+02] = 0.0
+    outp[inp == 0.0] = 0.0
+    outp.reshape(-1, data_width)
+    return outp
+
+def normalize_0_r_no5(inp):
+    # take norm
+    h = len(inp)
+    # remove band JHK
+    inp[:,4] = 0.0
+    inp[:,12] = 0.0
+    norm = np.amax(inp, axis=1)
+    outp = inp / norm.reshape(h,1)
+    # make each no observation having the same value
+    outp[inp == -9.99e+02] = 0.0
+    outp[inp == 0.0] = 0.0
+    outp.reshape(-1, data_width)
+    return outp
+
 def normalize_0_r_noH78(inp):
     # take norm
     h = len(inp)

@@ -20,6 +20,7 @@ update log
 20180910 version alpha 2
     1. replace name 'no' with 'mask'.
     2. Add new options: mask JHK4, and mask 4.
+    3. Add new options: mask JHK45, and mask 5.
 '''
 from sys import argv
 import time
@@ -31,7 +32,15 @@ if __name__ == "__main__":
     VERBOSE = 0
     # measure time
     start_time = time.time()
-    options = ['maskJHK', 'maskH', 'maskH78', 'mask78', 'maskJHK4', 'mask4']
+    options = [ 'maskJHK', 
+                'maskH', 
+                'maskH78', 
+                'mask78', 
+                'maskJHK4', 
+                'mask4',
+                'mask5',
+                'maskJHK5',
+                'maskJHK45']
     #-----------------------------------
     # Load argv
     if len(argv) != 3:
@@ -57,6 +66,12 @@ if __name__ == "__main__":
         from dat2npy_lib import normalize_0_r_noJHK4 as normalize
     if mod == 'mask4':
         from dat2npy_lib import normalize_0_r_no4 as normalize
+    if mod == 'maskJHK5':
+        from dat2npy_lib import normalize_0_r_noJHK5 as normalize
+    if mod == 'maskJHK45':
+        from dat2npy_lib import normalize_0_r_noJHK45 as normalize
+    if mod == 'mask5':
+        from dat2npy_lib import normalize_0_r_no5 as normalize
     # mask dataset with chosen mask, then normalize to the maximun flux equals 1.
     masked_data = normalize(data)
     # Save masked data set
