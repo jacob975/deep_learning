@@ -30,7 +30,7 @@ import numpy as np
 import convert_lib
 from convert_lib import TWOMASS_to_UKIDSS, fill_up_error
 from sys import argv
-from dat2npy_noobs_nodet import read_well_known_data
+from dat2npy_lib import read_well_known_data
 from uncertainties import ufloat
 
 # the function for read csv catalogs
