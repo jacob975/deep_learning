@@ -3,7 +3,10 @@
 Abstract:
     This is a program to convert .dat files to npy files
 Usage:
-    dat2npy.py [file name 1] [file name 2] [file name 3] ...
+    dat2npy.py [mask code] [file name 1] [file name 2] [file name 3] ...
+    
+    [mask code]:
+        The code represent the mask.
     [file name]:
         The file you want to processed.
         The first will be labeded as 0, the second will be labeded as 1, so as on.
@@ -12,7 +15,7 @@ Example:
     You have a data file "Toy.dat", "Toy2.dat", and "Toy3.dat"
 
     Then, do this cmd.
-    $ dat2npy Toy.dat Toy2.dat Toy3.dat
+    $ dat2npy 00000000 Toy.dat Toy2.dat Toy3.dat
     you get two series of files, one is data, another is label
     each series are sort by number of zero in a data.
 
@@ -50,15 +53,14 @@ update log
     1. add a new func to save coord infomations
 20180531 version alpha 12:
     1. all dat2npy programs are collected into the ensemble version
+20180912 version alpha 13:
+    1. Update the mask system, using a series of number represent the mask instead of key words.
 '''
 import time
 import re           # this is used to apply multiple spliting
 import numpy as np
 from sys import argv
-from dat2npy_lib import read_well_known_data, apply_filter_on
-
-# how many element in a data vector
-data_width = 16
+from dat2npy_lib import mask_and_normalize, no_observation_filter_eq_0, read_well_known_data, apply_filter_on
 
 #--------------------------------------------
 # main code
@@ -67,91 +69,20 @@ if __name__ == "__main__":
     # measure times
     start_time = time.time()
     # initialize
-    options = [ '0_r', 
-                '0_r_noH', 
-                '0_r_no4', 
-                '0_r_no5', 
-                '0_r_noMIPS', 
-                '0_r_noH_noMIPS', 
-                '0_r_noJHK', 
-                '0_r_noJHK4', 
-                '0_r_noJHK5', 
-                '0_r_noJHK45', 
-                '0_r_noH78', 
-                '0_r_no78', 
-                '1_1', 
-                '1_0', 
-                '1_r', 
-                '0_0']
     #----------------------------------
-    # check argv is right
+    # Check and load argv
     if len(argv) < 3:
-        print ("Error!\nUsage: dat2npy_ensemble.py [mod] [dat files]")
-        print("possible mods: ")
-        print(", ".join('%s'%x for x in options))
+        print ("Error! The number of argument is wrong\nUsage: dat2npy_ensemble.py [mask code] [dat files]")
+        print ("[mask code] should be a 8 digit decimal number.")
+        print ("Example: 00000000 represent no masked; 11111111 represent all masked")
         exit()
-    # read argv
-    # Base on mod, loading corresponding functions
-    mod = argv[1]
-    if mod == '0_r':
-        from dat2npy_lib import normalize_0_r as normalize
-        from dat2npy_lib import no_observation_filter_eq_0 as no_observation_filter
-    elif mod == '0_r_noH_noMIPS':
-        from dat2npy_lib import normalize_0_r_noH_noMIPS as normalize
-        from dat2npy_lib import no_observation_filter_eq_0 as no_observation_filter
-    elif mod == '0_r_noH':
-        from dat2npy_lib import normalize_0_r_noH as normalize
-        from dat2npy_lib import no_observation_filter_eq_0 as no_observation_filter
-    elif mod == '0_r_no4':
-        from dat2npy_lib import normalize_0_r_no4 as normalize
-        from dat2npy_lib import no_observation_filter_eq_0 as no_observation_filter
-    elif mod == '0_r_no5':
-        from dat2npy_lib import normalize_0_r_no5 as normalize
-        from dat2npy_lib import no_observation_filter_eq_0 as no_observation_filter
-    elif mod == '0_r_noMIPS':
-        from dat2npy_lib import normalize_0_r_noMIPS as normalize
-        from dat2npy_lib import no_observation_filter_eq_0 as no_observation_filter
-    elif mod == '0_r_noJHK':
-        from dat2npy_lib import normalize_0_r_noJHK as normalize
-        from dat2npy_lib import no_observation_filter_eq_0 as no_observation_filter
-    elif mod == '0_r_noJHK4':
-        from dat2npy_lib import normalize_0_r_noJHK4 as normalize
-        from dat2npy_lib import no_observation_filter_eq_0 as no_observation_filter
-    elif mod == '0_r_noJHK5':
-        from dat2npy_lib import normalize_0_r_noJHK5 as normalize
-        from dat2npy_lib import no_observation_filter_eq_0 as no_observation_filter
-    elif mod == '0_r_noJHK45':
-        from dat2npy_lib import normalize_0_r_noJHK45 as normalize
-        from dat2npy_lib import no_observation_filter_eq_0 as no_observation_filter
-    elif mod == '0_r_noH78':
-        from dat2npy_lib import normalize_0_r_noH78 as normalize
-        from dat2npy_lib import no_observation_filter_eq_0 as no_observation_filter
-    elif mod == '0_r_no78':
-        from dat2npy_lib import normalize_0_r_no78 as normalize
-        from dat2npy_lib import no_observation_filter_eq_0 as no_observation_filter
-    elif mod == '1_1':
-        from dat2npy_lib import normalize_1_1 as normalize
-        from dat2npy_lib import no_observation_filter_smaller_than_or_eq_minus1 as no_observation_filter
-    elif mod == '1_r':
-        from dat2npy_lib import normalize_1_r as normalize
-        from dat2npy_lib import no_observation_filter_eq_minus1 as no_observation_filter
-    elif mod == '1_0':
-        from dat2npy_lib import normalize_1_0 as normalize
-        from dat2npy_lib import no_observation_filter_eq_minus1 as no_observation_filter
-    elif mod == '0_0':
-        from dat2npy_lib import normalize_0_0 as normalize
-        from dat2npy_lib import no_observation_filter_smaller_than_or_eq_0 as no_observation_filter
-    else:
-        print("Wrong mod, program stops.")
-        print("possible mods: ")
-        print(", ".join('%s'%x for x in options))
-        exit()
+    mask_code = argv[1]
     data_name_list = argv[2:]
     print ("The command is:\n {0}".format(argv))
     print ("data to be processed: {0}".format(data_name_list))
+    #-----------------------------------
     # how many element in a data vector
     data_width = 16
-    #-----------------------------------
     # Load data, label, tracer, and coordinate
     sum_data = [[] for x in range(data_width)]
     sum_label = [[] for x in range(data_width)]
@@ -164,11 +95,11 @@ if __name__ == "__main__":
         # convert data from string to float
         str_data = read_well_known_data(data_name)
         data = np.array(str_data, dtype = float)
-        data_n = normalize(data)
+        data_n = mask_and_normalize(data, mask_code)
         # no observation filter
         # i is the tolarence of loss in a single datum
         for i in range(data_width):
-            data_n_z, _filter= no_observation_filter(data_n, i)
+            data_n_z, _filter= no_observation_filter_eq_0(data_n, i)
             name_tracer = "{0}_tracer.dat".format(data_name[:4])
             name_coord = "{0}_coord.dat".format(data_name[:4])
             failure, tracer_outp = apply_filter_on(name_tracer, _filter)

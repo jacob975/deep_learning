@@ -3,7 +3,7 @@
 Abstract:
     This is a program to mask data in some bands with 0. 
 Usage:
-    mask_bands.py [mod] [data]
+    mask_bands.py [mask code] [data]
 Editor:
     Jacob975
 
@@ -21,8 +21,11 @@ update log
     1. replace name 'no' with 'mask'.
     2. Add new options: mask JHK4, and mask 4.
     3. Add new options: mask JHK45, and mask 5.
+20180912 version alpha 3
+    1. Update the mask system, using mask code instead of keywords.
 '''
 from sys import argv
+from dat2npy_lib import mask_and_normalize
 import time
 import numpy as np
 
@@ -32,48 +35,21 @@ if __name__ == "__main__":
     VERBOSE = 0
     # measure time
     start_time = time.time()
-    options = [ 'maskJHK', 
-                'maskH', 
-                'maskH78', 
-                'mask78', 
-                'maskJHK4', 
-                'mask4',
-                'mask5',
-                'maskJHK5',
-                'maskJHK45']
     #-----------------------------------
     # Load argv
     if len(argv) != 3:
         print ("Wrong numbers of arguments")
-        print ("Usage: mask_bands.py [mod] [data]")
-        print ("Available mod: {0}".format(", ".join('%s'%x for x in options)))
+        print ("Usage: mask_bands.py [mask code] [data]")
+        print ("Mask code should be 8 digit decimal number.")
+        print ("Example: 00000000 represent no masked; 11111111 represent all masked")
         exit(0)
-    mod = argv[1]
+    mask_code = argv[1]
     data_name = argv[2]
     #-----------------------------------
     # Load data
     data = np.loadtxt(data_name, dtype = np.float64)
-    # Choose mask with bands set
-    if mod == 'maskJHK':
-        from dat2npy_lib import normalize_0_r_noJHK as normalize
-    if mod == 'maskH':
-        from dat2npy_lib import normalize_0_r_noH as normalize
-    if mod == 'maskH78':
-        from dat2npy_lib import normalize_0_r_noH78 as normalize
-    if mod == 'mask78':
-        from dat2npy_lib import normalize_0_r_no78 as normalize
-    if mod == 'maskJHK4':
-        from dat2npy_lib import normalize_0_r_noJHK4 as normalize
-    if mod == 'mask4':
-        from dat2npy_lib import normalize_0_r_no4 as normalize
-    if mod == 'maskJHK5':
-        from dat2npy_lib import normalize_0_r_noJHK5 as normalize
-    if mod == 'maskJHK45':
-        from dat2npy_lib import normalize_0_r_noJHK45 as normalize
-    if mod == 'mask5':
-        from dat2npy_lib import normalize_0_r_no5 as normalize
     # mask dataset with chosen mask, then normalize to the maximun flux equals 1.
-    masked_data = normalize(data)
+    masked_data = mask_and_normalize(data, mask_code)
     # Save masked data set
     np.savetxt(data_name, masked_data)
     #-----------------------------------

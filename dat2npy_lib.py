@@ -10,6 +10,8 @@ Editor:
 update log
 20180531 version alpha 1
     1. This is the library of dat2npy program in ensemble version 
+20180912 version alpha 2
+    1. Update the mask system, using mask code instead of keywords.
 '''
 import time
 import re           # this is used to apply multiple spliting
@@ -89,174 +91,16 @@ def normalize_1_0(inp):
     outp.reshape(-1, data_width)
     return outp
 
-def normalize_0_r(inp):
-    # take norm
+def mask_and_normalize(inp, mask_code = np.zeros(8)):
+    # The number of source in the input file.
     h = len(inp)
-    norm = np.amax(inp, axis=1)
-    outp = inp / norm.reshape(h,1)
-    # make each no observation having the same value
-    outp[inp == -9.99e+02] = 0.0
-    outp[inp == 0.0] = 0.0
-    outp.reshape(-1, data_width)
-    return outp
-
-def normalize_0_r_noH(inp):
-    # take norm
-    h = len(inp)
-    # remove band H
-    inp[:,1] = 0.0
-    inp[:,9] = 0.0
-    norm = np.amax(inp, axis=1)
-    outp = inp / norm.reshape(h,1)
-    # make each no observation having the same value
-    outp[inp == -9.99e+02] = 0.0
-    outp[inp == 0.0] = 0.0
-    outp.reshape(-1, data_width)
-    return outp
-    
-def normalize_0_r_noMIPS(inp):
-    # take norm
-    h = len(inp)
-    # remove band MIPS 24 um
-    inp[:,7] = 0.0
-    inp[:,15] = 0.0
-    norm = np.amax(inp, axis=1)
-    outp = inp / norm.reshape(h,1)
-    # make each no observation having the same value
-    outp[inp == -9.99e+02] = 0.0
-    outp[inp == 0.0] = 0.0
-    outp.reshape(-1, data_width)
-    return outp
-
-def normalize_0_r_noH_noMIPS(inp):
-    # take norm
-    h = len(inp)
-    # remove band H
-    inp[:,1] = 0.0
-    inp[:,9] = 0.0
-    # remove band MIPS 24 um
-    inp[:,7] = 0.0
-    inp[:,15] = 0.0
-    norm = np.amax(inp, axis=1)
-    outp = inp / norm.reshape(h,1)
-    # make each no observation having the same value
-    outp[inp == -9.99e+02] = 0.0
-    outp[inp == 0.0] = 0.0
-    outp.reshape(-1, data_width)
-    return outp
-
-def normalize_0_r_noJHK(inp):
-    # take norm
-    h = len(inp)
-    # remove band JHK
-    inp[:,0:3] = 0.0
-    inp[:,8:11] = 0.0
-    norm = np.amax(inp, axis=1)
-    outp = inp / norm.reshape(h,1)
-    # make each no observation having the same value
-    outp[inp == -9.99e+02] = 0.0
-    outp[inp == 0.0] = 0.0
-    outp.reshape(-1, data_width)
-    return outp
-
-def normalize_0_r_noJHK4(inp):
-    # take norm
-    h = len(inp)
-    # remove band JHK
-    inp[:,0:4] = 0.0
-    inp[:,8:12] = 0.0
-    norm = np.amax(inp, axis=1)
-    outp = inp / norm.reshape(h,1)
-    # make each no observation having the same value
-    outp[inp == -9.99e+02] = 0.0
-    outp[inp == 0.0] = 0.0
-    outp.reshape(-1, data_width)
-    return outp
-
-def normalize_0_r_no4(inp):
-    # take norm
-    h = len(inp)
-    # remove band JHK
-    inp[:,3] = 0.0
-    inp[:,11] = 0.0
-    norm = np.amax(inp, axis=1)
-    outp = inp / norm.reshape(h,1)
-    # make each no observation having the same value
-    outp[inp == -9.99e+02] = 0.0
-    outp[inp == 0.0] = 0.0
-    outp.reshape(-1, data_width)
-    return outp
-
-def normalize_0_r_noJHK45(inp):
-    # take norm
-    h = len(inp)
-    # remove band JHK
-    inp[:,0:5] = 0.0
-    inp[:,8:13] = 0.0
-    norm = np.amax(inp, axis=1)
-    outp = inp / norm.reshape(h,1)
-    # make each no observation having the same value
-    outp[inp == -9.99e+02] = 0.0
-    outp[inp == 0.0] = 0.0
-    outp.reshape(-1, data_width)
-    return outp
-
-def normalize_0_r_noJHK5(inp):
-    # take norm
-    h = len(inp)
-    # remove band JHK
-    inp[:,0:3] = 0.0
-    inp[:,8:11] = 0.0
-    inp[:,4] = 0.0
-    inp[:,12] = 0.0
-    norm = np.amax(inp, axis=1)
-    outp = inp / norm.reshape(h,1)
-    # make each no observation having the same value
-    outp[inp == -9.99e+02] = 0.0
-    outp[inp == 0.0] = 0.0
-    outp.reshape(-1, data_width)
-    return outp
-
-def normalize_0_r_no5(inp):
-    # take norm
-    h = len(inp)
-    # remove band JHK
-    inp[:,4] = 0.0
-    inp[:,12] = 0.0
-    norm = np.amax(inp, axis=1)
-    outp = inp / norm.reshape(h,1)
-    # make each no observation having the same value
-    outp[inp == -9.99e+02] = 0.0
-    outp[inp == 0.0] = 0.0
-    outp.reshape(-1, data_width)
-    return outp
-
-def normalize_0_r_noH78(inp):
-    # take norm
-    h = len(inp)
-    # remove band H, IRAC 4, MIPS 1 
-    inp[:,1] = 0.0
-    inp[:,9] = 0.0
-    inp[:,6] = 0.0
-    inp[:,14]= 0.0
-    inp[:,7] = 0.0
-    inp[:,15]= 0.0
-    norm = np.amax(inp, axis=1)
-    outp = inp / norm.reshape(h,1)
-    # make each no observation having the same value
-    outp[inp == -9.99e+02] = 0.0
-    outp[inp == 0.0] = 0.0
-    outp.reshape(-1, data_width)
-    return outp
-
-def normalize_0_r_no78(inp):
-    # take norm
-    h = len(inp)
-    # remove band, IRAC 4, MIPS 1 
-    inp[:,6] = 0.0
-    inp[:,14]= 0.0
-    inp[:,7] = 0.0
-    inp[:,15]= 0.0
+    # Mask some bands
+    mask_code = [ int(x) for x in list(mask_code)]
+    for index, value in enumerate(mask_code):
+        if value:
+            inp[:,index] = 0.0
+            inp[:,index + 8] = 0.0
+    # Normailze
     norm = np.amax(inp, axis=1)
     outp = inp / norm.reshape(h,1)
     # make each no observation having the same value
