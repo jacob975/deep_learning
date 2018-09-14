@@ -72,12 +72,16 @@ if __name__ == "__main__":
     #----------------------------------
     # Check and load argv
     if len(argv) < 3:
-        print ("Error! The number of argument is wrong\nUsage: dat2npy_ensemble.py [mask code] [dat files]")
-        print ("[mask code] should be a 8 digit decimal number.")
+        print ("Error! The number of argument is wrong")
+        print ("Usage: dat2npy_ensemble.py [mask code] [number of lost] [dat files]")
+        print ("[mask code] should be a 8 digit binary number.")
         print ("Example: 00000000 represent no masked; 11111111 represent all masked")
+        print ("[number of lost] represent the tolerance for data")
+        print ("Example: 0 means only data without loss will be saved, [number of lost] should be a integer between 0 and 15")
         exit()
     mask_code = argv[1]
-    data_name_list = argv[2:]
+    number_of_lost = int(argv[2])
+    data_name_list = argv[3:]
     print ("The command is:\n {0}".format(argv))
     print ("data to be processed: {0}".format(data_name_list))
     #-----------------------------------
@@ -129,14 +133,15 @@ if __name__ == "__main__":
         sum_label[i] = np.reshape(sum_label[i], (-1, 3))
         sum_coord[i] = np.reshape(sum_coord[i], (-1, 2))
         print ("number of data with MaxLoss {0} = {1}".format(i, len(sum_data[i])))
-        np.save("source_sed_MaxLoss{0}.npy".format(i), sum_data[i])
-        np.savetxt("source_sed_MaxLoss{0}.txt".format(i), sum_data[i])
-        np.save("source_id_MaxLoss{0}.npy".format(i), sum_label[i])
-        np.savetxt("source_id_MaxLoss{0}.txt".format(i), sum_label[i])
-        np.savetxt("source_tracer_MaxLoss{0}.txt".format(i), sum_tracer[i])
-        np.save("source_tracer_MaxLoss{0}.npy".format(i), sum_tracer[i])
-        np.savetxt("source_coord_MaxLoss{0}.txt".format(i), sum_coord[i])
-        np.save("source_coord_MaxLoss{0}.npy".format(i), sum_coord[i])
+        if i == number_of_lost:
+            np.save("source_sed_MaxLoss{0}.npy".format(i), sum_data[i])
+            np.savetxt("source_sed_MaxLoss{0}.txt".format(i), sum_data[i])
+            np.save("source_id_MaxLoss{0}.npy".format(i), sum_label[i])
+            np.savetxt("source_id_MaxLoss{0}.txt".format(i), sum_label[i])
+            np.savetxt("source_tracer_MaxLoss{0}.txt".format(i), sum_tracer[i])
+            np.save("source_tracer_MaxLoss{0}.npy".format(i), sum_tracer[i])
+            np.savetxt("source_coord_MaxLoss{0}.txt".format(i), sum_coord[i])
+            np.save("source_coord_MaxLoss{0}.npy".format(i), sum_coord[i])
     #-----------------------------------
     # measuring time
     elapsed_time = time.time() - start_time
