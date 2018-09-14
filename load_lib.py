@@ -180,7 +180,14 @@ def print_precision(y_true, y_pred):
     for label in range(3):
         denominator = np.where(y_pred == label)
         numerator = np.where((y_pred == label) & (y_true == label))
-        precision = len(numerator[0])/len(denominator[0])
+        precision = 0
+        if len(denominator[0]) == 0:
+            if len(numerator[0]) == 0:
+                precision = 0
+            else:
+                precision = np.inf
+        else:
+            precision = len(numerator[0])/len(denominator[0])
         print("precision for predict {0} is : {1:.2f}% ({2} /{3} )"\
         .format(objects[label], precision*100, len(numerator[0]), len(denominator[0])))
     return
@@ -239,10 +246,14 @@ class confusion_matrix_infos():
         for label in range(3):
             denominator = np.where(self.cls_pred == label)
             numerator = np.where((self.cls_pred == label) & (self.cls_true == label))
-            try:
+            precision = 0
+            if len(denominator[0]) == 0:
+                if len(numerator[0]) == 0:
+                    precision = 0
+                else:
+                    precision = np.inf
+            else:
                 precision = len(numerator[0])/len(denominator[0])
-            except:
-                precision = np.inf
             print("precision for predict {0} is : {1:.2f}% ({2} /{3} )"\
             .format(self.objects[label], precision*100, len(numerator[0]), len(denominator[0])))
         # only reliable
@@ -250,10 +261,14 @@ class confusion_matrix_infos():
         for label in range(3):
             denominator = np.where(self.cls_pred_reliable == label)
             numerator = np.where((self.cls_pred_reliable == label) & (self.cls_true_reliable == label))
-            try:
+            precision = 0
+            if len(denominator[0]) == 0:
+                if len(numerator[0]) == 0:
+                    precision = 0
+                else:
+                    precision = np.inf
+            else:
                 precision = len(numerator[0])/len(denominator[0])
-            except:
-                precision = np.inf
             print("precision for predict {0} is : {1:.2f}% ({2} /{3} )"\
             .format(self.objects[label], precision*100, len(numerator[0]), len(denominator[0])))
         return
@@ -264,10 +279,14 @@ class confusion_matrix_infos():
         for label in range(3):
             denominator = np.where(self.cls_true == label)
             numerator = np.where((self.cls_pred == label) & (self.cls_true == label))
-            try:
+            precision = 0
+            if len(denominator[0]) == 0:
+                if len(numerator[0]) == 0:
+                    precision = 0
+                else:
+                    precision = np.inf
+            else:
                 precision = len(numerator[0])/len(denominator[0])
-            except:
-                precision = np.inf
             print("recall-rate for true {0} is : {1:.2f}% ({2} /{3} )"\
             .format(self.objects[label], precision*100, len(numerator[0]), len(denominator[0])))
         # only reliable
@@ -275,10 +294,13 @@ class confusion_matrix_infos():
         for label in range(3):
             denominator = np.where(self.cls_true_reliable == label)
             numerator = np.where((self.cls_pred_reliable == label) & (self.cls_true_reliable == label))
-            try:
+            if len(denominator[0]) == 0:
+                if len(numerator[0]) == 0:
+                    precision = 0
+                else:
+                    precision = np.inf
+            else:
                 precision = len(numerator[0])/len(denominator[0])
-            except:
-                precision = np.inf
             print("recall-rate for true {0} is : {1:.2f}% ({2} /{3} )"\
             .format(self.objects[label], precision*100, len(numerator[0]), len(denominator[0])))
         return
