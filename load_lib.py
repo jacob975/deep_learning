@@ -48,6 +48,7 @@ def load_arrangement(sub_name,
                     reshape=False,
                     dtype=dtypes.float32,
                     seed=None,
+                    VERBOSE = 0
                     ):
     # directory is where you save AI
     # sub_name is used to denote filename
@@ -73,19 +74,19 @@ def load_arrangement(sub_name,
         train_data      = np.load("{0}/training_set_source_sed_{1}.npy".format(directory, sub_name))
         train_labels    = np.load("{0}/training_label_source_sed_{1}.npy".format(directory, sub_name))
     except:
-        print("In train dataset, data or label or tracer aren't completed")
+        if VERBOSE != 0:print("In train dataset, data or label or tracer aren't completed")
     try:
         valid_tracer    = np.load("{0}/validation_tracer_source_sed_{1}.npy".format(directory, sub_name))
         valid_data      = np.load("{0}/validation_set_source_sed_{1}.npy".format(directory, sub_name))
         valid_labels    = np.load("{0}/validation_labels_source_sed_{1}.npy".format(directory, sub_name))
     except:
-        print("In validation dataset, data or label or tracer aren't completed")
+        if VERBOSE != 0:print("In validation dataset, data or label or tracer aren't completed")
     try:
         test_tracer     = np.load("{0}/test_tracer_source_sed_{1}.npy".format(directory, sub_name))
         test_data       = np.load("{0}/test_set_source_sed_{1}.npy".format(directory, sub_name))
         test_labels     = np.load("{0}/test_labels_source_sed_{1}.npy".format(directory, sub_name))
     except:
-        print("In test dataset, data or label or tracer aren't completed")
+        if VERBOSE != 0:print("In test dataset, data or label or tracer aren't completed")
     options = dict(dtype=dtype, reshape=reshape, seed=seed)
     # generate tracer
     tracer = shuffled_tracer(train_tracer, valid_tracer, test_tracer)
@@ -304,3 +305,14 @@ class confusion_matrix_infos():
             print("recall-rate for true {0} is : {1:.2f}% ({2} /{3} )"\
             .format(self.objects[label], precision*100, len(numerator[0]), len(denominator[0])))
         return
+
+class cross_confusion_matrix_infos(confusion_matrix_infos):
+    def __init__(self, cls_pred, labels_pred):
+        self.cls_pred = cls_pred
+        self.cls_true = np.argmax(self.cls_pred, axis = 1)
+        self.labels_pred = labels_pred
+        self.cls_pred = np.argmax(self.labels_pred, axis = 1)
+        self.reliable = np.where((np.max(self.labels_pred, axis = 1) > 0.8))
+        self.cls_true_reliable = self.cls_true[self.reliable]
+        self.cls_pred_reliable = self.cls_pred[self.reliable]
+        return 
