@@ -29,6 +29,11 @@ import numpy as np
 from uncertainties import ufloat
 from astropy.coordinates import SkyCoord
 from astropy import units as u
+from scipy import optimize
+import matplotlib.pyplot as plt
+
+def gaussian(x, amp, mu, sig):
+    return amp * np.power(2 * np.pi , -0.5)*np.exp(-np.power(x - mu , 2.) / (2 * np.power(sig, 2.)))/sig
 
 def find_the_closest_extinction_position(coord, extinction_table):
     # Initialize
@@ -70,8 +75,35 @@ if __name__ == "__main__":
     sed_table = np.loadtxt(sed_table_name, dtype = float)
     # Av of each sources if known.
     Av_table = None
+    Av_mean = None
+    Av_deviation = None
     if Av_table_name != "skip":
         Av_table = np.loadtxt(Av_table_name, dtype = float)
+        # Calculate the deviation of Av.
+        Av_table_allOBS = Av_table[Av_table[:,0] != 0.0]
+        numbers, bin_edges = np.histogram(Av_table_allOBS[:,0], np.arange(-10, 20))
+        index_max = np.argmax(numbers)
+        #numbers = numbers[:index_max + 1]
+        bin_middles = 0.5*(bin_edges[1:] + bin_edges[:-1])
+        paras, cov = optimize.curve_fit(gaussian, bin_middles[:index_max + 1], numbers[:index_max + 1], p0 = [1000, 0, 1])
+        if paras[2] < np.sqrt(cov[2][2]):
+            print ('The fitting seems failed.')
+            exit()
+        else:
+            Av_mean = paras[1]
+            Av_deviation = paras[2]
+        # Plot the result
+        Av_hist_plot = plt.figure("Av_hist fitting result")
+        plt.title("Av_hist fitting result")
+        plt.xlabel("Av")
+        plt.ylabel("# of sources")
+        plt.scatter(bin_middles[index_max + 1:], numbers[index_max + 1:], color = 'b', label = "Datapoints not for fitting")
+        plt.scatter(bin_middles[:index_max + 1], numbers[:index_max + 1], color = 'r', label = "Datapoints for fitting")
+        x = np.arange(-10, 10, 0.1)
+        y = gaussian(x, paras[0], paras[1], paras[2])
+        plt.plot(x, y, label = "Fitting result")
+        plt.legend()
+        Av_hist_plot.savefig("Av_hist.png")
     # coord of each sources
     coord_table = np.loadtxt(coord_table_name, dtype = float)
     # Define the extinction curves
@@ -83,6 +115,7 @@ if __name__ == "__main__":
     tolerance_radius = 6/60
     # The list for final Av of each source
     final_Av = []
+    index_no_Av = [] 
     if Av_table_name != "skip":
         for index, source in enumerate(sed_table):
             #------------------------------------------------
@@ -90,7 +123,7 @@ if __name__ == "__main__":
             Av = 0.0
             err_Av = 0.0
             # If the label of source is star and Av exists, just apply it.
-            if Av_table[index, 0] > 0.0:
+            if Av_table[index, 0] > Av_mean - 3 * Av_deviation:
                 Av = Av_table[index, 0]
                 err_Av = Av_table[index, 1]
             # Find the closest extinction position for sources.
@@ -99,7 +132,7 @@ if __name__ == "__main__":
                 if min_distance > tolerance_radius:
                     Av = 0.0
                     err_Av = 0.0
-                elif extinction_table[index_min, 2] > 0.0:
+                elif extinction_table[index_min, 2] > Av_mean - 3 * Av_deviation:
                     # Read the Av of the selected extinction point.
                     Av = extinction_table[index_min, 2]
                     err_Av = extinction_table[index_min, 3]
@@ -107,6 +140,7 @@ if __name__ == "__main__":
             # Apply extinction correction on source.
             if Av == 0.0:
                 final_Av.append([0.0, 0.0])
+                index_no_Av.append(index)
                 # If extinction is not detected and not covered by extinction map
                 # remove this sources
                 for band in WD_55B:
@@ -137,7 +171,7 @@ if __name__ == "__main__":
             if min_distance > tolerance_radius:
                 Av = 0.0
                 err_Av = 0.0
-            elif extinction_table[index_min, 2] > 0.0:
+            elif extinction_table[index_min, 2] > Av_mean - 3 * Av_deviation:
                 # Read the Av of the selected extinction point.
                 Av = extinction_table[index_min, 2]
                 err_Av = extinction_table[index_min, 3]
@@ -145,6 +179,7 @@ if __name__ == "__main__":
             # Apply extinction correction on source.
             if Av == 0.0:
                 final_Av.append([0.0, 0.0])
+                index_no_Av.append(index)
                 # If extinction is not detected and not covered by extinction map
                 # remove this sources
                 for band in WD_55B:
@@ -167,6 +202,7 @@ if __name__ == "__main__":
     # Save the table
     np.savetxt("{0}_intrinsic.txt".format(sed_table_name[:-4]), sed_table)
     np.savetxt("{0}_appended_Av.txt".format(sed_table_name[:-4]), final_Av)
+    np.savetxt("{0}_index_of_no_Av.txt".format(sed_table_name[:-4]), index_no_Av, fmt = '%d')
     #-----------------------------------
     # measure time
     elapsed_time = time.time() - start_time

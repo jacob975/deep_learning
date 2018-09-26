@@ -5,6 +5,19 @@ Abstract:
 Usage:
     calculate_extinction.py [coord_table] [mag_table] [err_mag_table] [Rv] [bin size]
     Available Rv: WD55B, WD31B
+    Four files would be generated:
+        1. Av of each input source.
+        Av_table = [[Av1, stdev1],
+                    [Av2, stdev2],
+                    [Av3, stdev3],
+                    ...]
+        2. The plot of the histogram of Av of input sources.
+        3. extinction map, a fits image file.
+        4. extinction map in table format.
+        table =[[RA, DEC, Av1, stdev1],
+                [RA, DEC, Av2, stdev2],
+                [RA, DEC, Av3, stdev3],
+                ...]
 Editor:
     JW Wang, Jacob975
 
@@ -59,7 +72,7 @@ if __name__ == "__main__":
     control_coord = SkyCoord(control_coord, frame='icrs', unit='deg')
     control_mag = np.loadtxt("{0}/ELAIS_N1_NICER_control_image/twomass_mag.txt".format(DL_conf.path_of_data), dtype = float)
     control_err_mag = np.loadtxt("{0}/ELAIS_N1_NICER_control_image/err_twomass_mag.txt".format(DL_conf.path_of_data), dtype = float)
-    # read allOBS data only
+    # read allOBS in JHK data only
     index_science_allOBS = np.where((science_mag[:,0] != 0) & (science_mag[:,1] != 0) &(science_mag[:,2] != 0))
     index_control_allOBS = np.where((control_mag[:,0] != 0) & (control_mag[:,1] != 0) &(control_mag[:,2] != 0))
     science_coord = science_coord[index_science_allOBS]
@@ -109,20 +122,14 @@ if __name__ == "__main__":
     all_Av = np.zeros(science_coord_shape)
     all_Av[index_science_allOBS, 0] = Av_nicer
     all_Av[index_science_allOBS, 1] = std_Av_nicer
+    # Output 1
     np.savetxt('{0}_Av.dat'.format(coord_table_name[:-10]), all_Av)
     # Save extinction map
     #                                pixel size(degree)                       gaussian in pixel
     nicer_emap = ext_nicer.build_map(bandwidth = bin_size, metric="gaussian", sampling=5        , use_fwhm=True)
     nicer_emap_name = '{0}emap_{1:.0f}arcsec'.format(coord_table_name[:-9], bin_size * 3600)
+    # Output 2
     nicer_emap.save_fits(path="./{0}.fits".format(nicer_emap_name))
-    # Plot a histogram
-    Av_hist = np.histogram(Av_nicer, np.arange(-10, 20))
-    Av_hist_plot = plt.figure("Av histogram")
-    plt.title("Av histogram")
-    plt.xlabel("Av")
-    plt.ylabel("# of sources")
-    plt.bar(np.arange(-9.5, 19.5, 1), Av_hist[0])
-    Av_hist_plot.savefig("Av_hist.png")
     #----------------------------------
     # Convert extinction map to extinction table
     # Load data
@@ -147,6 +154,7 @@ if __name__ == "__main__":
     emap_table = np.array([world[0], world[1], emap, err_emap])
     emap_table = np.transpose(emap_table)
     # Save Av and position into table.
+    # Output 3
     np.savetxt("{0}.txt".format(nicer_emap_name), emap_table, fmt = '%s')
     #-----------------------------------
     # measure time
