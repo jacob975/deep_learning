@@ -171,7 +171,7 @@ if __name__ == "__main__":
             if min_distance > tolerance_radius:
                 Av = 0.0
                 err_Av = 0.0
-            elif extinction_table[index_min, 2] > Av_mean - 3 * Av_deviation:
+            else:
                 # Read the Av of the selected extinction point.
                 Av = extinction_table[index_min, 2]
                 err_Av = extinction_table[index_min, 3]
