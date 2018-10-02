@@ -48,4 +48,4 @@ if __name__ == "__main__":
     #-----------------------------------
     # Measure time
     elapsed_time = time.time() - start_time
-    print ("Exiting Main Program, spending ", elapsed_time, "seconds.")
+    print("Exiting Main Program, spending ", elapsed_time, "seconds.")
