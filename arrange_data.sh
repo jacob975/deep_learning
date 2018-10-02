@@ -10,7 +10,7 @@
 if [ "$#" -ne 1 ]; then
     echo "Illegal number of parameters"
     echo "Usage: ${0##*/} [option]"
-    echo "Available options: ELAIS_N1u_OPHu_CHA_II, ELAIS_N1_OPH_CHA_II, ELAIS_N1ui_OPHui_CHA_IIi, ELAIS_N1i_OPHi_CHA_IIi, ELAIS_N1ui, ELAIS_N1u, ELAIS_N1i, ELAIS_N1, OPHui, OPHu, OPHi, OPH, SERui, SERi, SERu, SER, PERui, PERu, PERi, PER, CHA_IIi, CHA_II, LUP_Ii, LUP_I, LUP_IIIi, LUP_III, LUP_IVi, LUP_IV"
+    echo "Available options: ELAIS_N1u_OPHu_CHA_II, ELAIS_N1_OPH_CHA_II, ELAIS_N1ui_OPHui_CHA_IIi, ELAIS_N1i_OPHi_CHA_IIi, ELAIS_N1u_OPHu_CHA_II_slctEC, ELAIS_N1ui, ELAIS_N1u, ELAIS_N1i, ELAIS_N1, OPHui, OPHu, OPHi, OPH, SERui, SERi, SERu, SER, PERui, PERu, PERi, PER, CHA_IIi, CHA_II, LUP_Ii, LUP_I, LUP_IIIi, LUP_III, LUP_IVi, LUP_IV"
     exit 1
 fi
 
@@ -99,6 +99,99 @@ if [ "${option}" = "ELAIS_N1ui_OPHui_CHA_IIi" ]; then
     echo done
     exit 0
 fi
+
+
+if [ "${option}" = "ELAIS_N1u_OPHu_CHA_II_slctEC" ]; then
+    # Cut data from dataset
+    echo "Cut data from catalog."
+    get_catalog.sh catalog-CHA_II-HREL.tbl star
+    get_catalog.sh catalog-CHA_II-HREL.tbl galaxy
+    get_catalog.sh catalog-CHA_II-HREL.tbl yso
+    mv star_sed.dat CHA_II_star_sed.dat
+    mv star_tracer.dat CHA_II_star_tracer.dat
+    mv star_coord.dat CHA_II_star_coord.dat
+    mv gala_coord.dat CHA_II_gala_coord.dat
+    mv gala_sed.dat CHA_II_gala_sed.dat
+    mv gala_tracer.dat CHA_II_gala_tracer.dat
+    mv ysos_coord.dat CHA_II_ysos_coord.dat
+    mv ysos_sed.dat CHA_II_ysos_sed.dat
+    mv ysos_tracer.dat CHA_II_ysos_tracer.dat
+    echo "CHA_II done."
+    get_catalog.sh catalog-OPH-HREL.tbl star
+    get_catalog.sh catalog-OPH-HREL.tbl galaxy
+    get_catalog.sh catalog-OPH-HREL.tbl yso
+    mv gala_coord.dat OPH_gala_coord.dat
+    mv gala_sed.dat OPH_gala_sed.dat
+    mv gala_tracer.dat OPH_gala_tracer.dat
+    mv star_coord.dat OPH_star_coord.dat
+    mv star_sed.dat OPH_star_sed.dat
+    mv star_tracer.dat OPH_star_tracer.dat
+    mv ysos_coord.dat OPH_ysos_coord.dat
+    mv ysos_sed.dat OPH_ysos_sed.dat
+    mv ysos_tracer.dat OPH_ysos_tracer.dat
+    echo "OPH done."
+    get_catalog_data_A.sh star
+    get_catalog_data_A.sh galaxy
+    mv star_coord.txt ELAIS_N1_star_coord.txt
+    mv star_sed.dat ELAIS_N1_star_sed.dat
+    mv star_tracer.dat ELAIS_N1_star_tracer.dat
+    mv gala_coord.txt ELAIS_N1_gala_coord.txt
+    mv gala_sed.dat ELAIS_N1_gala_sed.dat
+    mv gala_tracer.dat ELAIS_N1_gala_tracer.dat
+    echo "ELAIS N1 done."
+    # replace old data with ukidss data and 2mass data
+    echo "Replace JHK with UKIDSS data"
+    replace_jhk_with_ukidss.py DXS ELAIS_N1_DXS_source_table_star_WSA.csv ELAIS_N1_2mass/star_2mass.dat ELAIS_N1_star_sed.dat
+    replace_jhk_with_ukidss.py DXS ELAIS_N1_DXS_source_table_gala_WSA.csv ELAIS_N1_2mass/gala_2mass.dat ELAIS_N1_gala_sed.dat
+    replace_jhk_with_ukidss.py GCS OPH_GCS_source_table_star_WSA.csv OPH_2mass/star_2mass.dat OPH_star_sed.dat
+    replace_jhk_with_ukidss.py GCS OPH_GCS_source_table_gala_WSA.csv OPH_2mass/gala_2mass.dat OPH_gala_sed.dat
+    replace_jhk_with_ukidss.py GCS OPH_GCS_source_table_ysos_WSA.csv OPH_2mass/ysos_2mass.dat OPH_ysos_sed.dat
+    replace_jhk_with_ukidss.py DXS skip CHA_II_2mass/star_2mass.dat CHA_II_star_sed.dat
+    replace_jhk_with_ukidss.py DXS skip CHA_II_2mass/gala_2mass.dat CHA_II_gala_sed.dat
+    replace_jhk_with_ukidss.py DXS skip CHA_II_2mass/ysos_2mass.dat CHA_II_ysos_sed.dat
+    echo done
+    # Select sources with the extinction correction.
+    echo "Select sources with the extinction correction"
+    select_data.py ELAIS_N1_star_sed_u.txt ../prototype_EC/ELAIS_N1_star_sed_u_index_of_no_Av.txt
+    select_data.py ELAIS_N1_gala_sed_u.txt ../prototype_EC/ELAIS_N1_gala_sed_u_index_of_no_Av.txt
+    select_data.py ELAIS_N1_star_coord.txt ../prototype_EC/ELAIS_N1_gala_sed_u_index_of_no_Av.txt
+    select_data.py ELAIS_N1_gala_coord.txt ../prototype_EC/ELAIS_N1_gala_sed_u_index_of_no_Av.txt
+    select_data.py ELAIS_N1_star_tracer.dat ../prototype_EC/ELAIS_N1_gala_sed_u_index_of_no_Av.txt
+    select_data.py ELAIS_N1_gala_tracer.dat ../prototype_EC/ELAIS_N1_gala_sed_u_index_of_no_Av.txt
+    select_data.py OPH_star_sed_u.txt ../prototype_EC/OPH_star_sed_u_index_of_no_Av.txt
+    select_data.py OPH_gala_sed_u.txt ../prototype_EC/OPH_gala_sed_u_index_of_no_Av.txt
+    select_data.py OPH_ysos_sed_u.txt ../prototype_EC/OPH_ysos_sed_u_index_of_no_Av.txt
+    select_data.py OPH_star_coord.dat ../prototype_EC/OPH_ysos_sed_u_index_of_no_Av.txt
+    select_data.py OPH_gala_coord.dat ../prototype_EC/OPH_ysos_sed_u_index_of_no_Av.txt
+    select_data.py OPH_ysos_coord.dat ../prototype_EC/OPH_ysos_sed_u_index_of_no_Av.txt
+    select_data.py OPH_star_tracer.dat ../prototype_EC/OPH_ysos_sed_u_index_of_no_Av.txt
+    select_data.py OPH_gala_tracer.dat ../prototype_EC/OPH_ysos_sed_u_index_of_no_Av.txt
+    select_data.py OPH_ysos_tracer.dat ../prototype_EC/OPH_ysos_sed_u_index_of_no_Av.txt
+    select_data.py CHA_II_star_sed_u.txt ../prototype_EC/CHA_II_star_sed_u_index_of_no_Av.txt
+    select_data.py CHA_II_gala_sed_u.txt ../prototype_EC/CHA_II_gala_sed_u_index_of_no_Av.txt
+    select_data.py CHA_II_ysos_sed_u.txt ../prototype_EC/CHA_II_ysos_sed_u_index_of_no_Av.txt
+    select_data.py CHA_II_star_coord.dat ../prototype_EC/CHA_II_star_sed_u_index_of_no_Av.txt
+    select_data.py CHA_II_gala_coord.dat ../prototype_EC/CHA_II_gala_sed_u_index_of_no_Av.txt
+    select_data.py CHA_II_ysos_coord.dat ../prototype_EC/CHA_II_ysos_sed_u_index_of_no_Av.txt
+    select_data.py CHA_II_star_tracer.dat ../prototype_EC/CHA_II_star_sed_u_index_of_no_Av.txt
+    select_data.py CHA_II_gala_tracer.dat ../prototype_EC/CHA_II_gala_sed_u_index_of_no_Av.txt
+    select_data.py CHA_II_ysos_tracer.dat ../prototype_EC/CHA_II_ysos_sed_u_index_of_no_Av.txt
+    echo done
+    # stack all data
+    echo "Stack all data"
+    cat ELAIS_N1_star_sed_u.txt OPH_star_sed_u.txt CHA_II_star_sed_u.txt > star_sed_u.txt
+    cat ELAIS_N1_gala_sed_u.txt OPH_gala_sed_u.txt CHA_II_gala_sed_u.txt > gala_sed_u.txt
+    cat OPH_ysos_sed_u.txt CHA_II_ysos_sed_u.txt > ysos_sed_u.txt
+    cat ELAIS_N1_star_coord.txt OPH_star_coord.dat CHA_II_star_coord.dat > star_coord.txt
+    cat ELAIS_N1_gala_coord.txt OPH_gala_coord.dat CHA_II_gala_coord.dat > gala_coord.txt
+    cat OPH_ysos_coord.dat CHA_II_ysos_coord.dat > ysos_coord.txt
+    cat ELAIS_N1_star_tracer.dat OPH_star_tracer.dat CHA_II_star_tracer.dat > star_tracer.dat
+    cat ELAIS_N1_gala_tracer.dat OPH_gala_tracer.dat CHA_II_gala_tracer.dat > gala_tracer.dat
+    cat OPH_ysos_tracer.dat CHA_II_ysos_tracer.dat > ysos_tracer.dat
+    echo done
+    exit 0
+fi
+
 
 if [ "${option}" = "ELAIS_N1u_OPHu_CHA_II" ]; then
     # Cut data from dataset
@@ -779,5 +872,5 @@ fi
 
 
 echo "No match parameters"
-echo "Available options: ELAIS_N1u_OPHu_CHA_II, ELAIS_N1_OPH_CHA_II, ELAIS_N1ui_OPHui_CHA_IIi, ELAIS_N1i_OPHi_CHA_IIi, ELAIS_N1ui, ELAIS_N1u, ELAIS_N1i, ELAIS_N1, OPHui, OPHu, OPHi, OPH, SERui, SERi, SERu, SER, PERui, PERu, PERi, PER, CHA_IIi, CHA_II, LUP_Ii, LUP_I, LUP_IIIi, LUP_III, LUP_IVi, LUP_IV"
+echo "Available options: ELAIS_N1u_OPHu_CHA_II, ELAIS_N1_OPH_CHA_II, ELAIS_N1ui_OPHui_CHA_IIi, ELAIS_N1i_OPHi_CHA_IIi, ELAIS_N1u_OPHu_CHA_II_slctEC, ELAIS_N1ui, ELAIS_N1u, ELAIS_N1i, ELAIS_N1, OPHui, OPHu, OPHi, OPH, SERui, SERi, SERu, SER, PERui, PERu, PERi, PER, CHA_IIi, CHA_II, LUP_Ii, LUP_I, LUP_IIIi, LUP_III, LUP_IVi, LUP_IV"
 exit 1
