@@ -92,6 +92,7 @@ if __name__ == "__main__":
         else:
             Av_mean = paras[1]
             Av_deviation = paras[2]
+            print ("{0}: < Av > = {1}+-{2}".format(Av_table_name, Av_mean, Av_deviation))
         # Plot the result
         Av_hist_plot = plt.figure("Av_hist fitting result")
         plt.title("Av_hist fitting result")

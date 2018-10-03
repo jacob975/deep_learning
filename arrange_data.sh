@@ -10,7 +10,7 @@
 if [ "$#" -ne 1 ]; then
     echo "Illegal number of parameters"
     echo "Usage: ${0##*/} [option]"
-    echo "Available options: ELAIS_N1u_OPHu_CHA_II, ELAIS_N1_OPH_CHA_II, ELAIS_N1ui_OPHui_CHA_IIi, ELAIS_N1i_OPHi_CHA_IIi, ELAIS_N1u_OPHu_CHA_II_slctEC, ELAIS_N1ui, ELAIS_N1u, ELAIS_N1i, ELAIS_N1, OPHui, OPHu, OPHi, OPH, SERui, SERi, SERu, SER, PERui, PERu, PERi, PER, CHA_IIi, CHA_II, LUP_Ii, LUP_I, LUP_IIIi, LUP_III, LUP_IVi, LUP_IV"
+    echo "Available options: ELAIS_N1u_OPHu_CHA_II, ELAIS_N1_OPH_CHA_II, ELAIS_N1ui_OPHui_CHA_IIi, ELAIS_N1i_OPHi_CHA_IIi, ELAIS_N1u_OPHu_CHA_II_slctEC, ELAIS_N1ui, ELAIS_N1u, ELAIS_N1i, ELAIS_N1, OPHui, OPHu, OPHi, OPH, SERui, SERi, SERu, SER, PERui, PERu_slctEC, PERu, PERi, PER, CHA_IIi, CHA_II, LUP_Ii, LUP_I, LUP_IIIi, LUP_III, LUP_IVi, LUP_IV"
     exit 1
 fi
 
@@ -154,18 +154,18 @@ if [ "${option}" = "ELAIS_N1u_OPHu_CHA_II_slctEC" ]; then
     echo "Select sources with the extinction correction"
     select_data.py ELAIS_N1_star_sed_u.txt ../prototype_EC/ELAIS_N1_star_sed_u_index_of_no_Av.txt
     select_data.py ELAIS_N1_gala_sed_u.txt ../prototype_EC/ELAIS_N1_gala_sed_u_index_of_no_Av.txt
-    select_data.py ELAIS_N1_star_coord.txt ../prototype_EC/ELAIS_N1_gala_sed_u_index_of_no_Av.txt
+    select_data.py ELAIS_N1_star_coord.txt ../prototype_EC/ELAIS_N1_star_sed_u_index_of_no_Av.txt
     select_data.py ELAIS_N1_gala_coord.txt ../prototype_EC/ELAIS_N1_gala_sed_u_index_of_no_Av.txt
-    select_data.py ELAIS_N1_star_tracer.dat ../prototype_EC/ELAIS_N1_gala_sed_u_index_of_no_Av.txt
+    select_data.py ELAIS_N1_star_tracer.dat ../prototype_EC/ELAIS_N1_star_sed_u_index_of_no_Av.txt
     select_data.py ELAIS_N1_gala_tracer.dat ../prototype_EC/ELAIS_N1_gala_sed_u_index_of_no_Av.txt
     select_data.py OPH_star_sed_u.txt ../prototype_EC/OPH_star_sed_u_index_of_no_Av.txt
     select_data.py OPH_gala_sed_u.txt ../prototype_EC/OPH_gala_sed_u_index_of_no_Av.txt
     select_data.py OPH_ysos_sed_u.txt ../prototype_EC/OPH_ysos_sed_u_index_of_no_Av.txt
-    select_data.py OPH_star_coord.dat ../prototype_EC/OPH_ysos_sed_u_index_of_no_Av.txt
-    select_data.py OPH_gala_coord.dat ../prototype_EC/OPH_ysos_sed_u_index_of_no_Av.txt
+    select_data.py OPH_star_coord.dat ../prototype_EC/OPH_star_sed_u_index_of_no_Av.txt
+    select_data.py OPH_gala_coord.dat ../prototype_EC/OPH_gala_sed_u_index_of_no_Av.txt
     select_data.py OPH_ysos_coord.dat ../prototype_EC/OPH_ysos_sed_u_index_of_no_Av.txt
-    select_data.py OPH_star_tracer.dat ../prototype_EC/OPH_ysos_sed_u_index_of_no_Av.txt
-    select_data.py OPH_gala_tracer.dat ../prototype_EC/OPH_ysos_sed_u_index_of_no_Av.txt
+    select_data.py OPH_star_tracer.dat ../prototype_EC/OPH_star_sed_u_index_of_no_Av.txt
+    select_data.py OPH_gala_tracer.dat ../prototype_EC/OPH_gala_sed_u_index_of_no_Av.txt
     select_data.py OPH_ysos_tracer.dat ../prototype_EC/OPH_ysos_sed_u_index_of_no_Av.txt
     select_data.py CHA_II_star_sed_u.txt ../prototype_EC/CHA_II_star_sed_u_index_of_no_Av.txt
     select_data.py CHA_II_gala_sed_u.txt ../prototype_EC/CHA_II_gala_sed_u_index_of_no_Av.txt
@@ -658,6 +658,36 @@ if [ "${option}" = "PERui" ]; then
     exit 0
 fi
 
+if [ "${option}" = "PERu_slctEC" ]; then
+    # Cut data from dataset
+    echo "Cut data from catalog."
+    get_catalog.sh catalog-PER-HREL.tbl star
+    get_catalog.sh catalog-PER-HREL.tbl galaxy
+    get_catalog.sh catalog-PER-HREL.tbl yso
+    echo "done."
+    echo "Replace JHK with UKIDSS data"
+    replace_jhk_with_ukidss.py GCS PER_ukidss/PER_GCS_source_table_star_WSA.csv PER_2mass/star_2mass.dat star_sed.dat
+    replace_jhk_with_ukidss.py GCS PER_ukidss/PER_GCS_source_table_gala_WSA.csv PER_2mass/gala_2mass.dat gala_sed.dat
+    replace_jhk_with_ukidss.py GCS PER_ukidss/PER_GCS_source_table_ysos_WSA.csv PER_2mass/ysos_2mass.dat ysos_sed.dat
+    replace_jhk_with_ukidss.py GPS PER_ukidss/PER_GPS_source_table_star_WSA.csv skip star_sed_u.txt
+    replace_jhk_with_ukidss.py GPS PER_ukidss/PER_GPS_source_table_gala_WSA.csv skip gala_sed_u.txt
+    replace_jhk_with_ukidss.py GPS PER_ukidss/PER_GPS_source_table_ysos_WSA.csv skip ysos_sed_u.txt
+    echo 'done.'
+    # Select sources with the extinction correction.
+    echo "Select sources with the extinction correction"
+    select_data.py star_sed_u_u.txt ../prototype_EC/star_sed_u_u_index_of_no_Av.txt
+    select_data.py gala_sed_u_u.txt ../prototype_EC/gala_sed_u_u_index_of_no_Av.txt
+    select_data.py ysos_sed_u_u.txt ../prototype_EC/ysos_sed_u_u_index_of_no_Av.txt
+    select_data.py star_coord.dat ../prototype_EC/star_sed_u_u_index_of_no_Av.txt
+    select_data.py gala_coord.dat ../prototype_EC/gala_sed_u_u_index_of_no_Av.txt
+    select_data.py ysos_coord.dat ../prototype_EC/ysos_sed_u_u_index_of_no_Av.txt
+    select_data.py star_tracer.dat ../prototype_EC/star_sed_u_u_index_of_no_Av.txt
+    select_data.py gala_tracer.dat ../prototype_EC/gala_sed_u_u_index_of_no_Av.txt
+    select_data.py ysos_tracer.dat ../prototype_EC/ysos_sed_u_u_index_of_no_Av.txt
+    echo "done."
+    exit 0
+fi
+
 if [ "${option}" = "PERu" ]; then
     # Cut data from dataset
     echo "Cut data from catalog."
@@ -872,5 +902,5 @@ fi
 
 
 echo "No match parameters"
-echo "Available options: ELAIS_N1u_OPHu_CHA_II, ELAIS_N1_OPH_CHA_II, ELAIS_N1ui_OPHui_CHA_IIi, ELAIS_N1i_OPHi_CHA_IIi, ELAIS_N1u_OPHu_CHA_II_slctEC, ELAIS_N1ui, ELAIS_N1u, ELAIS_N1i, ELAIS_N1, OPHui, OPHu, OPHi, OPH, SERui, SERi, SERu, SER, PERui, PERu, PERi, PER, CHA_IIi, CHA_II, LUP_Ii, LUP_I, LUP_IIIi, LUP_III, LUP_IVi, LUP_IV"
+echo "Available options: ELAIS_N1u_OPHu_CHA_II, ELAIS_N1_OPH_CHA_II, ELAIS_N1ui_OPHui_CHA_IIi, ELAIS_N1i_OPHi_CHA_IIi, ELAIS_N1u_OPHu_CHA_II_slctEC, ELAIS_N1ui, ELAIS_N1u, ELAIS_N1i, ELAIS_N1, OPHui, OPHu, OPHi, OPH, SERui, SERi, SERu, SER, PERui, PERu_slctEC, PERu, PERi, PER, CHA_IIi, CHA_II, LUP_Ii, LUP_I, LUP_IIIi, LUP_III, LUP_IVi, LUP_IV"
 exit 1
