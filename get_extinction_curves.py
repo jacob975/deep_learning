@@ -22,6 +22,7 @@ update log
 import numpy as np
 import time
 from sys import argv
+import matplotlib.pyplot as plt
 
 # Find the closest freq with the given freq
 def match_freq(extinction_table, freq):

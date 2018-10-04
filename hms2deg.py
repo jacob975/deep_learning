@@ -44,7 +44,7 @@ if __name__ == "__main__":
         deg_coords[index,0] = coord.ra.degree
         deg_coords[index,1] = coord.dec.degree
     # Save the result
-    np.savetxt(coords_name, deg_coords)
+    np.savetxt(coords_name, deg_coords, fmt="%1.6f")
     np.savetxt(hms_coords_name, hms_coords, fmt = '%s')
     #-----------------------------------
     # Measure time
