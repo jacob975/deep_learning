@@ -144,17 +144,13 @@ if __name__ == "__main__":
     # save each band and coord respectively
     j = np.stack((j_mjy, err_j_mjy))
     j = np.transpose(j)
-    np.save("ukidss_j_{0}.npy".format(label), j)
     np.savetxt("ukidss_j_{0}.txt".format(label), j)
     h = np.stack((h_mjy, err_h_mjy))
     h = np.transpose(h)
-    np.save("ukidss_h_{0}.npy".format(label), h)
     np.savetxt("ukidss_h_{0}.txt".format(label), h)
     k = np.stack((k_mjy, err_k_mjy))
     k = np.transpose(k)
-    np.save("ukidss_k_{0}.npy".format(label), k)
     np.savetxt("ukidss_k_{0}.txt".format(label), k)
-    np.save("ukidss_coords_{0}.npy".format(label), coords)
     np.savetxt("ukidss_coords_{0}.txt".format(label), coords)
     #-----------------------------------
     # measuring time

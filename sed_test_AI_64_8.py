@@ -29,7 +29,6 @@ update log
     1. delete some functions never used in this code.
     2. add a func to save predicted labels.
 '''
-from IPython.display import Image       # Used to create flowchart
 import matplotlib.pyplot as plt
 import tensorflow as tf
 import numpy as np

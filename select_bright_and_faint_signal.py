@@ -41,9 +41,9 @@ if __name__ == "__main__":
     name_coords = argv[3]
     #-----------------------------------
     # load data
-    twomass = np.load(name_twomass)
-    ukidss = np.load(name_ukidss)
-    coords = np.load(name_coords)
+    twomass = np.loadtxt(name_twomass)
+    ukidss = np.loadtxt(name_ukidss)
+    coords = np.loadtxt(name_coords)
     coords_w_fulldata = np.hstack((coords, twomass, ukidss))
     #-----------------------------------
     # pick coordinate of bright signals and faint signals
@@ -59,7 +59,6 @@ if __name__ == "__main__":
     plt.errorbar(twomass[bright_signals[0], 0], ukidss[bright_signals[0], 0] -twomass[bright_signals[0], 0] , yerr=[err_diff, 2*err_diff], \
                 xerr=[twomass[bright_signals[0], 1], 2*twomass[bright_signals[0], 1]], fmt = 'ro')
     result_plt.savefig("sources_with_bright_signals_{0}_{1}.png".format(name_twomass[:-4], name_ukidss[:-4]))
-    np.save("{0}_sources_with_bright_signals.npy".format(name_twomass[:-4]), coords_w_fulldata[bright_signals])
     np.savetxt("{0}_sources_with_bright_signals.txt".format(name_twomass[:-4]), coords_w_fulldata[bright_signals])
     # save infos of faint signals
     # include flux and coords
@@ -72,7 +71,6 @@ if __name__ == "__main__":
     plt.errorbar(twomass[faint_signals[0], 0], ukidss[faint_signals[0], 0] -twomass[faint_signals[0], 0] , yerr=[err_diff, 2*err_diff], \
                 xerr=[twomass[faint_signals[0], 1], 2*twomass[faint_signals[0], 1]], fmt = 'ro')
     result_plt.savefig("sources_with_faint_signals_{0}_{1}.png".format(name_twomass[:-4], name_ukidss[:-4]))
-    np.save("{0}_sources_with_faint_signals.npy".format(name_twomass[:-4]), coords_w_fulldata[faint_signals])
     np.savetxt("{0}_sources_with_faint_signals.txt".format(name_twomass[:-4]), coords_w_fulldata[faint_signals])
     
     #-----------------------------------

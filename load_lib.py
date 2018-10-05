@@ -21,25 +21,23 @@ update log
 
 20180412 version alpha 2:
     1. It is hard to create pointer in python, so I back to call by value
-    2. add a func to print confusion matrix
+    2. Add a func to print confusion matrix
 20180414 version alpha 3:
-    1. add funcs for printing precision and recall-rate.
+    1. Add funcs for printing precision and recall-rate.
 20180523 version alpha 4: 
-    1. add funcs for printing accuracy of predictions.
+    1. Add funcs for printing accuracy of predictions.
 20180601 version alpha 5:
-    1. add funcs for selecting high reliability sources from dataset
-    2. delete some imported module never used.
+    1. Add funcs for selecting high reliability sources from dataset
+    2. Delete some imported module never used.
+20181005 version alpha 6:
+    1. Abandan .npy file format, using .txt file format only.
 '''
 import tensorflow as tf
 import time
 import numpy as np
 import os
-
-from six.moves import xrange  # pylint: disable=redefined-builtin
-
 from tensorflow.contrib.learn.python.learn.datasets import base
 from tensorflow.python.framework import dtypes
-
 from astro_mnist import DataSet, shuffled_tracer
 
 # This is used to load data, label, and shuffle tracer
@@ -70,21 +68,21 @@ def load_arrangement(sub_name,
         return 1, None
     # if directory is not null, load data, labels and tracers
     try:
-        train_tracer    = np.load("{0}/training_tracer_source_sed_{1}.npy".format(directory, sub_name))
-        train_data      = np.load("{0}/training_set_source_sed_{1}.npy".format(directory, sub_name))
-        train_labels    = np.load("{0}/training_label_source_sed_{1}.npy".format(directory, sub_name))
+        train_tracer    = np.loadtxt("{0}/training_tracer_source_sed_{1}.txt".format(directory, sub_name))
+        train_data      = np.loadtxt("{0}/training_set_source_sed_{1}.txt".format(directory, sub_name))
+        train_labels    = np.loadtxt("{0}/training_label_source_sed_{1}.txt".format(directory, sub_name))
     except:
         if VERBOSE != 0:print("In train dataset, data or label or tracer aren't completed")
     try:
-        valid_tracer    = np.load("{0}/validation_tracer_source_sed_{1}.npy".format(directory, sub_name))
-        valid_data      = np.load("{0}/validation_set_source_sed_{1}.npy".format(directory, sub_name))
-        valid_labels    = np.load("{0}/validation_labels_source_sed_{1}.npy".format(directory, sub_name))
+        valid_tracer    = np.loadtxt("{0}/validation_tracer_source_sed_{1}.txt".format(directory, sub_name))
+        valid_data      = np.loadtxt("{0}/validation_set_source_sed_{1}.txt".format(directory, sub_name))
+        valid_labels    = np.loadtxt("{0}/validation_labels_source_sed_{1}.txt".format(directory, sub_name))
     except:
         if VERBOSE != 0:print("In validation dataset, data or label or tracer aren't completed")
     try:
-        test_tracer     = np.load("{0}/test_tracer_source_sed_{1}.npy".format(directory, sub_name))
-        test_data       = np.load("{0}/test_set_source_sed_{1}.npy".format(directory, sub_name))
-        test_labels     = np.load("{0}/test_labels_source_sed_{1}.npy".format(directory, sub_name))
+        test_tracer     = np.loadtxt("{0}/test_tracer_source_sed_{1}.txt".format(directory, sub_name))
+        test_data       = np.loadtxt("{0}/test_set_source_sed_{1}.txt".format(directory, sub_name))
+        test_labels     = np.loadtxt("{0}/test_labels_source_sed_{1}.txt".format(directory, sub_name))
     except:
         if VERBOSE != 0:print("In test dataset, data or label or tracer aren't completed")
     options = dict(dtype=dtype, reshape=reshape, seed=seed)
@@ -109,7 +107,7 @@ def load_cls_pred(sub_name, directory):
     # sub_name is used to denote filename
     # cls_pred is the index of predicted labels
     try:
-        cls_pred = np.load("{0}/test_cls_pred_source_sed_{1}.npy".format(directory, sub_name))
+        cls_pred = np.loadtxt("{0}/test_cls_pred_source_sed_{1}.txt".format(directory, sub_name))
     except:
         print("test_cls_pred not found")
         return 1, None
@@ -121,19 +119,19 @@ def load_labels_pred(sub_name, directory):
     # sub_name is used to denote filename
     # cls_pred is predicted label
     try:
-        labels_pred = np.load("{0}/test_labels_pred_source_sed_{1}.npy".format(directory, sub_name))
+        labels_pred = np.loadtxt("{0}/test_labels_pred_source_sed_{1}.txt".format(directory, sub_name))
     except:
         print("test_labels_pred not found")
         return 1, None
     return 0, labels_pred
 
-# THis is used to loading the index of true lable
+# This is used to loading the index of true lable
 def load_cls_true(sub_name, directory):
     # directory is used to create a uniq folder
     # sub_name is used to denote filename
     # cls_pred is the index of true labels
     try:
-        cls_true = np.load("{0}/test_cls_true_source_sed_{1}.npy".format(directory, sub_name))
+        cls_true = np.loadtxt("{0}/test_cls_true_source_sed_{1}.txt".format(directory, sub_name))
     except:
         print ("test_cls_true not found")
         return 1, None
@@ -142,17 +140,17 @@ def load_cls_true(sub_name, directory):
 # This is the func to load coordinates of corresponding sources.
 def load_coords(sub_name, directory):
     try:
-        train_coords = np.load("{0}/train_coords_source_sed_{1}.npy".format(directory, sub_name))
+        train_coords = np.loadtxt("{0}/train_coords_source_sed_{1}.txt".format(directory, sub_name))
     except:
         print ("train coords not found")
         train_coords = None
     try:
-        validation_coords = np.load("{0}/validation_coords_source_sed_{1}.npy".format(directory, sub_name))
+        validation_coords = np.loadtxt("{0}/validation_coords_source_sed_{1}.txt".format(directory, sub_name))
     except:
         print ("validation coords not found")
         validation_coords = None
     try:
-        test_coords = np.load("{0}/test_coords_source_sed_{1}.npy".format(directory, sub_name))
+        test_coords = np.loadtxt("{0}/test_coords_source_sed_{1}.txt".format(directory, sub_name))
     except:
         print ("test coords not found")
         test_coords = None

@@ -222,17 +222,13 @@ if __name__ == "__main__":
     # save each band and coord respectively
     j = np.stack((j_mjy, err_j_mjy))
     j = np.transpose(j)
-    np.save("twomass_j_{0}.npy".format(label), j)
     np.savetxt("twomass_j_{0}.txt".format(label), j)
     h = np.stack((h_mjy, err_h_mjy))
     h = np.transpose(h)
-    np.save("twomass_h_{0}.npy".format(label), h)
     np.savetxt("twomass_h_{0}.txt".format(label), h)
     k = np.stack((k_mjy, err_k_mjy))
     k = np.transpose(k)
-    np.save("twomass_k_{0}.npy".format(label), k)
     np.savetxt("twomass_k_{0}.txt".format(label), k)
-    np.save("twomass_coords_{0}.npy".format(label), coords)
     np.savetxt("twomass_coords_{0}.txt".format(label), coords)
     #-----------------------------------
     # measuring time

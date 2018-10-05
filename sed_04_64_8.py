@@ -48,7 +48,6 @@ update log
     20180320 version alpha 4 
     1. arrange saving direction.
 '''
-from IPython.display import Image       # Used to create flowcart
 import matplotlib.pyplot as plt
 import tensorflow as tf
 import numpy as np

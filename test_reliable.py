@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 '''
 Abstract:
-    This is a program to demo how to trace a datum 
+    This is a program for showing reliable( >80%) result 
 Usage:
     test_reliable.py [DIR] [keyword]
 Example:

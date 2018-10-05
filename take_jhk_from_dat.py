@@ -55,11 +55,8 @@ if __name__ == "__main__":
     for i in range(5):
         print (k[i])
     # save each band respectively
-    np.save("{0}_j.npy".format(name_dat_file[:-4]), j)
     np.savetxt("{0}_j.txt".format(name_dat_file[:-4]), j)
-    np.save("{0}_h.npy".format(name_dat_file[:-4]), h)
     np.savetxt("{0}_h.txt".format(name_dat_file[:-4]), h)
-    np.save("{0}_k.npy".format(name_dat_file[:-4]), k)
     np.savetxt("{0}_k.txt".format(name_dat_file[:-4]), k)
     #-----------------------------------
     # measuring time

@@ -40,6 +40,7 @@ from astropy.coordinates import *
 from astropy.io import fits as pyfits
 from astropy import wcs
 import matplotlib.pyplot as plt
+from extinction_curves_lib import WD55B_twomass, WD31B
 from sys import argv
 import time
 import DL_conf
@@ -72,7 +73,7 @@ if __name__ == "__main__":
     control_coord = SkyCoord(control_coord, frame='icrs', unit='deg')
     control_mag = np.loadtxt("{0}/ELAIS_N1_NICER_control_image/twomass_mag.txt".format(DL_conf.path_of_data), dtype = float)
     control_err_mag = np.loadtxt("{0}/ELAIS_N1_NICER_control_image/err_twomass_mag.txt".format(DL_conf.path_of_data), dtype = float)
-    # read allOBS in JHK data only
+    # read source which is allOBS in JHK band only
     index_science_allOBS = np.where((science_mag[:,0] != 0) & (science_mag[:,1] != 0) &(science_mag[:,2] != 0))
     index_control_allOBS = np.where((control_mag[:,0] != 0) & (control_mag[:,1] != 0) &(control_mag[:,2] != 0))
     science_coord = science_coord[index_science_allOBS]
@@ -94,9 +95,11 @@ if __name__ == "__main__":
     mag_names = ["Ks"  , "H"   , "J"   ]
     extvec = []
     if Rv == 'WD55B':
-        extvec =[0.1117, 0.1619, 0.2738]
+        extvec = [WD55B_twomass[2][4], WD55B_twomass[1][4], WD55B_twomass[0][4]]
+        #extvec = [0.1117, 0.1619, 0.2738]
     elif Rv == 'WD31B':
-        extvec =[0.1193, 0.1847, 0.2939] 
+        extvec = [WD31B[2][4], WD31B[1][4], WD31B[0][4]]
+        #extvec = [0.1193, 0.1847, 0.2939] 
     else:
         print ('Wrong Rv value')
         print ('Available Rv: WD55B, WD31B')

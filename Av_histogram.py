@@ -3,7 +3,7 @@
 Abstract:
     This is a program for ploting Av histogram 
 Usage:
-    Av_histogram.py
+    Av_histogram.py [Av table]
 Editor:
     Jacob975
 

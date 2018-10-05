@@ -49,7 +49,7 @@ WD_55B_twomass=[['J'  ,0       ,8       ,0.2738],
 #----------------------------------------------------
 # Milky Way, R_V = 5.5: Weingartner & Draine (2001)
 # Milky Way size distribution "B" for R_V=5.5 with C/H = b_C = 30 ppm in log-normal size dists.
-# For 2MASS, IRAC, and MIPS
+# For UKIDSS, IRAC, and MIPS
 #              [      index of index of       ]
 #              [band ,flux    ,err_flux, C_av ]
 WD_55B_ukidss=[['J'  ,0       ,8       ,0.2683],

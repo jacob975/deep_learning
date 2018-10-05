@@ -134,14 +134,10 @@ if __name__ == "__main__":
         sum_coord[i] = np.reshape(sum_coord[i], (-1, 2))
         print ("number of data with MaxLoss {0} = {1}".format(i, len(sum_data[i])))
         if i == number_of_lost:
-            np.save("source_sed_MaxLoss{0}.npy".format(i), sum_data[i])
             np.savetxt("source_sed_MaxLoss{0}.txt".format(i), sum_data[i])
-            np.save("source_id_MaxLoss{0}.npy".format(i), sum_label[i])
             np.savetxt("source_id_MaxLoss{0}.txt".format(i), sum_label[i])
             np.savetxt("source_tracer_MaxLoss{0}.txt".format(i), sum_tracer[i])
-            np.save("source_tracer_MaxLoss{0}.npy".format(i), sum_tracer[i])
             np.savetxt("source_coord_MaxLoss{0}.txt".format(i), sum_coord[i])
-            np.save("source_coord_MaxLoss{0}.npy".format(i), sum_coord[i])
     #-----------------------------------
     # measuring time
     elapsed_time = time.time() - start_time

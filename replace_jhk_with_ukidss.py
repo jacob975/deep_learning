@@ -5,6 +5,8 @@ Abstract:
     and replace the small signals in 2MASS with signals in UKIDSS in bands JHK.
 Usage:
     replace_jhk_with_ukidss.py [ukidss catalog file] [twomass catalog file] [target dat file]
+Output:
+    
 Editor:
     Jacob975
 
@@ -171,7 +173,6 @@ if __name__ == "__main__":
         # save the converted file of ukidss jhk bands
         ukidss_flux = np.stack((ukidss_j_mjy, ukidss_h_mjy, ukidss_k_mjy, ukidss_err_j_mjy, ukidss_err_h_mjy, ukidss_err_k_mjy))
         ukidss_flux = np.transpose(ukidss_flux)
-        np.save("{0}_flux.npy".format(name_ukidss_catalog[:-4]), ukidss_flux)
         np.savetxt("{0}_flux.txt".format(name_ukidss_catalog[:-4]), ukidss_flux)
     #-----------------------------------
     # read the Database 2MASS as a catalog
@@ -247,7 +248,6 @@ if __name__ == "__main__":
         # save the converted file of ukidss jhk bands
         twomass_flux = np.stack((twomass_j_mjy, twomass_h_mjy, twomass_k_mjy, twomass_err_j_mjy, twomass_err_h_mjy, twomass_err_k_mjy))
         twomass_flux = np.transpose(twomass_flux)
-        np.save("{0}_flux.npy".format(name_twomass_catalog[:-4]), twomass_flux)
         np.savetxt("{0}_flux.txt".format(name_twomass_catalog[:-4]), twomass_flux)
     #-----------------------------------
     # replace the small signals in 2MASS with signals in UKIDSS in bands JHK
@@ -268,9 +268,7 @@ if __name__ == "__main__":
         dat_file[replacement_k, 8] = ukidss_err_j_mjy[replacement_k]
         dat_file[replacement_k, 9] = ukidss_err_h_mjy[replacement_k]
         dat_file[replacement_k, 10] = ukidss_err_k_mjy[replacement_k]
-        np.save("replaced_with_k_in_ukidss_{0}.npy".format(name_dat_file[:-4]), replacement_k[0])
         np.savetxt("replaced_with_k_in_ukidss_{0}.txt".format(name_dat_file[:-4]), replacement_k[0])
-    np.save("{0}_u.npy".format(name_dat_file[:-4]), dat_file)
     np.savetxt("{0}_u.txt".format(name_dat_file[:-4]), dat_file)
     #-----------------------------------
     # measuring time
