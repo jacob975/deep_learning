@@ -92,7 +92,8 @@ if __name__ == "__main__":
         else:
             Av_mean = paras[1]
             Av_deviation = paras[2]
-            print ("{0}: < Av > = {1}+-{2}".format(Av_table_name, Av_mean, Av_deviation))
+            print ("{0}: < Av > = {1:.2f}+-{2:.2f}".format(Av_table_name, Av_mean, Av_deviation))
+            print ("Lower bond: Av = {0:.2f}".format(Av_mean - 3 * Av_deviation))
         # Plot the result
         Av_hist_plot = plt.figure("Av_hist fitting result")
         plt.title("Av_hist fitting result")
@@ -123,7 +124,7 @@ if __name__ == "__main__":
             # Find Av
             Av = 0.0
             err_Av = 0.0
-            # If the label of source is star and Av exists, just apply it.
+            # If the label of source is star and Av exists, apply it.
             if Av_table[index, 0] > Av_mean - 3 * Av_deviation:
                 Av = Av_table[index, 0]
                 err_Av = Av_table[index, 1]
@@ -202,7 +203,8 @@ if __name__ == "__main__":
                         sed_table[index, band[2]] = intrinsic_flux.s
     # Save the table
     np.savetxt("{0}_intrinsic.txt".format(sed_table_name[:-4]), sed_table)
-    np.savetxt("{0}_appended_Av.txt".format(sed_table_name[:-4]), final_Av)
+    # This file saves the Av of all source based on extinction map an NICER.
+    np.savetxt("{0}_appended_Av.txt".format(sed_table_name[:-4]), final_Av, fmt="%1.4f")
     np.savetxt("{0}_index_of_no_Av.txt".format(sed_table_name[:-4]), index_no_Av, fmt = '%d')
     #-----------------------------------
     # measure time

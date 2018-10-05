@@ -40,7 +40,7 @@ from astropy.coordinates import *
 from astropy.io import fits as pyfits
 from astropy import wcs
 import matplotlib.pyplot as plt
-from extinction_curves_lib import WD55B_twomass, WD31B
+from extinction_curves_lib import WD_55B_twomass, WD_31B
 from sys import argv
 import time
 import DL_conf
@@ -78,28 +78,30 @@ if __name__ == "__main__":
     index_control_allOBS = np.where((control_mag[:,0] != 0) & (control_mag[:,1] != 0) &(control_mag[:,2] != 0))
     science_coord = science_coord[index_science_allOBS]
     science_mag = science_mag[index_science_allOBS]
-    science_mag = np.rot90(science_mag)
+    science_mag = np.transpose(science_mag)
     science_err_mag = science_err_mag[index_science_allOBS]
-    science_err_mag = np.rot90(science_err_mag)
+    science_err_mag = np.transpose(science_err_mag)
     control_coord = control_coord[index_control_allOBS]
     control_coord = control_coord[:len(control_coord)//4]
     control_mag = control_mag[index_control_allOBS]
     control_mag = control_mag[:len(control_mag)//4]
-    control_mag = np.rot90(control_mag)
+    control_mag = np.transpose(control_mag)
     control_err_mag = control_err_mag[index_control_allOBS]
     control_err_mag = control_err_mag[:len(control_err_mag)//4]
-    control_err_mag = np.rot90(control_err_mag)
+    control_err_mag = np.transpose(control_err_mag)
     #--------------------------------------------
     # Calculate the extinction
     # Initialize
-    mag_names = ["Ks"  , "H"   , "J"   ]
+    mag_names = ["J"  , "H"   , "Ks"   ]
     extvec = []
     if Rv == 'WD55B':
-        extvec = [WD55B_twomass[2][4], WD55B_twomass[1][4], WD55B_twomass[0][4]]
-        #extvec = [0.1117, 0.1619, 0.2738]
+        extvec = [  WD_55B_twomass[0][3], 
+                    WD_55B_twomass[1][3], 
+                    WD_55B_twomass[2][3]]
     elif Rv == 'WD31B':
-        extvec = [WD31B[2][4], WD31B[1][4], WD31B[0][4]]
-        #extvec = [0.1193, 0.1847, 0.2939] 
+        extvec = [  WD_31B[0][3], 
+                    WD_31B[1][3], 
+                    WD_31B[2][3]]
     else:
         print ('Wrong Rv value')
         print ('Available Rv: WD55B, WD31B')
@@ -126,7 +128,7 @@ if __name__ == "__main__":
     all_Av[index_science_allOBS, 0] = Av_nicer
     all_Av[index_science_allOBS, 1] = std_Av_nicer
     # Output 1
-    np.savetxt('{0}_Av.dat'.format(coord_table_name[:-10]), all_Av)
+    np.savetxt('{0}_Av.dat'.format(coord_table_name[:-10]), all_Av, fmt="%1.4f")
     # Save extinction map
     #                                pixel size(degree)                       gaussian in pixel
     nicer_emap = ext_nicer.build_map(bandwidth = bin_size, metric="gaussian", sampling=5        , use_fwhm=True)
@@ -158,7 +160,7 @@ if __name__ == "__main__":
     emap_table = np.transpose(emap_table)
     # Save Av and position into table.
     # Output 3
-    np.savetxt("{0}.txt".format(nicer_emap_name), emap_table, fmt = '%s')
+    np.savetxt("{0}.txt".format(nicer_emap_name), emap_table, fmt="%1.4f")
     #-----------------------------------
     # measure time
     elapsed_time = time.time() - start_time

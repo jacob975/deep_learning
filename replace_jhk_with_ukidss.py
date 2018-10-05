@@ -160,6 +160,7 @@ if __name__ == "__main__":
         # convert mag to mJy
         ukirt_system = convert_lib.set_ukirt()
         print("### converting from magnitude to mJy ###")
+        print ("--- band system = UKIDSS --- ")
         ukidss_j_mjy, ukidss_err_j_mjy =  mag_to_mjy_numpy(ukidss_bands_j, 'J', ukidss_distances, ukirt_system)
         ukidss_h_mjy, ukidss_err_h_mjy =  mag_to_mjy_numpy(ukidss_bands_h, 'H', ukidss_distances, ukirt_system)
         ukidss_k_mjy, ukidss_err_k_mjy =  mag_to_mjy_numpy(ukidss_bands_k, 'K', ukidss_distances, ukirt_system)
@@ -184,7 +185,7 @@ if __name__ == "__main__":
     twomass_err_k_mjy = None
     if name_twomass_catalog != 'skip':
         twomass_catalogs = np.loadtxt(name_twomass_catalog, skiprows = 79, dtype = np.str)
-        # split into J, H, and Ks bands.
+        # Split table into J, H, and Ks bands.
         twomass_bands_j = twomass_catalogs[:,11:13]
         twomass_bands_j[twomass_bands_j == 'null'] = '0.0'
         twomass_bands_j = np.array(twomass_bands_j, dtype = np.float64)
@@ -194,21 +195,21 @@ if __name__ == "__main__":
         twomass_bands_k = twomass_catalogs[:,19:21]
         twomass_bands_k[twomass_bands_k == 'null'] = '0.0'
         twomass_bands_k = np.array(twomass_bands_k, dtype = np.float64)
-        # convert from 2MASS bands system to UKIDSS bands system
+        # Fill up empty error
         twomass_bands_ju = []
         twomass_bands_hu = []
         twomass_bands_ku = []
-        # fill up empty error
         twomass_bands_j = fill_up_error(twomass_bands_j)
         twomass_bands_h = fill_up_error(twomass_bands_h)
         twomass_bands_k = fill_up_error(twomass_bands_k)
-        # save band JHK in twomass for checking
+        # Save band JHK in twomass for checking
         twomass_bands = np.array([twomass_bands_j[:,0], twomass_bands_h[:,0], twomass_bands_k[:,0]])
         twomass_bands = np.transpose(twomass_bands)
         err_twomass_bands = np.array([twomass_bands_j[:,1], twomass_bands_h[:,1], twomass_bands_k[:,1]])
         err_twomass_bands = np.transpose(err_twomass_bands)
         np.savetxt("{0}_twomass_mag.txt".format(name_dat_file[:-4]), twomass_bands)
         np.savetxt("{0}_err_twomass_mag.txt".format(name_dat_file[:-4]), err_twomass_bands)
+        # Convert band system from 2MASS to UKIDSS
         for i in range(len(twomass_catalogs)):
             twomass_band_j = ufloat(twomass_bands_j[i,0], twomass_bands_j[i,1])
             twomass_band_h = ufloat(twomass_bands_h[i,0], twomass_bands_h[i,1])
@@ -235,22 +236,22 @@ if __name__ == "__main__":
         twomass_err_h_mjy = []
         twomass_k_mjy = []
         twomass_err_k_mjy = []
-        # grab distance of target and table
+        # Read the distance between the source found in IRAC1 register and 2MASS register.
         twomass_distances = twomass_catalogs[:,1]
         twomass_distances[twomass_distances == 'null'] = '999.0'
         twomass_distances = np.array(twomass_distances, dtype = np.float64)
-        # convert mag to mJy
+        # Convert mag to mJy
         ukirt_system = convert_lib.set_ukirt()
-        print("--- In mJy ---")
+        print ("--- band system = UKIDSS --- ")
         twomass_j_mjy, twomass_err_j_mjy =  mag_to_mjy_ufloat(twomass_bands_ju, 'J', twomass_distances, ukirt_system)
         twomass_h_mjy, twomass_err_h_mjy =  mag_to_mjy_ufloat(twomass_bands_hu, 'H', twomass_distances, ukirt_system)
         twomass_k_mjy, twomass_err_k_mjy =  mag_to_mjy_ufloat(twomass_bands_ku, 'K', twomass_distances, ukirt_system)
-        # save the converted file of ukidss jhk bands
+        # Save the converted file of ukidss jhk bands
         twomass_flux = np.stack((twomass_j_mjy, twomass_h_mjy, twomass_k_mjy, twomass_err_j_mjy, twomass_err_h_mjy, twomass_err_k_mjy))
         twomass_flux = np.transpose(twomass_flux)
         np.savetxt("{0}_flux.txt".format(name_twomass_catalog[:-4]), twomass_flux)
     #-----------------------------------
-    # replace the small signals in 2MASS with signals in UKIDSS in bands JHK
+    # Replace the small signals in 2MASS with signals in UKIDSS in bands JHK
     str_dat_file = read_well_known_data(name_dat_file)
     dat_file = np.array(str_dat_file, dtype = np.float64)
     if name_twomass_catalog != 'skip':
@@ -268,7 +269,7 @@ if __name__ == "__main__":
         dat_file[replacement_k, 8] = ukidss_err_j_mjy[replacement_k]
         dat_file[replacement_k, 9] = ukidss_err_h_mjy[replacement_k]
         dat_file[replacement_k, 10] = ukidss_err_k_mjy[replacement_k]
-        np.savetxt("replaced_with_k_in_ukidss_{0}.txt".format(name_dat_file[:-4]), replacement_k[0])
+        np.savetxt("replaced_with_ukidss_based_on_k_{0}.txt".format(name_dat_file[:-4]), replacement_k[0])
     np.savetxt("{0}_u.txt".format(name_dat_file[:-4]), dat_file)
     #-----------------------------------
     # measuring time
