@@ -34,6 +34,7 @@ from convert_lib import TWOMASS_to_UKIDSS, fill_up_error
 from sys import argv
 from dat2npy_lib import read_well_known_data
 from uncertainties import ufloat
+import warnings
 
 # the function for read csv catalogs
 def readfile(filename):
@@ -113,6 +114,8 @@ if __name__ == "__main__":
     VERBOSE = 0
     # measure times
     start_time = time.time()
+    # Ignore all warnings
+    warnings.filterwarnings("ignore")
     #-----------------------------------    
     # Load and check argv
     if len(argv) != 5:

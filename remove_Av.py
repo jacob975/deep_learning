@@ -73,7 +73,7 @@ if __name__ == "__main__":
     extinction_table = extinction_table[~np.isnan(extinction_table[:,2])]
     # The source to be corrected
     sed_table = np.loadtxt(sed_table_name, dtype = float)
-    # Av of each sources if known.
+    # Statistical Av of all sources.
     Av_table = None
     Av_mean = None
     Av_deviation = None
@@ -105,7 +105,7 @@ if __name__ == "__main__":
         y = gaussian(x, paras[0], paras[1], paras[2])
         plt.plot(x, y, label = "Fitting result")
         plt.legend()
-        Av_hist_plot.savefig("Av_hist.png")
+        Av_hist_plot.savefig("{0}_hist.png".format(Av_table_name[:-4]))
     # coord of each sources
     coord_table = np.loadtxt(coord_table_name, dtype = float)
     # Define the extinction curves
@@ -204,7 +204,7 @@ if __name__ == "__main__":
     # Save the table
     np.savetxt("{0}_intrinsic.txt".format(sed_table_name[:-4]), sed_table)
     # This file saves the Av of all source based on extinction map an NICER.
-    np.savetxt("{0}_appended_Av.txt".format(sed_table_name[:-4]), final_Av, fmt="%1.4f")
+    np.savetxt("{0}_proper_Av.txt".format(sed_table_name[:-4]), final_Av, fmt="%1.4f")
     np.savetxt("{0}_index_of_no_Av.txt".format(sed_table_name[:-4]), index_no_Av, fmt = '%d')
     #-----------------------------------
     # measure time
