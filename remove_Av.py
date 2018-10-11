@@ -126,7 +126,7 @@ if __name__ == "__main__":
             Av = 0.0
             err_Av = 0.0
             # If the label of source is star and Av exists, apply it.
-            if Av_table[index, 0] > Av_lower_bond:
+            if Av_table[index, 0] > Av_lower_bond and Av != 0.0:
                 Av = Av_table[index, 0]
                 err_Av = Av_table[index, 1]
             # Find the closest extinction position for sources.

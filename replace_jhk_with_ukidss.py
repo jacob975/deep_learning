@@ -58,7 +58,6 @@ def mag_to_mjy_numpy(bands, band, distances, system):
     # initialize variables
     mjy_array = []
     err_mjy_array = []
-    print("zeropoint: {0}".format(ukirt_system[band][2]))
     # convert
     for i in range(len(bands)):
         # if JHK is not found...
@@ -127,6 +126,7 @@ if __name__ == "__main__":
     name_ukidss_catalog = argv[2]
     name_twomass_catalog = argv[3]
     name_dat_file = argv[4]
+    print ("Replace for {0}".format(name_dat_file))
     #-----------------------------------
     # read the Database UKIDSSDR10PLUS as a catalog
     ukidss_j_mjy = None
