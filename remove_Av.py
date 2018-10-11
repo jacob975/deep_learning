@@ -75,8 +75,7 @@ if __name__ == "__main__":
     sed_table = np.loadtxt(sed_table_name, dtype = float)
     # Statistical Av of all sources.
     Av_table = None
-    Av_mean = None
-    Av_deviation = None
+    Av_lower_bond = None
     if Av_table_name != "skip":
         Av_table = np.loadtxt(Av_table_name, dtype = float)
         # Calculate the deviation of Av.
@@ -88,12 +87,14 @@ if __name__ == "__main__":
         paras, cov = optimize.curve_fit(gaussian, bin_middles[:index_max + 1], numbers[:index_max + 1], p0 = [1000, 0, 1])
         if paras[2] < np.sqrt(cov[2][2]):
             print ('The fitting seems failed.')
-            exit()
-        else:
-            Av_mean = paras[1]
-            Av_deviation = paras[2]
-            print ("{0}: < Av > = {1:.2f}+-{2:.2f}".format(Av_table_name, Av_mean, Av_deviation))
-            print ("Lower bond: Av = {0:.2f}".format(Av_mean - 3 * Av_deviation))
+            exit(1)
+        Av_mean = paras[1]
+        Av_deviation = paras[2]
+        Av_lower_bond = Av_mean - 3 * Av_deviation
+        if Av_lower_bond >= 0.0:
+            Av_lower_bond = 0.0
+        print ("{0}: < Av > = {1:.2f}+-{2:.2f}".format(Av_table_name, Av_mean, Av_deviation))
+        print ("Lower bond: Av = {0:.2f}".format(Av_lower_bond))
         # Plot the result
         Av_hist_plot = plt.figure("Av_hist fitting result")
         plt.title("Av_hist fitting result")
@@ -125,7 +126,7 @@ if __name__ == "__main__":
             Av = 0.0
             err_Av = 0.0
             # If the label of source is star and Av exists, apply it.
-            if Av_table[index, 0] > Av_mean - 3 * Av_deviation:
+            if Av_table[index, 0] > Av_lower_bond:
                 Av = Av_table[index, 0]
                 err_Av = Av_table[index, 1]
             # Find the closest extinction position for sources.
@@ -134,7 +135,7 @@ if __name__ == "__main__":
                 if min_distance > tolerance_radius:
                     Av = 0.0
                     err_Av = 0.0
-                elif extinction_table[index_min, 2] > Av_mean - 3 * Av_deviation:
+                elif extinction_table[index_min, 2] > Av_lower_bond:
                     # Read the Av of the selected extinction point.
                     Av = extinction_table[index_min, 2]
                     err_Av = extinction_table[index_min, 3]

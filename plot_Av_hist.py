@@ -3,7 +3,7 @@
 Abstract:
     This is a program for ploting Av histogram 
 Usage:
-    Av_histogram.py [Av table]
+    plot_Av_hist.py [Av table]
 Editor:
     Jacob975
 
@@ -33,7 +33,7 @@ if __name__ == "__main__":
     # Load argv
     if len(argv) != 2:
         print ("Wrong numbers of arguments.")
-        print ("Usage: Av_histogram.py [Av table]")
+        print ("Usage: plot_Av_hist.py [Av table]")
         exit(1)
     Av_table_name = argv[1]
     #-----------------------------------

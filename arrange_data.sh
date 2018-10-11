@@ -10,7 +10,7 @@
 if [ "$#" -ne 1 ]; then
     echo "Illegal number of parameters"
     echo "Usage: ${0##*/} [option]"
-    echo "Available options: ELAIS_N1u_OPHu_CHA_II, ELAIS_N1_OPH_CHA_II, ELAIS_N1ui_OPHui_CHA_IIi, ELAIS_N1i_OPHi_CHA_IIi, ELAIS_N1u_OPHu_CHA_II_slctEC, ELAIS_N1ui, ELAIS_N1u, ELAIS_N1i, ELAIS_N1, OPHui, OPHu, OPHi, OPH, SERui, SERi, SERu, SER, PERui, PERu_slctEC, PERu, PERi, PER, CHA_IIi, CHA_II, LUP_Ii, LUP_I, LUP_IIIi, LUP_III, LUP_IVi, LUP_IV"
+    echo "Available options: ELAIS_N1u_OPHu_CHA_II, ELAIS_N1_OPH_CHA_II, ELAIS_N1ui_OPHui_CHA_IIi, ELAIS_N1i_OPHi_CHA_IIi, ELAIS_N1u_OPHu_CHA_II_slctEC, ELAIS_N1ui, ELAIS_N1u, ELAIS_N1i, ELAIS_N1, OPHui, OPHu, OPHi, OPH, SERui, SERi, SERu, SER, SERu_slct, PERui, PERu_slctEC, PERu, PERi, PER, CHA_IIi, CHA_II, LUP_Ii, LUP_I, LUP_IIIi, LUP_III, LUP_IVi, LUP_IV"
     exit 1
 fi
 
@@ -579,6 +579,34 @@ if [ "${option}" = "SERui" ]; then
     exit 0
 fi
 
+
+if [ "${option}" = "SERu_slct" ]; then
+    # Cut data from dataset
+    echo "Cut data from catalog."
+    get_catalog.sh catalog-SER-HREL.tbl star
+    get_catalog.sh catalog-SER-HREL.tbl galaxy
+    get_catalog.sh catalog-SER-HREL.tbl yso
+    echo "done."
+    echo "Replace JHK with UKIDSS data"
+    replace_jhk_with_ukidss.py GPS SER_ukidss/SER_GPS_source_table_star_WSA.csv SER_2mass/star_2mass.dat star_sed.dat
+    replace_jhk_with_ukidss.py GPS SER_ukidss/SER_GPS_source_table_gala_WSA.csv SER_2mass/gala_2mass.dat gala_sed.dat
+    replace_jhk_with_ukidss.py GPS SER_ukidss/SER_GPS_source_table_ysos_WSA.csv SER_2mass/ysos_2mass.dat ysos_sed.dat
+    echo "done."
+    # Select sources with the extinction correction.
+    echo "Select sources with the extinction correction"
+    select_data.py star_sed_u.txt ../prototype_EC/star_sed_u_index_of_no_Av.txt
+    select_data.py gala_sed_u.txt ../prototype_EC/gala_sed_u_index_of_no_Av.txt
+    select_data.py ysos_sed_u.txt ../prototype_EC/ysos_sed_u_index_of_no_Av.txt
+    select_data.py star_coord.dat ../prototype_EC/star_sed_u_index_of_no_Av.txt
+    select_data.py gala_coord.dat ../prototype_EC/gala_sed_u_index_of_no_Av.txt
+    select_data.py ysos_coord.dat ../prototype_EC/ysos_sed_u_index_of_no_Av.txt
+    select_data.py star_tracer.dat ../prototype_EC/star_sed_u_index_of_no_Av.txt
+    select_data.py gala_tracer.dat ../prototype_EC/gala_sed_u_index_of_no_Av.txt
+    select_data.py ysos_tracer.dat ../prototype_EC/ysos_sed_u_index_of_no_Av.txt
+    echo "done."
+    exit 0
+fi
+
 if [ "${option}" = "SERi" ]; then
     # Cut data from dataset
     echo "Cut data from catalog."
@@ -902,5 +930,5 @@ fi
 
 
 echo "No match parameters"
-echo "Available options: ELAIS_N1u_OPHu_CHA_II, ELAIS_N1_OPH_CHA_II, ELAIS_N1ui_OPHui_CHA_IIi, ELAIS_N1i_OPHi_CHA_IIi, ELAIS_N1u_OPHu_CHA_II_slctEC, ELAIS_N1ui, ELAIS_N1u, ELAIS_N1i, ELAIS_N1, OPHui, OPHu, OPHi, OPH, SERui, SERi, SERu, SER, PERui, PERu_slctEC, PERu, PERi, PER, CHA_IIi, CHA_II, LUP_Ii, LUP_I, LUP_IIIi, LUP_III, LUP_IVi, LUP_IV"
+echo "Available options: ELAIS_N1u_OPHu_CHA_II, ELAIS_N1_OPH_CHA_II, ELAIS_N1ui_OPHui_CHA_IIi, ELAIS_N1i_OPHi_CHA_IIi, ELAIS_N1u_OPHu_CHA_II_slctEC, ELAIS_N1ui, ELAIS_N1u, ELAIS_N1i, ELAIS_N1, OPHui, OPHu, OPHi, OPH, SERui, SERi, SERu, SER, SERu_slct, PERui, PERu_slctEC, PERu, PERi, PER, CHA_IIi, CHA_II, LUP_Ii, LUP_I, LUP_IIIi, LUP_III, LUP_IVi, LUP_IV"
 exit 1
