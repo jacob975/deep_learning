@@ -10,7 +10,7 @@
 if [ "$#" -ne 1 ]; then
     echo "Illegal number of parameters"
     echo "Usage: ${0##*/} [option]"
-    echo "Available options: ELAIS_N1u_OPHu_CHA_II, ELAIS_N1_OPH_CHA_II, ELAIS_N1ui_OPHui_CHA_IIi, ELAIS_N1i_OPHi_CHA_IIi, ELAIS_N1u_OPHu_CHA_II_slctEC, ELAIS_N1ui, ELAIS_N1u, ELAIS_N1i, ELAIS_N1, OPHui, OPHu, OPHi, OPH, SERui, SERi, SERu, SER, SERu_slct, PERui, PERu_slctEC, PERu, PERi, PER, CHA_IIi, CHA_II, LUP_Ii, LUP_I, LUP_IIIi, LUP_III, LUP_IVi, LUP_IV"
+    echo "Available options: ELAIS_N1u_OPHu_CHA_II, ELAIS_N1_OPH_CHA_II, ELAIS_N1ui_OPHui_CHA_IIi, ELAIS_N1i_OPHi_CHA_IIi, ELAIS_N1u_OPHu_CHA_II_slctEC, ELAIS_N1ui, ELAIS_N1u, ELAIS_N1i, ELAIS_N1, OPHui, OPHu, OPHi, OPH, SERui, SERi, SERu, SER, SERu_slct, PERui, PERu_slctEC, PERu, PERi, PER, CHA_IIi, CHA_II, LUP_Ii, LUP_I, LUP_I_slctEC, LUP_IIIi, LUP_III, LUP_IVi, LUP_IV"
     exit 1
 fi
 
@@ -152,30 +152,30 @@ if [ "${option}" = "ELAIS_N1u_OPHu_CHA_II_slctEC" ]; then
     echo done
     # Select sources with the extinction correction.
     echo "Select sources with the extinction correction"
-    select_data.py ELAIS_N1_star_sed_u.txt ../prototype_EC/ELAIS_N1_star_sed_u_index_of_no_Av.txt
-    select_data.py ELAIS_N1_gala_sed_u.txt ../prototype_EC/ELAIS_N1_gala_sed_u_index_of_no_Av.txt
-    select_data.py ELAIS_N1_star_coord.txt ../prototype_EC/ELAIS_N1_star_sed_u_index_of_no_Av.txt
-    select_data.py ELAIS_N1_gala_coord.txt ../prototype_EC/ELAIS_N1_gala_sed_u_index_of_no_Av.txt
-    select_data.py ELAIS_N1_star_tracer.dat ../prototype_EC/ELAIS_N1_star_sed_u_index_of_no_Av.txt
-    select_data.py ELAIS_N1_gala_tracer.dat ../prototype_EC/ELAIS_N1_gala_sed_u_index_of_no_Av.txt
-    select_data.py OPH_star_sed_u.txt ../prototype_EC/OPH_star_sed_u_index_of_no_Av.txt
-    select_data.py OPH_gala_sed_u.txt ../prototype_EC/OPH_gala_sed_u_index_of_no_Av.txt
-    select_data.py OPH_ysos_sed_u.txt ../prototype_EC/OPH_ysos_sed_u_index_of_no_Av.txt
-    select_data.py OPH_star_coord.dat ../prototype_EC/OPH_star_sed_u_index_of_no_Av.txt
-    select_data.py OPH_gala_coord.dat ../prototype_EC/OPH_gala_sed_u_index_of_no_Av.txt
-    select_data.py OPH_ysos_coord.dat ../prototype_EC/OPH_ysos_sed_u_index_of_no_Av.txt
-    select_data.py OPH_star_tracer.dat ../prototype_EC/OPH_star_sed_u_index_of_no_Av.txt
-    select_data.py OPH_gala_tracer.dat ../prototype_EC/OPH_gala_sed_u_index_of_no_Av.txt
-    select_data.py OPH_ysos_tracer.dat ../prototype_EC/OPH_ysos_sed_u_index_of_no_Av.txt
-    select_data.py CHA_II_star_sed_u.txt ../prototype_EC/CHA_II_star_sed_u_index_of_no_Av.txt
-    select_data.py CHA_II_gala_sed_u.txt ../prototype_EC/CHA_II_gala_sed_u_index_of_no_Av.txt
-    select_data.py CHA_II_ysos_sed_u.txt ../prototype_EC/CHA_II_ysos_sed_u_index_of_no_Av.txt
-    select_data.py CHA_II_star_coord.dat ../prototype_EC/CHA_II_star_sed_u_index_of_no_Av.txt
-    select_data.py CHA_II_gala_coord.dat ../prototype_EC/CHA_II_gala_sed_u_index_of_no_Av.txt
-    select_data.py CHA_II_ysos_coord.dat ../prototype_EC/CHA_II_ysos_sed_u_index_of_no_Av.txt
-    select_data.py CHA_II_star_tracer.dat ../prototype_EC/CHA_II_star_sed_u_index_of_no_Av.txt
-    select_data.py CHA_II_gala_tracer.dat ../prototype_EC/CHA_II_gala_sed_u_index_of_no_Av.txt
-    select_data.py CHA_II_ysos_tracer.dat ../prototype_EC/CHA_II_ysos_sed_u_index_of_no_Av.txt
+    select_data.py filter ELAIS_N1_star_sed_u.txt ../prototype_EC/ELAIS_N1_star_sed_u_index_of_no_Av.txt
+    select_data.py filter ELAIS_N1_gala_sed_u.txt ../prototype_EC/ELAIS_N1_gala_sed_u_index_of_no_Av.txt
+    select_data.py filter ELAIS_N1_star_coord.txt ../prototype_EC/ELAIS_N1_star_sed_u_index_of_no_Av.txt
+    select_data.py filter ELAIS_N1_gala_coord.txt ../prototype_EC/ELAIS_N1_gala_sed_u_index_of_no_Av.txt
+    select_data.py filter ELAIS_N1_star_tracer.dat ../prototype_EC/ELAIS_N1_star_sed_u_index_of_no_Av.txt
+    select_data.py filter ELAIS_N1_gala_tracer.dat ../prototype_EC/ELAIS_N1_gala_sed_u_index_of_no_Av.txt
+    select_data.py filter OPH_star_sed_u.txt ../prototype_EC/OPH_star_sed_u_index_of_no_Av.txt
+    select_data.py filter OPH_gala_sed_u.txt ../prototype_EC/OPH_gala_sed_u_index_of_no_Av.txt
+    select_data.py filter OPH_ysos_sed_u.txt ../prototype_EC/OPH_ysos_sed_u_index_of_no_Av.txt
+    select_data.py filter OPH_star_coord.dat ../prototype_EC/OPH_star_sed_u_index_of_no_Av.txt
+    select_data.py filter OPH_gala_coord.dat ../prototype_EC/OPH_gala_sed_u_index_of_no_Av.txt
+    select_data.py filter OPH_ysos_coord.dat ../prototype_EC/OPH_ysos_sed_u_index_of_no_Av.txt
+    select_data.py filter OPH_star_tracer.dat ../prototype_EC/OPH_star_sed_u_index_of_no_Av.txt
+    select_data.py filter OPH_gala_tracer.dat ../prototype_EC/OPH_gala_sed_u_index_of_no_Av.txt
+    select_data.py filter OPH_ysos_tracer.dat ../prototype_EC/OPH_ysos_sed_u_index_of_no_Av.txt
+    select_data.py filter CHA_II_star_sed_u.txt ../prototype_EC/CHA_II_star_sed_u_index_of_no_Av.txt
+    select_data.py filter CHA_II_gala_sed_u.txt ../prototype_EC/CHA_II_gala_sed_u_index_of_no_Av.txt
+    select_data.py filter CHA_II_ysos_sed_u.txt ../prototype_EC/CHA_II_ysos_sed_u_index_of_no_Av.txt
+    select_data.py filter CHA_II_star_coord.dat ../prototype_EC/CHA_II_star_sed_u_index_of_no_Av.txt
+    select_data.py filter CHA_II_gala_coord.dat ../prototype_EC/CHA_II_gala_sed_u_index_of_no_Av.txt
+    select_data.py filter CHA_II_ysos_coord.dat ../prototype_EC/CHA_II_ysos_sed_u_index_of_no_Av.txt
+    select_data.py filter CHA_II_star_tracer.dat ../prototype_EC/CHA_II_star_sed_u_index_of_no_Av.txt
+    select_data.py filter CHA_II_gala_tracer.dat ../prototype_EC/CHA_II_gala_sed_u_index_of_no_Av.txt
+    select_data.py filter CHA_II_ysos_tracer.dat ../prototype_EC/CHA_II_ysos_sed_u_index_of_no_Av.txt
     echo done
     # stack all data
     echo "Stack all data"
@@ -594,15 +594,15 @@ if [ "${option}" = "SERu_slct" ]; then
     echo "done."
     # Select sources with the extinction correction.
     echo "Select sources with the extinction correction"
-    select_data.py star_sed_u.txt ../prototype_EC/star_sed_u_index_of_no_Av.txt
-    select_data.py gala_sed_u.txt ../prototype_EC/gala_sed_u_index_of_no_Av.txt
-    select_data.py ysos_sed_u.txt ../prototype_EC/ysos_sed_u_index_of_no_Av.txt
-    select_data.py star_coord.dat ../prototype_EC/star_sed_u_index_of_no_Av.txt
-    select_data.py gala_coord.dat ../prototype_EC/gala_sed_u_index_of_no_Av.txt
-    select_data.py ysos_coord.dat ../prototype_EC/ysos_sed_u_index_of_no_Av.txt
-    select_data.py star_tracer.dat ../prototype_EC/star_sed_u_index_of_no_Av.txt
-    select_data.py gala_tracer.dat ../prototype_EC/gala_sed_u_index_of_no_Av.txt
-    select_data.py ysos_tracer.dat ../prototype_EC/ysos_sed_u_index_of_no_Av.txt
+    select_data.py filter star_sed_u.txt ../prototype_EC/star_sed_u_index_of_no_Av.txt
+    select_data.py filter gala_sed_u.txt ../prototype_EC/gala_sed_u_index_of_no_Av.txt
+    select_data.py filter ysos_sed_u.txt ../prototype_EC/ysos_sed_u_index_of_no_Av.txt
+    select_data.py filter star_coord.dat ../prototype_EC/star_sed_u_index_of_no_Av.txt
+    select_data.py filter gala_coord.dat ../prototype_EC/gala_sed_u_index_of_no_Av.txt
+    select_data.py filter ysos_coord.dat ../prototype_EC/ysos_sed_u_index_of_no_Av.txt
+    select_data.py filter star_tracer.dat ../prototype_EC/star_sed_u_index_of_no_Av.txt
+    select_data.py filter gala_tracer.dat ../prototype_EC/gala_sed_u_index_of_no_Av.txt
+    select_data.py filter ysos_tracer.dat ../prototype_EC/ysos_sed_u_index_of_no_Av.txt
     echo "done."
     exit 0
 fi
@@ -703,15 +703,15 @@ if [ "${option}" = "PERu_slctEC" ]; then
     echo 'done.'
     # Select sources with the extinction correction.
     echo "Select sources with the extinction correction"
-    select_data.py star_sed_u_u.txt ../prototype_EC/star_sed_u_u_index_of_no_Av.txt
-    select_data.py gala_sed_u_u.txt ../prototype_EC/gala_sed_u_u_index_of_no_Av.txt
-    select_data.py ysos_sed_u_u.txt ../prototype_EC/ysos_sed_u_u_index_of_no_Av.txt
-    select_data.py star_coord.dat ../prototype_EC/star_sed_u_u_index_of_no_Av.txt
-    select_data.py gala_coord.dat ../prototype_EC/gala_sed_u_u_index_of_no_Av.txt
-    select_data.py ysos_coord.dat ../prototype_EC/ysos_sed_u_u_index_of_no_Av.txt
-    select_data.py star_tracer.dat ../prototype_EC/star_sed_u_u_index_of_no_Av.txt
-    select_data.py gala_tracer.dat ../prototype_EC/gala_sed_u_u_index_of_no_Av.txt
-    select_data.py ysos_tracer.dat ../prototype_EC/ysos_sed_u_u_index_of_no_Av.txt
+    select_data.py filter star_sed_u_u.txt ../prototype_EC/star_sed_u_u_index_of_no_Av.txt
+    select_data.py filter gala_sed_u_u.txt ../prototype_EC/gala_sed_u_u_index_of_no_Av.txt
+    select_data.py filter ysos_sed_u_u.txt ../prototype_EC/ysos_sed_u_u_index_of_no_Av.txt
+    select_data.py filter star_coord.dat ../prototype_EC/star_sed_u_u_index_of_no_Av.txt
+    select_data.py filter gala_coord.dat ../prototype_EC/gala_sed_u_u_index_of_no_Av.txt
+    select_data.py filter ysos_coord.dat ../prototype_EC/ysos_sed_u_u_index_of_no_Av.txt
+    select_data.py filter star_tracer.dat ../prototype_EC/star_sed_u_u_index_of_no_Av.txt
+    select_data.py filter gala_tracer.dat ../prototype_EC/gala_sed_u_u_index_of_no_Av.txt
+    select_data.py filter ysos_tracer.dat ../prototype_EC/ysos_sed_u_u_index_of_no_Av.txt
     echo "done."
     exit 0
 fi
@@ -850,6 +850,34 @@ if [ "${option}" = "LUP_I" ]; then
     exit 0
 fi
 
+if [ "${option}" = "LUP_I_slctEC" ]; then
+    # Cut data from dataset
+    echo "Cut data from catalog."
+    get_catalog.sh catalog-LUP_I-HREL.tbl star
+    get_catalog.sh catalog-LUP_I-HREL.tbl galaxy
+    get_catalog.sh catalog-LUP_I-HREL.tbl yso
+    echo "done."
+    # convert 2MASS band system to UKIDSS band system 
+    echo "Convert 2MASS band system to UKIDSS band system"
+    replace_jhk_with_ukidss.py GCS skip LUP_I_2mass/star_2mass.dat star_sed.dat
+    replace_jhk_with_ukidss.py GCS skip LUP_I_2mass/gala_2mass.dat gala_sed.dat
+    replace_jhk_with_ukidss.py GCS skip LUP_I_2mass/ysos_2mass.dat ysos_sed.dat
+    echo "done."
+    # Select sources with the extinction correction.
+    echo "Select sources with the extinction correction"
+    select_data.py filter star_sed_u.txt ../prototype_EC/star_sed_u_index_of_no_Av.txt
+    select_data.py filter gala_sed_u.txt ../prototype_EC/gala_sed_u_index_of_no_Av.txt
+    select_data.py filter ysos_sed_u.txt ../prototype_EC/ysos_sed_u_index_of_no_Av.txt
+    select_data.py filter star_coord.dat ../prototype_EC/star_sed_u_index_of_no_Av.txt
+    select_data.py filter gala_coord.dat ../prototype_EC/gala_sed_u_index_of_no_Av.txt
+    select_data.py filter ysos_coord.dat ../prototype_EC/ysos_sed_u_index_of_no_Av.txt
+    select_data.py filter star_tracer.dat ../prototype_EC/star_sed_u_index_of_no_Av.txt
+    select_data.py filter gala_tracer.dat ../prototype_EC/gala_sed_u_index_of_no_Av.txt
+    select_data.py filter ysos_tracer.dat ../prototype_EC/ysos_sed_u_index_of_no_Av.txt
+    echo "done."
+    exit 0
+fi
+
 if [ "${option}" = "LUP_IIIi" ]; then
     # Cut data from dataset
     echo "Cut data from catalog."
@@ -930,5 +958,5 @@ fi
 
 
 echo "No match parameters"
-echo "Available options: ELAIS_N1u_OPHu_CHA_II, ELAIS_N1_OPH_CHA_II, ELAIS_N1ui_OPHui_CHA_IIi, ELAIS_N1i_OPHi_CHA_IIi, ELAIS_N1u_OPHu_CHA_II_slctEC, ELAIS_N1ui, ELAIS_N1u, ELAIS_N1i, ELAIS_N1, OPHui, OPHu, OPHi, OPH, SERui, SERi, SERu, SER, SERu_slct, PERui, PERu_slctEC, PERu, PERi, PER, CHA_IIi, CHA_II, LUP_Ii, LUP_I, LUP_IIIi, LUP_III, LUP_IVi, LUP_IV"
+echo "Available options: ELAIS_N1u_OPHu_CHA_II, ELAIS_N1_OPH_CHA_II, ELAIS_N1ui_OPHui_CHA_IIi, ELAIS_N1i_OPHi_CHA_IIi, ELAIS_N1u_OPHu_CHA_II_slctEC, ELAIS_N1ui, ELAIS_N1u, ELAIS_N1i, ELAIS_N1, OPHui, OPHu, OPHi, OPH, SERui, SERi, SERu, SER, SERu_slct, PERui, PERu_slctEC, PERu, PERi, PER, CHA_IIi, CHA_II, LUP_Ii, LUP_I, LUP_I_slctEC, LUP_IIIi, LUP_III, LUP_IVi, LUP_IV"
 exit 1
