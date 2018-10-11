@@ -1,11 +1,7 @@
 #############################################
-The strategy of the name of AI
+# The structure of the name of our trained AI
 
-AI_[neural]_[layers] --- checkpoint_[iterations]
-                      |
-                      -- checkpoint_[iterations]
-                      |
-                      -- checkpoint_[iterations]
+# [timestamp]_trained_by_[keywords]
 
 #############################################
 #20180501
@@ -13,11 +9,6 @@ AI_[neural]_[layers] --- checkpoint_[iterations]
 # how to get coords for WSM from catalog-SWIRE-v3.tbl
 awk '$17~/star/ && $17!~/dust/ { print $1" "$3 }' catalog-SWIRE-v3.tbl > coord_of_star_list
 awk '$17~/Galc/ && $17!~/dust/ { print $1" "$3 }' catalog-SWIRE-v3.tbl > coord_of_gala_list
-
-#############################################
-# region of data
-# name       RA          DEC
-# ELAIS N1   16 11 00    55 00 00
 
 #############################################
 # UKIDSS is a set of five surveys. The areas and 5-sigma depths are as follows:
@@ -33,15 +24,17 @@ awk '$17~/Galc/ && $17!~/dust/ { print $1" "$3 }' catalog-SWIRE-v3.tbl > coord_o
 #   % means part of sources are found in that survey
 #   x means no data found in that survey
 #
-# region    | GPS   | GCS   | LAS   | DES
-# ELAIS N1  |       |       |       | * 
-# OPH       | x     | *     |       |
-# SER       | *     |       |       |
-# PER       | %     | %     |       |
-# CHA_II    | x     | x     | x     |
-# LUP_I     | x     | x     | x     |
-# LUP_III   | x     | x     | x     |
-# LUP_IV    | x     | x     | x     |
+# region    |RA     |DEC    | GPS   | GCS   | LAS   | DES
+#           |hhmmss |ddmmss |
+#-------------------------------------------------------------
+# ELAIS N1  |161100 |550000 |       |       |       | * 
+# OPH       |       |       | x     | *     |       |
+# SER       |       |       | *     |       |       |
+# PER       |       |       | %     | %     |       |
+# CHA_II    |       |       | x     | x     | x     |
+# LUP_I     |       |       | x     | x     | x     |
+# LUP_III   |       |       | x     | x     | x     |
+# LUP_IV    |       |       | x     | x     | x     |
 #
 # How to identify categories of surveyes?
 #

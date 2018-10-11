@@ -102,8 +102,9 @@ if __name__ == "__main__":
     # Draw the confusion matrix of elements respectively
     alice_cls_pred_in_elements = [None for i in range(3)]
     bob_cls_pred_in_elements = [None for i in range(3)]
+    label_name_list = ['Star', 'Galaxy', 'YSOc']
     for i in range(3):
-        print ("--- True: {0} --- ".format(i))
+        print ("--- True: {0} --- ".format(label_name_list[i]))
         alice_cls_pred_in_elements[i] = alice_ensemble_labels_pred[ensemble_cls_true == i] 
         bob_cls_pred_in_elements[i] = bob_ensemble_labels_pred[ensemble_cls_true == i]
         if len(alice_cls_pred_in_elements[i]) == 0:

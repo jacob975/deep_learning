@@ -162,8 +162,7 @@ if __name__ == "__main__":
         ukidss_distances = catalogs[:,3]
         # convert mag to mJy
         ukirt_system = convert_lib.set_ukirt()
-        print("### converting from magnitude to mJy ###")
-        print ("--- band system = UKIDSS --- ")
+        print("--- Let UKIDSS data converted from magnitude to mJy add used in SED ---")
         ukidss_j_mjy, ukidss_err_j_mjy =  mag_to_mjy_numpy(ukidss_bands_j, 'J', ukidss_distances, ukirt_system)
         ukidss_h_mjy, ukidss_err_h_mjy =  mag_to_mjy_numpy(ukidss_bands_h, 'H', ukidss_distances, ukirt_system)
         ukidss_k_mjy, ukidss_err_k_mjy =  mag_to_mjy_numpy(ukidss_bands_k, 'K', ukidss_distances, ukirt_system)
@@ -245,7 +244,7 @@ if __name__ == "__main__":
         twomass_distances = np.array(twomass_distances, dtype = np.float64)
         # Convert mag to mJy
         ukirt_system = convert_lib.set_ukirt()
-        print ("--- band system = UKIDSS --- ")
+        print ("--- Let 2MASS data converted to UKIDSS band system, and fill up the blank of UKIDSS data --- ")
         twomass_j_mjy, twomass_err_j_mjy =  mag_to_mjy_ufloat(twomass_bands_ju, 'J', twomass_distances, ukirt_system)
         twomass_h_mjy, twomass_err_h_mjy =  mag_to_mjy_ufloat(twomass_bands_hu, 'H', twomass_distances, ukirt_system)
         twomass_k_mjy, twomass_err_k_mjy =  mag_to_mjy_ufloat(twomass_bands_ku, 'K', twomass_distances, ukirt_system)
