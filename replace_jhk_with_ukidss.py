@@ -82,7 +82,6 @@ def mag_to_mjy_ufloat(bands, band, distances, system):
     # initialize variables
     mjy_array = []
     err_mjy_array = []
-    print("zeropoint: {0}".format(ukirt_system[band][2]))
     # convert
     for i in range(len(bands)):
         # if JHK is not found...
