@@ -65,10 +65,10 @@ if __name__ == "__main__":
     fig = plt.figure(figsize = (8,8))
     sub_fig = plt.subplot(111, projection="mollweide")
     m = hp.read_map(bkg_name)
-    hp.mollview(m, fig = 1, cmap = 'Greys', norm = 'log', cbar = False, title = 'The regions of sets in the whole sky map', notext = True)
+    hp.mollview(m, fig = 1, cmap = 'Greys', norm = 'log', cbar = False, title = 'Locations of our datasets in the whole sky map', notext = True)
     hp.graticule()
     plt.grid(True)
-    region_name_list = ['CHA_II',
+    region_name_list = ['CHA II',
                         'OPH',
                         'ELAIS N1',
                         'LUP I',
@@ -98,9 +98,9 @@ if __name__ == "__main__":
         world_coords = w.wcs_pix2world(pixel_coords, 1)
         gala_coords = equatorial2galactic(world_coords)
         print ("{1}, {0}".format(name, gala_coords[0]))
-        hp.projplot(gala_coords[:,0], gala_coords[:,1], lonlat = True, c = color_list[index], label = name)
+        hp.projplot(gala_coords[:,0], gala_coords[:,1], lonlat = True, c = color_list[index], label = region_name_list[index])
     plt.legend()
-    fig.savefig('Regions_in_whole_sky_map.png', dpi = 300)
+    fig.savefig('Locations_of_our_datasets_in_whole_sky_map.png', dpi = 300)
     #-----------------------------------
     # Measure time
     elapsed_time = time.time() - start_time
