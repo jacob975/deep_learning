@@ -3,7 +3,7 @@
 Abstract:
     This is a program for show regions on all sky map. 
 Usage:
-    show_all_emap.py [bkg fits file] [fits image file 1] [fits image file 2]  [fits image file 3]
+    show_all_emap.py [bkg fits file] [fits image file 1] [fits image file 2] [fits image file 3] ... and so on.
     
     You have to follow this order:
     CHA_II_120asec_Av.fits 
@@ -52,22 +52,22 @@ if __name__ == "__main__":
     start_time = time.time()
     #-----------------------------------
     # Load arguments
-    print("Usage: show_all_emap.py [bkg image file] [fits image file 1] [fits image file 2]  [fits image file 3]") 
+    print("Usage: show_all_emap.py [bkg image file] [fits image file 1] [fits image file 2] [fits image file 3] ... and so on.") 
     if len(argv) < 3:
         print ("The number of arguments is wrong.")
         exit(1)
     bkg_name = argv[1]
     image_name_list = argv[2:]
     #-----------------------------------
-    # Load data
-    #-----------------------------------
     # Plot and show
     fig = plt.figure(figsize = (8,8))
     sub_fig = plt.subplot(111, projection="mollweide")
+    # Plot background
     m = hp.read_map(bkg_name)
     hp.mollview(m, fig = 1, cmap = 'Greys', norm = 'log', cbar = False, title = 'Locations of our datasets in the whole sky map', notext = True)
     hp.graticule()
     plt.grid(True)
+    # Initialize the information of regions
     region_name_list = ['CHA II',
                         'OPH',
                         'ELAIS N1',
@@ -86,6 +86,7 @@ if __name__ == "__main__":
                             [ 0.04, -0.10],
                             [-0.05, -0.15],
                             [-0.05, -0.15]])
+    # Plot regions
     plt.plot(np.pi, np.pi/2, c= 'w', label = 'Training sets')
     for index, name in enumerate(image_name_list):
         if index == 3:
