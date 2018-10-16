@@ -4,7 +4,7 @@ Abstract:
     This is a code for test AI with given sed data in interactive mode.
 Usage:
     sed_test_AI.py [AI]
-Editor and Practicer:
+Auther:
     Jacob975
 
 ##################################
@@ -24,8 +24,12 @@ import numpy as np
 import time
 from sys import argv
 import os
+import matplotlib.pyplot as plt
 # We need PrettyTensor.
 import prettytensor as pt
+
+def sigmoid(inp):
+    return np.divide(1, 1+np.exp(-inp))
 
 # Return the prediction manually.
 def test_data():
@@ -47,10 +51,45 @@ def test_data():
     feed_dict = {   x:_input_sed, 
                     y_true:_input_label }
     cls_pred = session.run(y_pred, feed_dict = feed_dict)
-    grad = session.run(gradients, feed_dict = feed_dict)
+    grad = session.run(Adam_gradients, feed_dict = feed_dict)
+    # Show the prediction in the terminal and gradients in plt.imshow
     print ('The prediction is {0}'.format(cls_pred))
-    print ('The gradient is {0}'.format(grad))
-    return 
+    gradients_fig = plt.figure()
+    for k, v in enumerate(grad):
+        print ("{0}:\n{1}\n".format(tf.trainable_variables()[k], v[0].shape))
+        im = plt.subplot(3, 6, k+1)
+        plt.title(tf.trainable_variables()[k].name)
+        try:
+            plt.imshow(sigmoid(v[0]), vmin = 0, vmax = 1)
+        except:
+            v_res = np.array([v[0]])
+            plt.imshow(sigmoid(v_res), vmin = 0, vmax = 1)
+    plt.subplots_adjust(bottom=0.1, right=0.8, top=0.9)
+    cax = plt.axes([0.85, 0.1, 0.075, 0.8])
+    plt.colorbar(cax=cax)
+    gradients_fig.show()
+    return grad 
+
+# Show the ratio of current gradients and the last gradients.
+def compare_grad(the_grad, last_grad):
+    the_grad = np.array(the_grad)
+    last_grad = np.array(last_grad)
+    ratio = np.divide(the_grad, last_grad)
+    ratio_fig = plt.figure()
+    for k, v in enumerate(ratio):
+        print ("{0}:\n{1}\n".format(tf.trainable_variables()[k], v[0].shape))
+        im = plt.subplot(3, 6, k+1)
+        plt.title(tf.trainable_variables()[k].name)
+        try:
+            plt.imshow(sigmoid(v[0]), vmin = 0, vmax = 1)
+        except:
+            v_res = np.array([v[0]])
+            plt.imshow(sigmoid(v_res), vmin = 0, vmax = 1)
+    plt.subplots_adjust(bottom=0.1, right=0.85, top=0.9)
+    cax = plt.axes([0.90, 0.1, 0.025, 0.8])
+    plt.colorbar(cax=cax)
+    ratio_fig.show()
+    return
 
 #--------------------------------------------
 # main code
@@ -62,7 +101,9 @@ if __name__ == "__main__":
     # Load arguments
     if len(argv) != 2:
         print ('Error')
-        print("The number of arguments is wrong")
+        print ("The number of arguments is wrong")
+        print ("Usage: sed_test_AI.py [AI]")
+        print ("AI could be 'skip', then no AI will be loaded.")
         exit()
     AI_saved_dir = argv[1]
     #-----------------------------------
@@ -100,31 +141,37 @@ if __name__ == "__main__":
     y_pred_cls = tf.argmax(y_pred, axis=1)
     correct_prediction = tf.equal(y_pred_cls, y_true_cls)
     accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
-    for v in tf.trainable_variables():
-        print (v.name)
-    gradients = tf.train.AdamOptimizer().compute_gradients(loss)
-    #-----------------------------------
-    # Saver
-    saver = tf.train.Saver()
-    print ("AI:{0}".format(AI_saved_dir))
-    if not os.path.exists(AI_saved_dir):
-        print ("No AI can be restore, please check folder ./checkpoints")
-        exit(1)
-    save_path = os.path.join(AI_saved_dir, 'checkpoint_AI_64_8_source_sed_MaxLoss0/best_validation')
-    print (save_path)
+    Adam_gradients = tf.train.AdamOptimizer().compute_gradients(loss)
+    GD_gradients = tf.train.GradientDescentOptimizer(learning_rate = 0.001).compute_gradients(loss)
     #-----------------------------------
     # Tensorflow run
     session = tf.Session()
-    # restore previous weight
-    saver.restore(sess=session, save_path=save_path)
-    batch_size = 512
-    print ("batch_size = {0}".format(batch_size))
+    # Restore trained weight
+    if AI_saved_dir == 'skip':
+        print ('No AI will be loaded.')
+        session.run(tf.global_variables_initializer())
+    else:
+        saver = tf.train.Saver()
+        print ("AI:{0}".format(AI_saved_dir))
+        if not os.path.exists(AI_saved_dir):
+            print ("No AI can be restore, please check folder ./checkpoints")
+            exit(1)
+        save_path = os.path.join(AI_saved_dir, 'checkpoint_AI_64_8_source_sed_MaxLoss0/best_validation')
+        saver.restore(sess=session, save_path=save_path)
     # Test the restored AI interactively.
+    last_grad = None
     while True:
-        test_data()
-        escape = input("Continue? (y/n)")
+        the_grad = test_data()
+        # Compare the gradients with the last.
+        do_compare = input("Compare with the last gradients? (y/n): ")
+        if do_compare == 'y':
+            compare_grad(the_grad, last_grad)
+        # Stop or continue?
+        escape = input("Continue? (y/n): ")
         if escape == 'n':
             break
+        else:
+            last_grad = the_grad
     session.close()
     #-----------------------------------
     # measuring time
