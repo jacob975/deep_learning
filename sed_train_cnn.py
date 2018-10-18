@@ -7,10 +7,10 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 Abstract:
-    This is a code for train AI to identify YSO from SED data
-    with 64 neurals per layer, 8 layers.
+    This is a code for train AI to identify YSO from SED data with Convolutional Neural Network( CNN).
 Usage:
-    sed_04_64_8.py [source] [id] [time_stamp]
+    sed_train_cnn.py [imply mask] [source] [id] [coord] [time_stamp]
+    sed_train_cnn.py 00000000 source_sed.txt source_id.txt source_coords.txt sometimes 
 
 Result tree:
 
@@ -24,29 +24,18 @@ Result tree:
 Quoted from:
     Magnus Erik Hvass Pedersen
 Modifier:
-    Jacob975
+    Chi-Ting Ho, Jacob975
 
 ##################################
 #   Python3                      #
 #   This code is made in python3 #
 ##################################
 
-20170301
+20181016
 ####################################
 update log
-    20180301 version alpha 1
-    The code is base on sed_04
-    1. Add milestone in the optimize iteration, when acheive the milestone, AI will be saved and test to a new folder.
-    2. the neural network is 64 neurals per layer, 8 layers.
-
-    20180306 version alpha 2
-    1. add flexible data length.
-
-    20180310 version alpha 3
-    1. Training set, validation set, test set will be saved after arrangement.
-
-    20180320 version alpha 4 
-    1. arrange saving direction.
+20181016 version alpha 1:
+    1. The code works
 '''
 import matplotlib.pyplot as plt
 import tensorflow as tf
@@ -58,14 +47,14 @@ from save_lib import save_arrangement, save_cls_pred, save_cls_true, save_coords
 import astro_mnist
 import math
 import os
-# We also need PrettyTensor.
-import prettytensor as pt
 
-def new_weights(shape):
-    return tf.Variable(tf.truncated_normal(shape, stddev=0.05))
+def weight_variable(shape, std = 0.1):
+    initial = tf.truncated_normal(shape) * std
+    return tf.Variable(initial)
 
-def new_biases(length):
-    return tf.Variable(tf.constant(0.05, shape=[length]))
+def bias_variable(shape):
+    initial = tf.constant(0.1, shape = shape)
+    return tf.Variable(initial)
 
 def optimize(num_iterations):
     # Ensure we update the global variables rather than local copies.
@@ -86,10 +75,10 @@ def optimize(num_iterations):
         # x_batch now holds a batch of images and
         # y_true_batch are the true labels for those images.
         x_batch, y_true_batch = data.train.next_batch(train_batch_size)
-
+        x_batch = x_batch.reshape((-1, 2, 8, 1))
         # Put the batch into a dict with the proper names
         # for placeholder variables in the TensorFlow graph.
-        feed_dict_train = {x: x_batch,
+        feed_dict_train = {x_image: x_batch,
                            y_true: y_true_batch}
 
         # Run the optimizer using this batch of training data.
@@ -147,7 +136,7 @@ def optimize(num_iterations):
     time_dif = end_time - start_time
 
     # Print the time-usage.
-    print("Time usage: " + str(timedelta(seconds=int(round(time_dif)))))
+    print("Time usage: {0} sec.".format(int(round(time_dif))))
 
 # the def is used to plot data and their labels
 def plot_images(images, cls_true, cls_pred=None):
@@ -219,22 +208,6 @@ def plot_confusion_matrix(cls_pred):
     
     # Print the confusion matrix as text.
     print(cm)
-    '''
-    # Plot the confusion matrix as an image.
-    plt.matshow(cm)
-
-    # Make various adjustments to the plot.
-    plt.colorbar()
-    tick_marks = np.arange(num_classes)
-    plt.xticks(tick_marks, range(num_classes))
-    plt.yticks(tick_marks, range(num_classes))
-    plt.xlabel('Predicted')
-    plt.ylabel('True')
-
-    # Ensure the plot is shown correctly with multiple plots
-    # in a single Notebook cell.
-    plt.show()
-    '''
 
 def print_test_accuracy(show_example_errors=False,
                         show_confusion_matrix=False):
@@ -288,7 +261,7 @@ def predict_cls(images, labels, cls_true):
 
         # Create a feed-dict with the images and labels
         # between index i and j.
-        feed_dict = {x: images[i:j, :],
+        feed_dict = {x_image: images[i:j, :].reshape((-1, 2, 8, 1)),
                      y_true: labels[i:j, :]}
 
         # Calculate the predicted class using TensorFlow.
@@ -339,14 +312,24 @@ if __name__ == "__main__":
     VERBOSE = 0
     # measure times
     start_time = time.time()
-    time_stamp = argv[4]
-    print ("starting time: {0}".format(time_stamp))
     #-----------------------------------
-    # Load Data
+    # Load arguments
+    if len(argv) != 6:
+        print ("Error!")
+        print ("The number of arguments is wrong.")
+        print ("Usage: sed_train_cnn.py [imply mask] [source] [id] [coord] [time_stamp]")
+        print ("Example: sed_train_cnn.py 00000000 source_sed.txt source_id.txt source_coords.txt sometimes ")
+        exit(1)
+    imply_mask = argv[1]
     global images_name
-    images_name = argv[1]
-    labels_name = argv[2]
-    coords_name = argv[3]
+    images_name = argv[2]
+    labels_name = argv[3]
+    coords_name = argv[4]
+    time_stamp = argv[5]
+    #------------------------------------
+    # Load Data
+    # We should play a mask on image
+    print ("starting time: {0}".format(time_stamp))
     data, tracer, coords = astro_mnist.read_data_sets(images_name, labels_name, coords_name)
     print("Size of:")
     print("- Training-set:\t\t{}".format(len(data.train.labels)))
@@ -363,21 +346,48 @@ if __name__ == "__main__":
         print ("coords are saved.")
     #-----------------------------------
     # Data dimension
-    # We know that from the length of a data. 
-    img_size = len(data.train.images[0])
-    print ("image size = {0}".format(img_size))
-    # Images are stored in one-dimensional arrays of this length.
-    img_size_flat = img_size * 1
-    # Tuple with height and width of images used to reshape arrays.
-    img_shape = (img_size, 1)
-    # Number of colour channels for the images: 1 channel for gray-scale.
-    num_channels = 1
-    # Number of classes, one class for each of 10 digits.
-    num_classes = 3
-    # the number of iterations
+    img_maj = imply_mask.count('0')
+    image_shape = (2, img_maj)
+    kernal_shape = (2, 2)
+    num_kernal_1 = 32
+    num_kernal_2 = 64
+    num_conn_neural = 100
+    num_label = len(data.train.labels[0])
+    #-----------------------------------
+    # Construct an AI
+    x = tf.placeholder(tf.float32, [None, 2 * img_maj], name = 'x')
+    y_true = tf.placeholder(tf.float32, [None, 3], name = 'y_true')
+    y_true_cls = tf.argmax(y_true, axis=1)
+    x_image = tf.reshape(x, [-1, image_shape[0], image_shape[1], 1])
+    # First layer( First kernal)
+    W_conv1 = weight_variable([kernal_shape[0], kernal_shape[1], 1, num_kernal_1])
+    b_conv1 = bias_variable([num_kernal_1])
+    h_conv1 = tf.nn.relu(tf.nn.conv2d(x_image, W_conv1, [1,1,1,1], 'SAME') + b_conv1)
+    # Second layer( Second kernal)
+    W_conv2 = weight_variable([kernal_shape[0], kernal_shape[1], num_kernal_1, num_kernal_2])
+    b_conv2 = bias_variable([num_kernal_2])
+    h_conv2 = tf.nn.relu(tf.nn.conv2d(h_conv1, W_conv2, [1,1,1,1], 'SAME') + b_conv2)
+    # Third layer ( Fully connected)
+    W_fc1 = weight_variable([image_shape[0] * image_shape[1] * num_kernal_2, num_conn_neural])
+    b_fc1 = bias_variable([num_conn_neural])
+    h_conv2_flat = tf.reshape(h_conv2, [ -1, image_shape[0] * image_shape[1] * num_kernal_2])
+    h_fc1 = tf.nn.relu(tf.matmul(h_conv2_flat, W_fc1) + b_fc1)
+    # Output layer
+    W_fc2 = weight_variable([num_conn_neural, num_label])
+    b_fc2 = bias_variable([num_label])
+    y_pred = tf.matmul(h_fc1, W_fc2) + b_fc2
+    y_pred_cls = tf.argmax(y_pred, axis=1)
+    correct_prediction = tf.equal(y_pred_cls, y_true_cls)
+    accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+    # Calculate the loss
+    cross_entropy = tf.reduce_sum(tf.nn.softmax_cross_entropy_with_logits(logits = y_pred, labels = y_true))
+    beta = 0.001
+    regularizers = tf.nn.l2_loss(W_conv1) + tf.nn.l2_loss(W_conv2)
+    loss = tf.reduce_mean(cross_entropy + beta * regularizers)
+    # The number of iterations
     iters = 1000000
     print ("number of iterations = {0}".format(iters))
-    # the size of a batch
+    # The size of a batch
     if len(data.validation.labels) < 512:
         train_batch_size = 128
     else:
@@ -391,29 +401,9 @@ if __name__ == "__main__":
     print ("batch size = {0}".format(batch_size))
     #-----------------------------------
     # Get the true classes for those images.
-    data.test.cls = np.argmax(data.test.labels, axis=1)
     data.validation.cls = np.argmax(data.validation.labels, axis=1)
     #-----------------------------------
     # Tensorflow Graph
-    x = tf.placeholder(tf.float32, shape=[None, img_size_flat], name='x')
-    x_image = tf.reshape(x, [-1, img_size, 1, num_channels])
-    y_true = tf.placeholder(tf.float32, shape=[None, num_classes], name='y_true')
-    y_true_cls = tf.argmax(y_true, axis=1)
-    #-----------------------------------
-    # PrettyTensor Implementation
-    x_pretty = pt.wrap(x_image)
-    with pt.defaults_scope(activation_fn=tf.nn.relu6):
-        y_pred, loss = x_pretty.\
-            flatten().\
-            fully_connected(size = 64, name='layer_fc1').\
-            fully_connected(size = 64, name='layer_fc2').\
-            fully_connected(size = 64, name='layer_fc3').\
-            fully_connected(size = 64, name='layer_fc4').\
-            fully_connected(size = 64, name='layer_fc5').\
-            fully_connected(size = 64, name='layer_fc6').\
-            fully_connected(size = 64, name='layer_fc7').\
-            fully_connected(size = 64, name='layer_fc8').\
-            softmax_classifier(num_classes=num_classes, labels=y_true)
     starter_learning_rate = 1e-4
     print ("starter learning rate = {0}".format(starter_learning_rate))
     base = 0.96
@@ -423,9 +413,6 @@ if __name__ == "__main__":
     global_step = tf.Variable(0, trainable=False)
     learning_rate = tf.train.exponential_decay(starter_learning_rate, global_step , unit_step, base, staircase=True)
     optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(loss, global_step = global_step)
-    y_pred_cls = tf.argmax(y_pred, axis=1)
-    correct_prediction = tf.equal(y_pred_cls, y_true_cls)
-    accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
     #-----------------------------------
     # Saver
     validation_list = []

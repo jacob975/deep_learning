@@ -166,9 +166,9 @@ def read_data_sets(images_name,
                    dtype=dtypes.float32,
                    reshape=True,
                    # Total size are 10
-                   train_weight = 7,
+                   train_weight = 9,
                    validation_weight=1,
-                   test_weight = 2,
+                   test_weight = 0,
                    seed=None):
 
   # load data, label, and coords
