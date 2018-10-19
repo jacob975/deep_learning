@@ -75,10 +75,9 @@ def optimize(num_iterations):
         # x_batch now holds a batch of images and
         # y_true_batch are the true labels for those images.
         x_batch, y_true_batch = data.train.next_batch(train_batch_size)
-        x_batch = x_batch.reshape((-1, 2, 8, 1))
         # Put the batch into a dict with the proper names
         # for placeholder variables in the TensorFlow graph.
-        feed_dict_train = {x_image: x_batch,
+        feed_dict_train = {x: x_batch,
                            y_true: y_true_batch}
 
         # Run the optimizer using this batch of training data.
@@ -261,7 +260,7 @@ def predict_cls(images, labels, cls_true):
 
         # Create a feed-dict with the images and labels
         # between index i and j.
-        feed_dict = {x_image: images[i:j, :].reshape((-1, 2, 8, 1)),
+        feed_dict = {x: images[i:j, :],
                      y_true: labels[i:j, :]}
 
         # Calculate the predicted class using TensorFlow.

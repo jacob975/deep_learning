@@ -147,7 +147,7 @@ def optimize(num_iterations):
     time_dif = end_time - start_time
 
     # Print the time-usage.
-    print("Time usage: " + str(timedelta(seconds=int(round(time_dif)))))
+    print("Time usage: {0} sec.".format(int(round(time_dif))))
 
 # the def is used to plot data and their labels
 def plot_images(images, cls_true, cls_pred=None):
