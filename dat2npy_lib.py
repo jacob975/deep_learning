@@ -91,7 +91,7 @@ def normalize_1_0(inp):
     outp.reshape(-1, data_width)
     return outp
 
-def mask_and_normalize(inp, mask_code = np.zeros(8)):
+def mask(inp, mask_code = np.zeros(8)):
     # The number of source in the input file.
     h = len(inp)
     # Mask some bands
@@ -100,13 +100,17 @@ def mask_and_normalize(inp, mask_code = np.zeros(8)):
         if value:
             inp[:,index] = 0.0
             inp[:,index + 8] = 0.0
+    # make each no observation having the same value
+    inp[inp == -9.99e+02] = 0.0
+    inp[inp == 0.0] = 0.0
+    return inp
+
+def normalize(inp):
     # Normailze
+    h = len(inp)
+    outp = np.zeros(inp.shape)
     norm = np.amax(inp, axis=1)
     outp = inp / norm.reshape(h,1)
-    # make each no observation having the same value
-    outp[inp == -9.99e+02] = 0.0
-    outp[inp == 0.0] = 0.0
-    outp.reshape(-1, data_width)
     return outp
 
 #------------------------------------------------------

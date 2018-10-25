@@ -25,7 +25,7 @@ update log
     1. Update the mask system, using mask code instead of keywords.
 '''
 from sys import argv
-from dat2npy_lib import mask_and_normalize
+from dat2npy_lib import mask, normalize
 import time
 import numpy as np
 
@@ -49,7 +49,8 @@ if __name__ == "__main__":
     # Load data
     data = np.loadtxt(data_name, dtype = np.float64)
     # mask dataset with chosen mask, then normalize to the maximun flux equals 1.
-    masked_data = mask_and_normalize(data, mask_code)
+    masked_data = mask(data, mask_code)
+    masked_data = normalize(masked_data)
     # Save masked data set
     np.savetxt(data_name, masked_data)
     #-----------------------------------

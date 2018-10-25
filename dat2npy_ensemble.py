@@ -60,7 +60,7 @@ import time
 import re           # this is used to apply multiple spliting
 import numpy as np
 from sys import argv
-from dat2npy_lib import mask_and_normalize, no_observation_filter_eq_0, read_well_known_data, apply_filter_on
+from dat2npy_lib import mask, normalize, no_observation_filter_eq_0, read_well_known_data, apply_filter_on
 
 #--------------------------------------------
 # main code
@@ -99,7 +99,8 @@ if __name__ == "__main__":
         # convert data from string to float
         str_data = read_well_known_data(data_name)
         data = np.array(str_data, dtype = float)
-        data_n = mask_and_normalize(data, mask_code)
+        data_n = mask(data, mask_code)
+        data_n = normalize(data_n)
         # no observation filter
         # i is the tolarence of loss in a single datum
         for i in range(data_width):
