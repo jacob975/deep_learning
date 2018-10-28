@@ -30,6 +30,9 @@ def gaussian(x, amp, mu, sig, const):
 def linear(x, a):
     return a*x
 
+def const(x, c):
+    return c
+
 def power_law(x, a, p, b):
     return a*x**p + b
 
@@ -51,7 +54,6 @@ if __name__ == "__main__":
     test_set = np.logspace(0, 3, num_test)
     for i in range(num_test):
         y_data = (1 + np.random.normal(-0.26, 0.26, num_sample))*(gaussian(x_data, test_set[i], 50, 10, 0) + np.random.poisson(1,num_sample))
-        y_data = y_data/10
         paras, covs = optimize.curve_fit( gaussian, x_data, y_data, p0 = (10, 50 ,10 ,0))
         amp_array[i] = paras[0]
         error_array[i] = np.sqrt(covs[0,0])
@@ -64,17 +66,23 @@ if __name__ == "__main__":
             axs[1].bar(x_data, y_data, color = 'r')
             axs[1].plot(x_fit, y_fit)
     source_fig.show()
+    # fit the head trend
+    first_amp = amp_array[:20]
+    first_error = error_array[:20]
+    paras, covs = optimize.curve_fit(const, first_amp, first_error)
+    x_fit_first = np.array(first_amp[0], first_amp[-1])
+    y_fit_first = const(x_fit_first)
+    # fit the tale trend
     last_amp = amp_array[-30:]
     last_error = error_array[-30:]
     paras, covs = optimize.curve_fit(linear, last_amp, last_error)
-    x_fit = np.array([last_amp[0], last_amp[-1]])
-    y_fit = linear(x_fit, paras[0])
+    x_fit_last = np.array([last_amp[0], last_amp[-1]])
+    y_fit_last = linear(x_fit_last, paras[0])
     fig2, axs = plt.subplots(1,1)
     plt.scatter(amp_array, error_array)
     plt.scatter(last_amp, last_error, marker = '+', c = 'r', label = "The powerlaw part I fit")
-    #plt.plot(x_fit, y_fit, 'b-', label = r'y = %.4f$x^{%.4f}$ + %.4f' % (paras[0], paras[1], paras[2]))
-    #plt.plot(x_fit, y_fit, 'b-', label = r'y = %.4fx + %.4f' % (paras[0], paras[1]))
-    plt.plot(x_fit, y_fit, 'b-', label = r'y = %.4fx' % (paras[0]))
+    plt.plot(x_fit_last, y_fit_last, 'b-', label = r'y = %.4fx + %' % (paras[0]))
+    plt.plot(x_fit_first, y_fit_first, 'b-', label = r'y = %.4f' % (paras[0]))
     axs.set_xscale("log")
     axs.set_yscale("log")
     axs.set_xlabel("flux(mJy)")

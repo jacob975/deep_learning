@@ -95,3 +95,9 @@ awk '$17~/Galc/ && $17!~/dust/ { print $1" "$3 }' catalog-SWIRE-v3.tbl > coord_o
 # SER       506     732
 # OPH       733     1024
 #
+###############################################
+# The name of this machine
+# Spectral Classifier of Astronomical Objects
+#
+# Kate suggests
+# Taxonomy of Astrophysics Point source in the InfRared.
