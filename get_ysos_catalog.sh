@@ -13,6 +13,7 @@ fi
 
 #-----------------------------------------------
 # Load variables
+rm -r yso_lab
 mkdir -p yso_lab
 YSO_m1=${1}
 YSO_m2=${2}
@@ -54,21 +55,21 @@ cut -c150-157 $YSO_m2 > e_M1
 awk '{if ($1>0)  print $1; else print "0.00e+00"}' e_M1 > e_M1_0
 paste J_0 H_0 K_0 I1_0 I2_0 I3_0 I4_0 M1_0 e_J_0 e_H_0 e_K_0 e_I1_0 e_I2_0 e_I3_0 e_I4_0 e_M1_0 > apjs_yso.txt
 awk '{print $1"\t" $2"\t" $3"\t" $4"\t" $5"\t" $6"\t" $7"\t" $8"\t" $9"\t" $10"\t" $11"\t" $12"\t" $13"\t" $14"\t" $15"\t" $16}' apjs_yso.txt > apjs_yso_sed.dat
-cp apjs_yso_sed.dat ../ysos_sed.dat
+cp apjs_yso_sed.dat ../Evans_ysos_sed.dat
 # Create coordinates
 cut -c15-16 $YSO_m1 > yso_RA_h
 cut -c17-18 $YSO_m1 > yso_RA_m
 cut -c19-23 $YSO_m1 > yso_RA_s
 
-cut -c25-26 $YSO_m1 > yso_DEC_d
+cut -c24-26 $YSO_m1 > yso_DEC_d
 cut -c27-28 $YSO_m1 > yso_DEC_m
 cut -c29-32 $YSO_m1 > yso_DEC_s
 echo 'Cut finished'
 paste yso_RA_h yso_RA_m yso_RA_s yso_DEC_d yso_DEC_m yso_DEC_s > temp_ysos_coord.dat
-awk '{print $1"h"$2"m"$3"s "$4"d"$5"m"$6"s"}' temp_ysos_coord.dat > ysos_coord.dat
-hms2deg.py ysos_coord.dat
-cp ysos_coord.dat ../ysos_coord.dat
+awk '{print $1"h"$2"m"$3"s "$4"d"$5"m"$6"s"}' temp_ysos_coord.dat > Evans_ysos_coord.dat
+hms2deg.py Evans_ysos_coord.dat
+cp Evans_ysos_coord.dat ../Evans_ysos_coord.dat
 cd ..
 # Create tracer 
-awk '{print NR}' ysos_sed.dat > ysos_tracer.dat
+awk '{print NR}' Evans_ysos_sed.dat > Evans_ysos_tracer.dat
 exit 0
