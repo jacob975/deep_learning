@@ -145,14 +145,3 @@ def no_observation_filter_eq_minus1(inp, maximun):
     outp = inp[_filter]
     outp.reshape(-1, data_width)
     return outp, _filter
-#------------------------------------------------------
-
-# This code is used to apply filter on certain files
-def apply_filter_on(name_file, _filter):
-    try:
-        inp = np.loadtxt(name_file)
-    except:
-        print ("No such file or directory: {0}".format(name_file))
-        return 1, None
-    outp = inp[_filter]
-    return 0, outp

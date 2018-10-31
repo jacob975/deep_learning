@@ -49,10 +49,10 @@ if [ "${option}" = "ELAIS_N1ui_OPHui_CHA_IIi" ]; then
     echo "OPH done."
     get_catalog_data_A.sh star
     get_catalog_data_A.sh galaxy
-    mv star_coord.txt ELAIS_N1_star_coord.txt
+    mv star_coord.dat ELAIS_N1_star_coord.dat
     mv star_sed.dat ELAIS_N1_star_sed.dat
     mv star_tracer.dat ELAIS_N1_star_tracer.dat
-    mv gala_coord.txt ELAIS_N1_gala_coord.txt
+    mv gala_coord.dat ELAIS_N1_gala_coord.dat
     mv gala_sed.dat ELAIS_N1_gala_sed.dat
     mv gala_tracer.dat ELAIS_N1_gala_tracer.dat
     echo "ELAIS N1 done."
@@ -71,7 +71,7 @@ if [ "${option}" = "ELAIS_N1ui_OPHui_CHA_IIi" ]; then
     echo "Make an extinction map."
     calculate_extinction.py OPH_star_coord.dat OPH_star_sed_twomass_mag.txt OPH_star_sed_err_twomass_mag.txt WD55B 6
     calculate_extinction.py CHA_II_star_coord.dat CHA_II_star_sed_twomass_mag.txt CHA_II_star_sed_err_twomass_mag.txt WD55B 3
-    calculate_extinction.py ELAIS_N1_star_coord.txt ELAIS_N1_star_sed_twomass_mag.txt ELAIS_N1_star_sed_err_twomass_mag.txt WD55B 4.5
+    calculate_extinction.py ELAIS_N1_star_coord.dat ELAIS_N1_star_sed_twomass_mag.txt ELAIS_N1_star_sed_err_twomass_mag.txt WD55B 4.5
     echo "done."
     echo "Do extinction correction with extinction map."
     remove_Av.py ukidss OPH_star_emap_360arcsec.txt OPH_star_sed_u.txt OPH_star_Av.dat OPH_star_coord.dat
@@ -82,17 +82,17 @@ if [ "${option}" = "ELAIS_N1ui_OPHui_CHA_IIi" ]; then
     remove_Av.py ukidss CHA_II_star_emap_180arcsec.txt CHA_II_gala_sed_u.txt skip CHA_II_gala_coord.dat
     remove_Av.py ukidss CHA_II_star_emap_180arcsec.txt CHA_II_ysos_sed_u.txt skip CHA_II_ysos_coord.dat
     echo "CHA_II done."
-    remove_Av.py ukidss ELAIS_N1_star_emap_270arcsec.txt ELAIS_N1_star_sed_u.txt ELAIS_N1_star_Av.dat ELAIS_N1_star_coord.txt
-    remove_Av.py ukidss ELAIS_N1_star_emap_270arcsec.txt ELAIS_N1_gala_sed_u.txt skip ELAIS_N1_gala_coord.txt
+    remove_Av.py ukidss ELAIS_N1_star_emap_270arcsec.txt ELAIS_N1_star_sed_u.txt ELAIS_N1_star_Av.dat ELAIS_N1_star_coord.dat
+    remove_Av.py ukidss ELAIS_N1_star_emap_270arcsec.txt ELAIS_N1_gala_sed_u.txt skip ELAIS_N1_gala_coord.dat
     echo "ELAIS N1 done."
     # stack all data
     echo "Stack all data"
     cat ELAIS_N1_star_sed_u_intrinsic.txt OPH_star_sed_u_intrinsic.txt CHA_II_star_sed_u_intrinsic.txt > star_sed_u_intrinsic.txt
     cat ELAIS_N1_gala_sed_u_intrinsic.txt OPH_gala_sed_u_intrinsic.txt CHA_II_gala_sed_u_intrinsic.txt > gala_sed_u_intrinsic.txt
     cat OPH_ysos_sed_u_intrinsic.txt CHA_II_ysos_sed_u_intrinsic.txt > ysos_sed_u_intrinsic.txt
-    cat ELAIS_N1_star_coord.txt OPH_star_coord.dat CHA_II_star_coord.dat > star_coord.txt
-    cat ELAIS_N1_gala_coord.txt OPH_gala_coord.dat CHA_II_gala_coord.dat > gala_coord.txt
-    cat OPH_ysos_coord.dat CHA_II_ysos_coord.dat > ysos_coord.txt
+    cat ELAIS_N1_star_coord.dat OPH_star_coord.dat CHA_II_star_coord.dat > star_coord.dat
+    cat ELAIS_N1_gala_coord.dat OPH_gala_coord.dat CHA_II_gala_coord.dat > gala_coord.dat
+    cat OPH_ysos_coord.dat CHA_II_ysos_coord.dat > ysos_coord.dat
     cat ELAIS_N1_star_tracer.dat OPH_star_tracer.dat CHA_II_star_tracer.dat > star_tracer.dat
     cat ELAIS_N1_gala_tracer.dat OPH_gala_tracer.dat CHA_II_gala_tracer.dat > gala_tracer.dat
     cat OPH_ysos_tracer.dat CHA_II_ysos_tracer.dat > ysos_tracer.dat
@@ -132,10 +132,10 @@ if [ "${option}" = "ELAIS_N1u_OPHu_CHA_II_slctEC" ]; then
     echo "OPH done."
     get_catalog_data_A.sh star
     get_catalog_data_A.sh galaxy
-    mv star_coord.txt ELAIS_N1_star_coord.txt
+    mv star_coord.dat ELAIS_N1_star_coord.dat
     mv star_sed.dat ELAIS_N1_star_sed.dat
     mv star_tracer.dat ELAIS_N1_star_tracer.dat
-    mv gala_coord.txt ELAIS_N1_gala_coord.txt
+    mv gala_coord.dat ELAIS_N1_gala_coord.dat
     mv gala_sed.dat ELAIS_N1_gala_sed.dat
     mv gala_tracer.dat ELAIS_N1_gala_tracer.dat
     echo "ELAIS N1 done."
@@ -154,8 +154,8 @@ if [ "${option}" = "ELAIS_N1u_OPHu_CHA_II_slctEC" ]; then
     echo "Select sources with the extinction correction"
     select_data.py filter ELAIS_N1_star_sed_u.txt ../prototype_EC/ELAIS_N1_star_sed_u_index_of_no_Av.txt
     select_data.py filter ELAIS_N1_gala_sed_u.txt ../prototype_EC/ELAIS_N1_gala_sed_u_index_of_no_Av.txt
-    select_data.py filter ELAIS_N1_star_coord.txt ../prototype_EC/ELAIS_N1_star_sed_u_index_of_no_Av.txt
-    select_data.py filter ELAIS_N1_gala_coord.txt ../prototype_EC/ELAIS_N1_gala_sed_u_index_of_no_Av.txt
+    select_data.py filter ELAIS_N1_star_coord.dat ../prototype_EC/ELAIS_N1_star_sed_u_index_of_no_Av.txt
+    select_data.py filter ELAIS_N1_gala_coord.dat ../prototype_EC/ELAIS_N1_gala_sed_u_index_of_no_Av.txt
     select_data.py filter ELAIS_N1_star_tracer.dat ../prototype_EC/ELAIS_N1_star_sed_u_index_of_no_Av.txt
     select_data.py filter ELAIS_N1_gala_tracer.dat ../prototype_EC/ELAIS_N1_gala_sed_u_index_of_no_Av.txt
     select_data.py filter OPH_star_sed_u.txt ../prototype_EC/OPH_star_sed_u_index_of_no_Av.txt
@@ -182,9 +182,9 @@ if [ "${option}" = "ELAIS_N1u_OPHu_CHA_II_slctEC" ]; then
     cat ELAIS_N1_star_sed_u.txt OPH_star_sed_u.txt CHA_II_star_sed_u.txt > star_sed_u.txt
     cat ELAIS_N1_gala_sed_u.txt OPH_gala_sed_u.txt CHA_II_gala_sed_u.txt > gala_sed_u.txt
     cat OPH_ysos_sed_u.txt CHA_II_ysos_sed_u.txt > ysos_sed_u.txt
-    cat ELAIS_N1_star_coord.txt OPH_star_coord.dat CHA_II_star_coord.dat > star_coord.txt
-    cat ELAIS_N1_gala_coord.txt OPH_gala_coord.dat CHA_II_gala_coord.dat > gala_coord.txt
-    cat OPH_ysos_coord.dat CHA_II_ysos_coord.dat > ysos_coord.txt
+    cat ELAIS_N1_star_coord.dat OPH_star_coord.dat CHA_II_star_coord.dat > star_coord.dat
+    cat ELAIS_N1_gala_coord.dat OPH_gala_coord.dat CHA_II_gala_coord.dat > gala_coord.dat
+    cat OPH_ysos_coord.dat CHA_II_ysos_coord.dat > ysos_coord.dat
     cat ELAIS_N1_star_tracer.dat OPH_star_tracer.dat CHA_II_star_tracer.dat > star_tracer.dat
     cat ELAIS_N1_gala_tracer.dat OPH_gala_tracer.dat CHA_II_gala_tracer.dat > gala_tracer.dat
     cat OPH_ysos_tracer.dat CHA_II_ysos_tracer.dat > ysos_tracer.dat
@@ -224,10 +224,10 @@ if [ "${option}" = "ELAIS_N1u_OPHu_CHA_II" ]; then
     echo "OPH done."
     get_catalog_data_A.sh star
     get_catalog_data_A.sh galaxy
-    mv star_coord.txt ELAIS_N1_star_coord.txt
+    mv star_coord.dat ELAIS_N1_star_coord.dat
     mv star_sed.dat ELAIS_N1_star_sed.dat
     mv star_tracer.dat ELAIS_N1_star_tracer.dat
-    mv gala_coord.txt ELAIS_N1_gala_coord.txt
+    mv gala_coord.dat ELAIS_N1_gala_coord.dat
     mv gala_sed.dat ELAIS_N1_gala_sed.dat
     mv gala_tracer.dat ELAIS_N1_gala_tracer.dat
     echo "ELAIS N1 done."
@@ -247,9 +247,9 @@ if [ "${option}" = "ELAIS_N1u_OPHu_CHA_II" ]; then
     cat ELAIS_N1_star_sed_u.txt OPH_star_sed_u.txt CHA_II_star_sed_u.txt > star_sed_u.txt
     cat ELAIS_N1_gala_sed_u.txt OPH_gala_sed_u.txt CHA_II_gala_sed_u.txt > gala_sed_u.txt
     cat OPH_ysos_sed_u.txt CHA_II_ysos_sed_u.txt > ysos_sed_u.txt
-    cat ELAIS_N1_star_coord.txt OPH_star_coord.dat CHA_II_star_coord.dat > star_coord.txt
-    cat ELAIS_N1_gala_coord.txt OPH_gala_coord.dat CHA_II_gala_coord.dat > gala_coord.txt
-    cat OPH_ysos_coord.dat CHA_II_ysos_coord.dat > ysos_coord.txt
+    cat ELAIS_N1_star_coord.dat OPH_star_coord.dat CHA_II_star_coord.dat > star_coord.dat
+    cat ELAIS_N1_gala_coord.dat OPH_gala_coord.dat CHA_II_gala_coord.dat > gala_coord.dat
+    cat OPH_ysos_coord.dat CHA_II_ysos_coord.dat > ysos_coord.dat
     cat ELAIS_N1_star_tracer.dat OPH_star_tracer.dat CHA_II_star_tracer.dat > star_tracer.dat
     cat ELAIS_N1_gala_tracer.dat OPH_gala_tracer.dat CHA_II_gala_tracer.dat > gala_tracer.dat
     cat OPH_ysos_tracer.dat CHA_II_ysos_tracer.dat > ysos_tracer.dat
@@ -288,10 +288,10 @@ if [ "${option}" = "ELAIS_N1i_OPHi_CHA_IIi" ]; then
     echo "OPH done."
     get_catalog_data_A.sh star
     get_catalog_data_A.sh galaxy
-    mv star_coord.txt ELAIS_N1_star_coord.txt
+    mv star_coord.dat ELAIS_N1_star_coord.dat
     mv star_sed.dat ELAIS_N1_star_sed.dat
     mv star_tracer.dat ELAIS_N1_star_tracer.dat
-    mv gala_coord.txt ELAIS_N1_gala_coord.txt
+    mv gala_coord.dat ELAIS_N1_gala_coord.dat
     mv gala_sed.dat ELAIS_N1_gala_sed.dat
     mv gala_tracer.dat ELAIS_N1_gala_tracer.dat
     echo "ELAIS N1 done."
@@ -310,7 +310,7 @@ if [ "${option}" = "ELAIS_N1i_OPHi_CHA_IIi" ]; then
     echo "Make an extinction map."
     calculate_extinction.py OPH_star_coord.dat OPH_star_sed_twomass_mag.txt OPH_star_sed_err_twomass_mag.txt WD55B 6
     calculate_extinction.py CHA_II_star_coord.dat CHA_II_star_sed_twomass_mag.txt CHA_II_star_sed_err_twomass_mag.txt WD55B 3
-    calculate_extinction.py ELAIS_N1_star_coord.txt ELAIS_N1_star_sed_twomass_mag.txt ELAIS_N1_star_sed_err_twomass_mag.txt WD55B 4.5
+    calculate_extinction.py ELAIS_N1_star_coord.dat ELAIS_N1_star_sed_twomass_mag.txt ELAIS_N1_star_sed_err_twomass_mag.txt WD55B 4.5
     echo "done."
     echo "Do extinction correction with extinction map."
     remove_Av.py ukidss OPH_star_emap_360arcsec.txt OPH_star_sed_u.txt OPH_star_Av.dat OPH_star_coord.dat
@@ -321,17 +321,17 @@ if [ "${option}" = "ELAIS_N1i_OPHi_CHA_IIi" ]; then
     remove_Av.py ukidss CHA_II_star_emap_180arcsec.txt CHA_II_gala_sed_u.txt skip CHA_II_gala_coord.dat
     remove_Av.py ukidss CHA_II_star_emap_180arcsec.txt CHA_II_ysos_sed_u.txt skip CHA_II_ysos_coord.dat
     echo "CHA_II done."
-    remove_Av.py ukidss ELAIS_N1_star_emap_270arcsec.txt ELAIS_N1_star_sed_u.txt ELAIS_N1_star_Av.dat ELAIS_N1_star_coord.txt
-    remove_Av.py ukidss ELAIS_N1_star_emap_270arcsec.txt ELAIS_N1_gala_sed_u.txt skip ELAIS_N1_gala_coord.txt
+    remove_Av.py ukidss ELAIS_N1_star_emap_270arcsec.txt ELAIS_N1_star_sed_u.txt ELAIS_N1_star_Av.dat ELAIS_N1_star_coord.dat
+    remove_Av.py ukidss ELAIS_N1_star_emap_270arcsec.txt ELAIS_N1_gala_sed_u.txt skip ELAIS_N1_gala_coord.dat
     echo "ELAIS N1 done."
     # stack all data
     echo "Stack all data"
     cat ELAIS_N1_star_sed_u_intrinsic.txt OPH_star_sed_u_intrinsic.txt CHA_II_star_sed_u_intrinsic.txt > star_sed_u_intrinsic.txt
     cat ELAIS_N1_gala_sed_u_intrinsic.txt OPH_gala_sed_u_intrinsic.txt CHA_II_gala_sed_u_intrinsic.txt > gala_sed_u_intrinsic.txt
     cat OPH_ysos_sed_u_intrinsic.txt CHA_II_ysos_sed_u_intrinsic.txt > ysos_sed_u_intrinsic.txt
-    cat ELAIS_N1_star_coord.txt OPH_star_coord.dat CHA_II_star_coord.dat > star_coord.txt
-    cat ELAIS_N1_gala_coord.txt OPH_gala_coord.dat CHA_II_gala_coord.dat > gala_coord.txt
-    cat OPH_ysos_coord.dat CHA_II_ysos_coord.dat > ysos_coord.txt
+    cat ELAIS_N1_star_coord.dat OPH_star_coord.dat CHA_II_star_coord.dat > star_coord.dat
+    cat ELAIS_N1_gala_coord.dat OPH_gala_coord.dat CHA_II_gala_coord.dat > gala_coord.dat
+    cat OPH_ysos_coord.dat CHA_II_ysos_coord.dat > ysos_coord.dat
     cat ELAIS_N1_star_tracer.dat OPH_star_tracer.dat CHA_II_star_tracer.dat > star_tracer.dat
     cat ELAIS_N1_gala_tracer.dat OPH_gala_tracer.dat CHA_II_gala_tracer.dat > gala_tracer.dat
     cat OPH_ysos_tracer.dat CHA_II_ysos_tracer.dat > ysos_tracer.dat
@@ -370,10 +370,10 @@ if [ "${option}" = "ELAIS_N1_OPH_CHA_II" ]; then
     echo "OPH done."
     get_catalog_data_A.sh star
     get_catalog_data_A.sh galaxy
-    mv star_coord.txt ELAIS_N1_star_coord.txt
+    mv star_coord.dat ELAIS_N1_star_coord.dat
     mv star_sed.dat ELAIS_N1_star_sed.dat
     mv star_tracer.dat ELAIS_N1_star_tracer.dat
-    mv gala_coord.txt ELAIS_N1_gala_coord.txt
+    mv gala_coord.dat ELAIS_N1_gala_coord.dat
     mv gala_sed.dat ELAIS_N1_gala_sed.dat
     mv gala_tracer.dat ELAIS_N1_gala_tracer.dat
     echo "ELAIS N1 done."
@@ -393,9 +393,9 @@ if [ "${option}" = "ELAIS_N1_OPH_CHA_II" ]; then
     cat ELAIS_N1_star_sed_u.txt OPH_star_sed_u.txt CHA_II_star_sed_u.txt > star_sed_u.txt
     cat ELAIS_N1_gala_sed_u.txt OPH_gala_sed_u.txt CHA_II_gala_sed_u.txt > gala_sed_u.txt
     cat OPH_ysos_sed_u.txt CHA_II_ysos_sed_u.txt > ysos_sed_u.txt
-    cat ELAIS_N1_star_coord.txt OPH_star_coord.dat CHA_II_star_coord.dat > star_coord.txt
-    cat ELAIS_N1_gala_coord.txt OPH_gala_coord.dat CHA_II_gala_coord.dat > gala_coord.txt
-    cat OPH_ysos_coord.dat CHA_II_ysos_coord.dat > ysos_coord.txt
+    cat ELAIS_N1_star_coord.dat OPH_star_coord.dat CHA_II_star_coord.dat > star_coord.dat
+    cat ELAIS_N1_gala_coord.dat OPH_gala_coord.dat CHA_II_gala_coord.dat > gala_coord.dat
+    cat OPH_ysos_coord.dat CHA_II_ysos_coord.dat > ysos_coord.dat
     cat ELAIS_N1_star_tracer.dat OPH_star_tracer.dat CHA_II_star_tracer.dat > star_tracer.dat
     cat ELAIS_N1_gala_tracer.dat OPH_gala_tracer.dat CHA_II_gala_tracer.dat > gala_tracer.dat
     cat OPH_ysos_tracer.dat CHA_II_ysos_tracer.dat > ysos_tracer.dat
@@ -495,12 +495,12 @@ if [ "${option}" = "ELAIS_N1ui" ]; then
     echo done
     # Make an extinction map
     echo "Make an extinction map."
-    calculate_extinction.py star_coord.txt star_sed_twomass_mag.txt star_sed_err_twomass_mag.txt WD55B 4.5
+    calculate_extinction.py star_coord.dat star_sed_twomass_mag.txt star_sed_err_twomass_mag.txt WD55B 4.5
     echo "done."
     # Do extinction correction with extinction map
     echo "Do extinction correction with extinction map."
-    remove_Av.py ukidss star_emap_270arcsec.txt star_sed_u.txt star_Av.dat star_coord.txt
-    remove_Av.py ukidss star_emap_270arcsec.txt gala_sed_u.txt skip gala_coord.txt
+    remove_Av.py ukidss star_emap_270arcsec.txt star_sed_u.txt star_Av.dat star_coord.dat
+    remove_Av.py ukidss star_emap_270arcsec.txt gala_sed_u.txt skip gala_coord.dat
     echo "done."
     exit 0
 fi
@@ -518,12 +518,12 @@ if [ "${option}" = "ELAIS_N1i" ]; then
     echo done
     # Make an extinction map
     echo "Make an extinction map."
-    calculate_extinction.py star_coord.txt star_sed_twomass_mag.txt star_sed_err_twomass_mag.txt WD55B 4.5
+    calculate_extinction.py star_coord.dat star_sed_twomass_mag.txt star_sed_err_twomass_mag.txt WD55B 4.5
     echo "done."
     # Do extinction correction with extinction map
     echo "Do extinction correction with extinction map."
-    remove_Av.py ukidss star_emap_270arcsec.txt star_sed_u.txt star_Av.dat star_coord.txt
-    remove_Av.py ukidss star_emap_270arcsec.txt gala_sed_u.txt skip gala_coord.txt
+    remove_Av.py ukidss star_emap_270arcsec.txt star_sed_u.txt star_Av.dat star_coord.dat
+    remove_Av.py ukidss star_emap_270arcsec.txt gala_sed_u.txt skip gala_coord.dat
     echo "done."
     exit 0
 fi

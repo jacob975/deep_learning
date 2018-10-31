@@ -3,10 +3,12 @@
 Abstract:
     This is a program to convert .dat files to npy files
 Usage:
-    dat2npy.py [mask code] [file name 1] [file name 2] [file name 3] ...
+    dat2npy.py [mask code] [selection code] [file name 1] [file name 2] [file name 3] ...
     
     [mask code]:
         The code represent the mask.
+    [selection code]:
+        Specify the loss tolerance of your files.
     [file name]:
         The file you want to processed.
         The first will be labeded as 0, the second will be labeded as 1, so as on.
@@ -15,9 +17,8 @@ Example:
     You have a data file "Toy.dat", "Toy2.dat", and "Toy3.dat"
 
     Then, do this cmd.
-    $ dat2npy 00000000 Toy.dat Toy2.dat Toy3.dat
-    you get two series of files, one is data, another is label
-    each series are sort by number of zero in a data.
+    $ dat2npy 00000000 0 Toy.dat Toy2.dat Toy3.dat
+    you will get data file and corresponding tracers, labels, and coordinates with max loss by 0.
 
 Editor:
     Jacob975
@@ -55,12 +56,14 @@ update log
     1. all dat2npy programs are collected into the ensemble version
 20180912 version alpha 13:
     1. Update the mask system, using a series of number represent the mask instead of key words.
+20181031 version alpha 14:
+    1. Update the description in the header.
 '''
 import time
 import re           # this is used to apply multiple spliting
 import numpy as np
 from sys import argv
-from dat2npy_lib import mask, normalize, no_observation_filter_eq_0, read_well_known_data, apply_filter_on
+from dat2npy_lib import mask, normalize, no_observation_filter_eq_0, read_well_known_data
 
 #--------------------------------------------
 # main code
@@ -101,15 +104,23 @@ if __name__ == "__main__":
         data = np.array(str_data, dtype = float)
         data_n = mask(data, mask_code)
         data_n = normalize(data_n)
+        name_tracer = "{0}_tracer.dat".format(data_name[:4])
+        name_coord = "{0}_coord.dat".format(data_name[:4])
+        tracer = np.loadtxt(name_tracer, dtype = int)
+        coord = np.loadtxt(name_coord)
+        # remove all nan value
+        nan_filter = np.isnan(data_n[:,0])
+        data_n = data_n[~nan_filter]
+        tracer = tracer[~nan_filter]
+        coord  = coord[~nan_filter]
         # no observation filter
         # i is the tolarence of loss in a single datum
         for i in range(data_width):
             data_n_z, _filter= no_observation_filter_eq_0(data_n, i)
-            name_tracer = "{0}_tracer.dat".format(data_name[:4])
-            name_coord = "{0}_coord.dat".format(data_name[:4])
-            failure, tracer_outp = apply_filter_on(name_tracer, _filter)
-            failure, coord_outp = apply_filter_on(name_coord, _filter)
+            tracer_outp = tracer[_filter]
+            coord_outp = coord[_filter]
             print ("MaxLoss = {0}, number of data = {1}".format(i, len(data_n_z)))
+            # Generate labels
             label_z = np.array([ind for x in range(len(data_n_z)) ])
             label_z_f = [[0 for k in range(3)] for j in range(len(label_z))]
             for u in range(len(label_z_f)):
@@ -119,11 +130,7 @@ if __name__ == "__main__":
             sum_data[i] = np.append(sum_data[i], data_n_z)
             sum_label[i] = np.append(sum_label[i], label_z_f)
             sum_tracer[i] = np.append(sum_tracer[i], tracer_outp)
-            # if the coord file is not found, appending 0 into coord file
-            if not failure:
-                sum_coord[i] = np.append(sum_coord[i], coord_outp)
-            elif failure:
-                sum_coord[i] = np.append(sum_coord[i], np.zeros(2* len(_filter)))
+            sum_coord[i] = np.append(sum_coord[i], coord_outp)
             #-----------------------------------------------------
     # save data, label, tracer, and coordinate
     print ("###############################")
