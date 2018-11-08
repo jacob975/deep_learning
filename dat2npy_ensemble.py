@@ -95,6 +95,7 @@ if __name__ == "__main__":
     sum_label = [[] for x in range(data_width)]
     sum_tracer = [[] for x in range(data_width)]
     sum_coord = [[] for x in range(data_width)]
+    num_sources = np.zeros((data_width, len(data_name_list)), dtype = int)
     for ind, data_name in enumerate(data_name_list, start = 0):
         print ("##############################")
         print ("data name = {0}".format(data_name))
@@ -119,6 +120,7 @@ if __name__ == "__main__":
             data_n_z, _filter= no_observation_filter_eq_0(data_n, i)
             tracer_outp = tracer[_filter]
             coord_outp = coord[_filter]
+            num_sources[i, ind] = len(data_n_z)
             print ("MaxLoss = {0}, number of data = {1}".format(i, len(data_n_z)))
             # Generate labels
             label_z = np.array([ind for x in range(len(data_n_z)) ])
@@ -132,9 +134,10 @@ if __name__ == "__main__":
             sum_tracer[i] = np.append(sum_tracer[i], tracer_outp)
             sum_coord[i] = np.append(sum_coord[i], coord_outp)
             #-----------------------------------------------------
-    # save data, label, tracer, and coordinate
+    # save data, number of sources in different selection, label, tracer, and coordinate
     print ("###############################")
     print ("save data, label, tracer, and coordinate")
+    np.savetxt("num_sources.txt", num_sources, fmt = '%d', header = "Star Gala YSOs")
     for i in range(data_width):
         # reshape the data because np.append smooth the array.
         sum_data[i] = np.reshape(sum_data[i], (-1, data_width))
