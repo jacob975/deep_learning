@@ -314,3 +314,7 @@ class cross_confusion_matrix_infos(confusion_matrix_infos):
         self.cls_true_reliable = self.cls_true[self.reliable]
         self.cls_pred_reliable = self.cls_pred[self.reliable]
         return 
+
+class SED_datasets():
+    def __init__(self, images_name, labels_name, coords_name, num_sources_name):
+    def next_batch():

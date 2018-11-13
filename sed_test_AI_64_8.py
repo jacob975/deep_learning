@@ -221,6 +221,7 @@ if __name__ == "__main__":
     print ("AI:{0}".format(AI_saved_dir))
     if not os.path.exists(AI_saved_dir):
         print ("No AI can be restore, please check folder ./checkpoints")
+        exit()
     save_path = os.path.join(AI_saved_dir, 'best_validation')
     #-----------------------------------
     # Tensorflow run

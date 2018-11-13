@@ -10,7 +10,7 @@ Abstract:
     This is a code for train AI to identify YSO from SED data
     with 64 neurals per layer, 8 layers.
 Usage:
-    sed_04_64_8.py [source] [id] [time_stamp]
+    sed_train_dnn.py [image name] [labels name] [coords name] [number of source table] [time stamp]
 
 Result tree:
 
@@ -21,9 +21,9 @@ Result tree:
                                     |-  cls pred of test                        // true label of test set
                                     |-  checkpoint_AI_64_8_[file_name]          // this is AI
 
-Quoted from:
+Former author:
     Magnus Erik Hvass Pedersen
-Modifier:
+Author:
     Jacob975
 
 ##################################
@@ -31,22 +31,12 @@ Modifier:
 #   This code is made in python3 #
 ##################################
 
-20170301
+20181031
 ####################################
 update log
-    20180301 version alpha 1
-    The code is base on sed_04
-    1. Add milestone in the optimize iteration, when acheive the milestone, AI will be saved and test to a new folder.
-    2. the neural network is 64 neurals per layer, 8 layers.
 
-    20180306 version alpha 2
-    1. add flexible data length.
-
-    20180310 version alpha 3
-    1. Training set, validation set, test set will be saved after arrangement.
-
-    20180320 version alpha 4 
-    1. arrange saving direction.
+20181031 version alpha 1:
+    1. The code works.
 '''
 import matplotlib.pyplot as plt
 import tensorflow as tf
@@ -55,7 +45,7 @@ from sklearn.metrics import confusion_matrix
 import time
 from sys import argv
 from save_lib import save_arrangement, save_cls_pred, save_cls_true, save_coords
-import astro_mnist
+from load_lib import construct_dataset
 import math
 import os
 # We also need PrettyTensor.
@@ -66,6 +56,25 @@ def new_weights(shape):
 
 def new_biases(length):
     return tf.Variable(tf.constant(0.05, shape=[length]))
+
+def new_fc_layer(input,          # The previous layer.
+                 num_inputs,     # Num. inputs from prev. layer.
+                 num_outputs,    # Num. outputs.
+                 use_relu=True): # Use Rectified Linear Unit (ReLU)?
+
+    # Create new weights and biases.
+    weights = new_weights(shape=[num_inputs, num_outputs])
+    biases = new_biases(length=num_outputs)
+
+    # Calculate the layer as the matrix multiplication of
+    # the input and weights, and then add the bias-values.
+    layer = tf.matmul(input, weights) + biases
+
+    # Use ReLU?
+    if use_relu:
+        layer = tf.nn.relu6(layer)
+
+    return layer
 
 def optimize(num_iterations):
     # Ensure we update the global variables rather than local copies.
@@ -343,30 +352,19 @@ if __name__ == "__main__":
     # Load arguments
     if len(argv) != 5:
         print ("The number of arguments is wrong.")
-        print ("Usage: sed_04_64_8.py [time stamp] [number of labels] [source1] [coord1] [source2] [coord2] [source3] [coord3]")
+        print ("Usage: sed_train_dnn.py [image name] [labels name] [coords name] [number of source table] [time stamp]") 
         exit(1)
     # Need to be updated.
     global images_name
     images_name = argv[1]
     labels_name = argv[2]
     coords_name = argv[3]
-    time_stamp = argv[4]
+    num_sources_name = argv[4]
+    time_stamp = argv[5]
     print ("starting time: {0}".format(time_stamp))
     #-----------------------------------
     # Load Data
-    data, tracer, coords = astro_mnist.read_data_sets(images_name, labels_name, coords_name)
-    print("Size of:")
-    print("- Training-set:\t\t{}".format(len(data.train.labels)))
-    print("- Test-set:\t\t{}".format(len(data.test.labels)))
-    print("- Validation-set:\t{}".format(len(data.validation.labels)))
-    data.test.cls = np.argmax(data.test.labels, axis=1)
-    # save arrangement and coords
-    failure = save_arrangement(images_name[:-4], time_stamp, data, tracer)
-    if not failure:
-        print ("tracers and data are saved.")
-    failure = save_coords(images_name[:-4], time_stamp, coords)
-    if not failure:
-        print ("coords are saved.")
+    data = construct_dataset(images_name, labels_name, coords_name, num_sources_name, time_stamp)
     #-----------------------------------
     # Data dimension
     # We know that from the length of a data. 
@@ -386,30 +384,53 @@ if __name__ == "__main__":
     batch_size = 100
     print ("batch size = {0}".format(batch_size))
     #-----------------------------------
-    # Get the true classes for those images.
-    data.test.cls = np.argmax(data.test.labels, axis=1)
-    data.validation.cls = np.argmax(data.validation.labels, axis=1)
-    #-----------------------------------
     # Tensorflow Graph
     x = tf.placeholder(tf.float32, shape=[None, img_size_flat], name='x')
-    x_image = tf.reshape(x, [-1, img_size, 1, num_channels])
+    x_image = tf.reshape(x, [-1, img_size])
     y_true = tf.placeholder(tf.float32, shape=[None, num_classes], name='y_true')
     y_true_cls = tf.argmax(y_true, axis=1)
     #-----------------------------------
-    # PrettyTensor Implementation
-    x_pretty = pt.wrap(x_image)
-    with pt.defaults_scope(activation_fn=tf.nn.relu6):
-        y_pred, loss = x_pretty.\
-            flatten().\
-            fully_connected(size = 64, name='layer_fc1').\
-            fully_connected(size = 64, name='layer_fc2').\
-            fully_connected(size = 64, name='layer_fc3').\
-            fully_connected(size = 64, name='layer_fc4').\
-            fully_connected(size = 64, name='layer_fc5').\
-            fully_connected(size = 64, name='layer_fc6').\
-            fully_connected(size = 64, name='layer_fc7').\
-            fully_connected(size = 64, name='layer_fc8').\
-            softmax_classifier(num_classes=num_classes, labels=y_true)
+    layer_fc1 = new_fc_layer(input = x_image,
+                            num_inputs = img_size,
+                            num_outputs = 64,
+                            use_relu=True)
+    layer_fc2 = new_fc_layer(input = layer_fc1,
+                            num_inputs = 64,
+                            num_outputs = 64,
+                            use_relu=True)
+    layer_fc3 = new_fc_layer(input = layer_fc2,
+                            num_inputs = 64,
+                            num_outputs = 64,
+                            use_relu=True)
+    layer_fc4 = new_fc_layer(input = layer_fc3,
+                            num_inputs = 64,
+                            num_outputs = 64,
+                            use_relu=True)
+    layer_fc5 = new_fc_layer(input = layer_fc4,
+                            num_inputs = 64,
+                            num_outputs = 64,
+                            use_relu=True)
+    layer_fc6 = new_fc_layer(input = layer_fc5,
+                            num_inputs = 64,
+                            num_outputs = 64,
+                            use_relu=True)
+    layer_fc7 = new_fc_layer(input = layer_fc6,
+                            num_inputs = 64,
+                            num_outputs = 64,
+                            use_relu=True)
+    layer_fc8 = new_fc_layer(input = layer_fc7,
+                            num_inputs = 64,
+                            num_outputs = 64,
+                            use_relu=True)
+    layer_last = new_fc_layer(input = layer_fc8,
+                             num_inputs=64,
+                             num_outputs=num_classes,
+                             use_relu=False)
+    y_pred = tf.nn.softmax(layer_last)
+    cross_entropy = \
+        tf.nn.softmax_cross_entropy_with_logits(logits=layer_last,
+                                                labels=y_true)
+    loss = tf.reduce_mean(cross_entropy)
     starter_learning_rate = 1e-4
     print ("starter learning rate = {0}".format(starter_learning_rate))
     base = 0.96
