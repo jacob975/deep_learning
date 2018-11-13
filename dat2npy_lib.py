@@ -18,7 +18,6 @@ import re           # this is used to apply multiple spliting
 import numpy as np
 from sys import argv
 
-# how many element in a data vector
 data_width = 16
 
 # the def is used to read a list of data with the same class.
@@ -114,7 +113,7 @@ def normalize(inp):
     return outp
 
 #------------------------------------------------------
-def no_observation_filter_smaller_than_or_eq_0(inp, maximun):
+def no_observation_filter_smaller_than_or_eq_0(inp, maximun, data_width):
     # set up MaxLoss filter
     _filter= np.array([ np.count_nonzero(row <= 0.0) <= maximun for row in inp])
     # apply filter
@@ -122,7 +121,7 @@ def no_observation_filter_smaller_than_or_eq_0(inp, maximun):
     outp.reshape(-1, data_width)
     return outp, _filter
 
-def no_observation_filter_eq_0(inp, maximun):
+def no_observation_filter_eq_0(inp, maximun, data_width):
     # set up MaxLoss filter
     _filter= np.array([ np.count_nonzero(row == 0.0) <= maximun for row in inp])
     # apply filter
@@ -130,7 +129,7 @@ def no_observation_filter_eq_0(inp, maximun):
     outp.reshape(-1, data_width)
     return outp, _filter
 
-def no_observation_filter_smaller_than_or_eq_minus1(inp, maximun):
+def no_observation_filter_smaller_than_or_eq_minus1(inp, maximun, data_width):
     # set up MaxLoss filter
     _filter= np.array([ np.count_nonzero(row <= -1.0) <= maximun for row in inp])
     # apply filter
@@ -138,7 +137,7 @@ def no_observation_filter_smaller_than_or_eq_minus1(inp, maximun):
     outp.reshape(-1, data_width)
     return outp, _filter
 
-def no_observation_filter_eq_minus1(inp, maximun):
+def no_observation_filter_eq_minus1(inp, maximun, data_width):
     # set up MaxLoss filter
     _filter= np.array([ np.count_nonzero(row == -1.0) <= maximun for row in inp])
     # apply filter
