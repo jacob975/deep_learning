@@ -10,11 +10,11 @@ Abstract:
     This is a code for train AI to identify YSO from SED data
     with 64 neurals per layer, 8 layers.
 Usage:
-    sed_04_64_8_milestone.py [source] [id] [time_stamp]
+    sed_train_dnn_tmp.py [source] [label] [coords] [time_stamp]
 
 Result tree:
 
-[yyyy-mm-dd hh:mm:ss+08:00]--- -------  test -------------   tracer             // tracer index
+[yyyy-mm-dd hh:mm:ss+08:00] ---------  test -------------   tracer              // tracer index
                                     |-  training        |-   labels             // true label
                                     |-  validation      |-   dataset            // data
                                     |-  cls true of test                        // predicted label of test set
@@ -45,31 +45,44 @@ update log
     20180310 version alpha 3
     1. Training set, validation set, test set will be saved after arrangement.
 
-    20180320 version alpha 4
-    1. now the code save both cls_pred and cls_true, which is used to trace correction.
-    2. now the code save index before shuffling.
+    20180320 version alpha 4 
+    1. arrange saving direction.
 '''
-from IPython.display import Image       # Used to create flowcart
 import matplotlib.pyplot as plt
 import tensorflow as tf
 import numpy as np
 from sklearn.metrics import confusion_matrix
 import time
-from datetime import timedelta
 from sys import argv
-from help_func import plot_images
-from save_lib import save_arrangement, save_cls_pred, save_cls_true
+from save_lib import save_arrangement, save_cls_pred, save_cls_true, save_coords
 import astro_mnist
 import math
 import os
-# We also need PrettyTensor.
-import prettytensor as pt
 
 def new_weights(shape):
     return tf.Variable(tf.truncated_normal(shape, stddev=0.05))
 
 def new_biases(length):
     return tf.Variable(tf.constant(0.05, shape=[length]))
+
+def new_fc_layer(input,          # The previous layer.
+                 num_inputs,     # Num. inputs from prev. layer.
+                 num_outputs,    # Num. outputs.
+                 use_relu=True): # Use Rectified Linear Unit (ReLU)?
+
+    # Create new weights and biases.
+    weights = new_weights(shape=[num_inputs, num_outputs])
+    biases = new_biases(length=num_outputs)
+
+    # Calculate the layer as the matrix multiplication of
+    # the input and weights, and then add the bias-values.
+    layer = tf.matmul(input, weights) + biases
+
+    # Use ReLU?
+    if use_relu:
+        layer = tf.nn.relu6(layer)
+
+    return layer
 
 def optimize(num_iterations):
     # Ensure we update the global variables rather than local copies.
@@ -85,22 +98,7 @@ def optimize(num_iterations):
         # It is easier to update it in each iteration because
         # we need this number several times in the following.
         total_iterations += 1
-        # Switch the folder saved AI as iterations increase.
-        milestones = [1,1e4, 2e4, 5e4, 1e5, 2e5, 5e5, 1e6, 2e6, 5e6, 1e7, 2e7, 5e7, 1e8, 2e8, 5e8]
-        for key, milestone in enumerate(milestones):
-            if i != milestone:
-                continue
-            # test the accuracy of the AI
-            print ("======================")
-            print ("iters = {0}".format(milestone))
-            print_test_accuracy(show_confusion_matrix=True)
-            print ("======================")
-            # switch to next checkpoint
-            save_dir = 'AI_64_8_{0}/checkpoints_{1}/'.format(argv[1][:-4], milestones[key+1])
-            if not os.path.exists(save_dir):
-                os.makedirs(save_dir)
-            save_path = os.path.join(save_dir, 'best_validation')
-            break
+        
         # Get a batch of training examples.
         # x_batch now holds a batch of images and
         # y_true_batch are the true labels for those images.
@@ -166,7 +164,35 @@ def optimize(num_iterations):
     time_dif = end_time - start_time
 
     # Print the time-usage.
-    print("Time usage: " + str(timedelta(seconds=int(round(time_dif)))))
+    print("Time usage: {0} sec.".format(int(round(time_dif))))
+
+# the def is used to plot data and their labels
+def plot_images(images, cls_true, cls_pred=None):
+    assert len(images) == len(cls_true) == 9
+    # Create figure with 3x3 sub-plots.
+    fig, axes = plt.subplots(3, 3)
+    fig.subplots_adjust(hspace=0.3, wspace=0.3)
+
+    for i, ax in enumerate(axes.flat):
+        # Plot image.
+        ax.plot(range(len(images[i])), images[i])
+
+        # Show true and predicted classes.
+        if cls_pred is None:
+            xlabel = "True: {0}".format(cls_true[i])
+        else:
+            xlabel = "True: {0}, Pred: {1}".format(cls_true[i], cls_pred[i])
+
+        ax.set_xlabel(xlabel)
+
+        # Remove ticks from the plot.
+        ax.set_xticks([])
+        ax.set_yticks([])
+
+    # Ensure the plot is shown correctly with multiple plots
+    # in a single Notebook cell.
+    plt.show()
+    return
 
 def plot_example_errors(cls_pred, correct):
     # This function is called from print_test_accuracy() below.
@@ -207,7 +233,7 @@ def plot_confusion_matrix(cls_pred):
     # Get the confusion matrix using sklearn.
     cm = confusion_matrix(y_true=cls_true,
                           y_pred=cls_pred)
-
+    
     # Print the confusion matrix as text.
     print(cm)
     '''
@@ -233,11 +259,11 @@ def print_test_accuracy(show_example_errors=False,
     # For all the images in the test-set,
     # calculate the predicted classes and whether they are correct.
     correct, cls_pred = predict_cls_test()
-    
-    # save pred and true labels
-    save_cls_pred(argv, time_stamp, cls_pred)
-    save_cls_true(argv, time_stamp, data.test.cls)
-
+    #----------------------------------------
+    # save cls_pred and cls_true
+    save_cls_pred(images_name[:-4], time_stamp, cls_pred)
+    save_cls_true(images_name[:-4], time_stamp, data.test.cls)
+    #----------------------------------------
     # Classification accuracy and the number of correct classifications.
     acc, num_correct = cls_accuracy(correct)
     
@@ -330,20 +356,28 @@ if __name__ == "__main__":
     VERBOSE = 0
     # measure times
     start_time = time.time()
-    time_stamp = argv[3]
+    time_stamp = argv[4]
+    print ("starting time: {0}".format(time_stamp))
     #-----------------------------------
     # Load Data
+    global images_name
     images_name = argv[1]
     labels_name = argv[2]
-    data, tracer = astro_mnist.read_data_sets(images_name, labels_name)
+    coords_name = argv[3]
+    data, tracer, coords = astro_mnist.read_data_sets(images_name, labels_name, coords_name)
     print("Size of:")
     print("- Training-set:\t\t{}".format(len(data.train.labels)))
     print("- Test-set:\t\t{}".format(len(data.test.labels)))
     print("- Validation-set:\t{}".format(len(data.validation.labels)))
     data.test.cls = np.argmax(data.test.labels, axis=1)
-    # save the distribution
-    if save_arrangement(argv, time_stamp, data, tracer):
-        print ("tracer and data is saved.")
+    #-----------------------------------
+    # save arrangement and coords
+    failure = save_arrangement(images_name[:-4], time_stamp, data, tracer)
+    if not failure:
+        print ("tracers and data are saved.")
+    failure = save_coords(images_name[:-4], time_stamp, coords)
+    if not failure:
+        print ("coords are saved.")
     #-----------------------------------
     # Data dimension
     # We know that from the length of a data. 
@@ -376,35 +410,54 @@ if __name__ == "__main__":
     # Get the true classes for those images.
     data.test.cls = np.argmax(data.test.labels, axis=1)
     data.validation.cls = np.argmax(data.validation.labels, axis=1)
-    '''
-    # Get the first images from the test-set.
-    images = data.test.images[0:9]
-    # Get the true classes for those images.
-    cls_true = data.test.cls[0:9]
-    # Plot the images and labels using our helper-function above.
-    if VERBOSE> 2: plot_images(images=images, cls_true=cls_true)
-    '''
     #-----------------------------------
     # Tensorflow Graph
     x = tf.placeholder(tf.float32, shape=[None, img_size_flat], name='x')
-    x_image = tf.reshape(x, [-1, img_size, 1, num_channels])
+    x_image = tf.reshape(x, [-1, img_size])
     y_true = tf.placeholder(tf.float32, shape=[None, num_classes], name='y_true')
     y_true_cls = tf.argmax(y_true, axis=1)
     #-----------------------------------
-    # PrettyTensor Implementation
-    x_pretty = pt.wrap(x_image)
-    with pt.defaults_scope(activation_fn=tf.nn.relu6):
-        y_pred, loss = x_pretty.\
-            flatten().\
-            fully_connected(size = 64, name='layer_fc1').\
-            fully_connected(size = 64, name='layer_fc2').\
-            fully_connected(size = 64, name='layer_fc3').\
-            fully_connected(size = 64, name='layer_fc4').\
-            fully_connected(size = 64, name='layer_fc5').\
-            fully_connected(size = 64, name='layer_fc6').\
-            fully_connected(size = 64, name='layer_fc7').\
-            fully_connected(size = 64, name='layer_fc8').\
-            softmax_classifier(num_classes=num_classes, labels=y_true)
+    layer_fc1 = new_fc_layer(input = x_image,
+                            num_inputs = img_size,
+                            num_outputs = 64,
+                            use_relu=True)
+    layer_fc2 = new_fc_layer(input = layer_fc1,
+                            num_inputs = 64,
+                            num_outputs = 64,
+                            use_relu=True)
+    layer_fc3 = new_fc_layer(input = layer_fc2,
+                            num_inputs = 64,
+                            num_outputs = 64,
+                            use_relu=True)
+    layer_fc4 = new_fc_layer(input = layer_fc3,
+                            num_inputs = 64,
+                            num_outputs = 64,
+                            use_relu=True)
+    layer_fc5 = new_fc_layer(input = layer_fc4,
+                            num_inputs = 64,
+                            num_outputs = 64,
+                            use_relu=True)
+    layer_fc6 = new_fc_layer(input = layer_fc5,
+                            num_inputs = 64,
+                            num_outputs = 64,
+                            use_relu=True)
+    layer_fc7 = new_fc_layer(input = layer_fc6,
+                            num_inputs = 64,
+                            num_outputs = 64,
+                            use_relu=True)
+    layer_fc8 = new_fc_layer(input = layer_fc7,
+                            num_inputs = 64,
+                            num_outputs = 64,
+                            use_relu=True)
+    layer_last = new_fc_layer(input = layer_fc8,
+                             num_inputs=64,
+                             num_outputs=num_classes,
+                             use_relu=False)
+    y_pred = tf.nn.softmax(layer_last)
+    cross_entropy = \
+        tf.nn.softmax_cross_entropy_with_logits(logits=layer_last,
+                                                labels=y_true)
+    loss = tf.reduce_mean(cross_entropy)
     starter_learning_rate = 1e-4
     print ("starter learning rate = {0}".format(starter_learning_rate))
     base = 0.96
@@ -422,6 +475,10 @@ if __name__ == "__main__":
     validation_list = []
     improved_validation_list = []
     saver = tf.train.Saver()
+    save_dir = '{0}/checkpoint_AI_64_8_{1}'.format(time_stamp, images_name[:-4])
+    if not os.path.exists(save_dir):
+        os.makedirs(save_dir)
+    save_path = os.path.join(save_dir, 'best_validation')
     #-----------------------------------
     # Tensorflow run
     session = tf.Session()
@@ -435,12 +492,12 @@ if __name__ == "__main__":
     # Iteration-number for last improvement to validation accuracy.
     last_improvement = 0
     # Stop optimization if no improvement found in this many iterations.
-    require_improvement = 500000
+    require_improvement = 100000
     # Counter for total number of iterations performed so far.
     total_iterations = 0
     optimize(num_iterations=iters)
     print ( "final_learning_rate = {0}".format(session.run(learning_rate)))
-    print_test_accuracy(show_example_errors=True, show_confusion_matrix=True)
+    #print_test_accuracy(show_example_errors=False, show_confusion_matrix=True)
     session.close()
     #-----------------------------------
     # measuring time

@@ -90,3 +90,7 @@ def save_coords(keyword, time_stamp, coords):
     if len(coords.test):
         np.savetxt("{0}/test_coords_{1}.txt".format(time_stamp, keyword), coords.test)
     return 0
+
+def save_any(filename, time_stamp, files):
+    np.savetxt("{0}/{1}.txt".format(time_stamp, filename), files)
+    return 0

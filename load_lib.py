@@ -317,4 +317,8 @@ class cross_confusion_matrix_infos(confusion_matrix_infos):
 
 class SED_datasets():
     def __init__(self, images_name, labels_name, coords_name, num_sources_name):
-    def next_batch():
+        pass
+        return
+    def next_batch(self):
+        pass
+        return

@@ -16,8 +16,9 @@ Example:
     You have a data file "Toy.dat", "Toy2.dat", and "Toy3.dat"
 
     Then, do this cmd.
-    $ dat2npy 00000000 0 Toy.dat Toy2.dat Toy3.dat
-    you will get data file and corresponding tracers, labels, and coordinates with max loss by 0.
+    $ dat2npy.py
+    the option file will give to you
+    $ dat2npy.py [option files] Toy1.dat Toy2.dat Toy3.dat
 
 Editor:
     Jacob975

@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 '''
 Abstract:
-    This is a program for counting labels. 
+    This is a program for counting the number of labels. 
 Usage:
     count_labels.py
 Editor:
