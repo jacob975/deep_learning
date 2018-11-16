@@ -89,7 +89,7 @@ def print_test_accuracy(show_confusion_matrix=False):
     # calculate the predicted classes and whether they are correct.
     correct, cls_pred = predict_cls_test()
     # save cls_pred and cls_true
-    save_cls_pred(images_name[:-4], directory, cls_pred)
+    save_cls_pred(images_name[:-4], directory, cls_pred) 
     save_cls_true(images_name[:-4], directory, data.test.cls)
     
     # Classification accuracy and the number of correct classifications.

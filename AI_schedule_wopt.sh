@@ -21,7 +21,7 @@ do
         # time stamp is used as identification
         timestamp=`date --rfc-3339=seconds`
         mkdir "${timestamp}_trained_by_${keyword}"
-        sed_train_dnn_tmp.py source_sed_${keyword}.txt source_id_${keyword}.txt source_coord_${keyword}.txt\
+        sed_train_dnn_wopt.py source_sed_${keyword}.txt source_id_${keyword}.txt source_coord_${keyword}.txt\
                         "${timestamp}_trained_by_${keyword}" > "${timestamp}_trained_by_${keyword}/Iters_log"
         (( iter++ ))
 done
