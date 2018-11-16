@@ -113,6 +113,8 @@ def normalize(inp):
     return outp
 
 #------------------------------------------------------
+# Common filters for no-detected sources and no-observed sources.
+
 def no_observation_filter_smaller_than_or_eq_0(inp, maximun, data_width):
     # set up MaxLoss filter
     _filter= np.array([ np.count_nonzero(row <= 0.0) <= maximun for row in inp])
@@ -144,3 +146,25 @@ def no_observation_filter_eq_minus1(inp, maximun, data_width):
     outp = inp[_filter]
     outp.reshape(-1, data_width)
     return outp, _filter
+
+#------------------------------------------------------
+# Special filters
+def select_high_flux_error_correlated_source(   data, 
+                                                bkg_noise = [0,0,0,1e-2, 1e-2, 1e-1, 1e-1, 8e-1], 
+                                                error_flux_ratio = [0,0,0,0.047,0.047,0.047,0.047, 0.095]):
+    # Check the format the inputs.
+    if len(bkg_noise) != 8 or len(error_flux_ratio) != 8:
+        print ("The format of given bkg noise and given error flux ratio is not correct.")
+        return 1
+    exclusion = np.zeros(len(data))
+    # Range all bands.
+    for i in range(8):
+        # Don't select in bands J, H, K
+        if i < 3:
+            pass
+        else:
+            ratio = np.divide(data[:,i+8], data[:,i])
+            exclusion = (exclusion == True) | \
+                        (data[:,i+8]> bkg_noise[i]) & \
+                        (ratio > 5 * error_flux_ratio[i])
+    return exclusion 

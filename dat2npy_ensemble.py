@@ -65,7 +65,7 @@ import time
 import re           # this is used to apply multiple spliting
 import numpy as np
 from sys import argv
-from dat2npy_lib import mask, normalize, no_observation_filter_eq_0, read_well_known_data
+from dat2npy_lib import mask, normalize, no_observation_filter_eq_0, read_well_known_data, select_high_flux_error_correlated_source
 from input_lib import option_dat2npy as option_files
 
 #--------------------------------------------
@@ -86,7 +86,7 @@ if __name__ == "__main__":
         exit()
     option_file_name = argv[1]
     data_name_list = argv[2:]
-    mask_code, number_of_lost, do_normalization, consider_error = option_file.load(option_file_name)
+    mask_code, number_of_lost, do_normalization, consider_error, high_flux_error_correlation = option_file.load(option_file_name)
     number_of_lost = int(number_of_lost)
     print ('mask code: {0}'.format(mask_code))
     print ('number_of_lost: {0}'.format(number_of_lost))
@@ -110,10 +110,23 @@ if __name__ == "__main__":
         print ("##############################")
         print ("data name = {0}".format(data_name))
         print ("label = {0}".format(ind))
-        # convert data from string to float
+        # Load data, tracer and coord 
         str_data = read_well_known_data(data_name)
+        name_tracer = "{0}_tracer.dat".format(data_name[:4])
+        name_coord = "{0}_coord.dat".format(data_name[:4])
+        tracer = np.loadtxt(name_tracer, dtype = int)
+        coord = np.loadtxt(name_coord)
+        # Convert the format from str to float
         data = np.array(str_data, dtype = float)
+        # Mask low flux error correlated sources.
+        if high_flux_error_correlation == 'yes':
+            exclusion = select_high_flux_error_correlated_source(data)
+            data = data[~exclusion]
+            tracer = tracer[~exclusion]
+            coord = coord[~exclusion]
+        # Mask specified bands
         data_n = mask(data, mask_code)
+        # Mask error or not
         if consider_error == 'no':
             data_n = data_n[:,:8]
         # Do normalization
@@ -121,10 +134,6 @@ if __name__ == "__main__":
             data_n = normalize(data_n)
         elif do_normalization == 'no':
             pass 
-        name_tracer = "{0}_tracer.dat".format(data_name[:4])
-        name_coord = "{0}_coord.dat".format(data_name[:4])
-        tracer = np.loadtxt(name_tracer, dtype = int)
-        coord = np.loadtxt(name_coord)
         # remove all nan value
         nan_filter = np.isnan(data_n[:,0])
         data_n = data_n[~nan_filter]

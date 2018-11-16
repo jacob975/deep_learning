@@ -44,15 +44,15 @@ def save_arrangement(keyword, time_stamp, data, tracer):
         os.makedirs(time_stamp)
     # if train set is not null, save data, labels and tracers
     if len(data.train.images):
-        np.savetxt("{0}/training_tracer_{1}.txt".format(time_stamp, keyword), tracer.train)
+        np.savetxt("{0}/training_tracer_{1}.txt".format(time_stamp, keyword), tracer.train, fmt = '%d')
         np.savetxt("{0}/training_set_{1}.txt".format(time_stamp, keyword), data.train.images)
         np.savetxt("{0}/training_label_{1}.txt".format(time_stamp, keyword), data.train.labels)
     if len(data.validation.images):
-        np.savetxt("{0}/validation_tracer_{1}.txt".format(time_stamp, keyword), tracer.validation)      
+        np.savetxt("{0}/validation_tracer_{1}.txt".format(time_stamp, keyword), tracer.validation, fmt = '%d')      
         np.savetxt("{0}/validation_set_{1}.txt".format(time_stamp, keyword), data.validation.images)
         np.savetxt("{0}/validation_labels_{1}.txt".format(time_stamp, keyword), data.validation.labels)
     if len(data.test.images):
-        np.savetxt("{0}/test_tracer_{1}.txt".format(time_stamp, keyword), tracer.test)
+        np.savetxt("{0}/test_tracer_{1}.txt".format(time_stamp, keyword), tracer.test, fmt = '%d')
         np.savetxt("{0}/test_set_{1}.txt".format(time_stamp, keyword), data.test.images)
         np.savetxt("{0}/test_labels_{1}.txt".format(time_stamp, keyword), data.test.labels)
     return 0
@@ -78,7 +78,7 @@ def save_cls_true(keyword, time_stamp, cls_true):
     # time_stamp is used to create a uniq folder
     # keyword is used to denote filename
     # cls_pred is the index of true label
-    np.savetxt("{0}/test_cls_true_{1}.txt".format(time_stamp, keyword), cls_true)
+    np.savetxt("{0}/test_cls_true_{1}.txt".format(time_stamp, keyword), cls_true, fmt = '%d')
     return 0
 
 # This is used to saving coords

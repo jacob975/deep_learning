@@ -38,20 +38,26 @@ if __name__ == "__main__":
     start_time = time.time()
     #-----------------------------------
     # Load argv
-    if len(argv) != 2:
+    if len(argv) < 2 or len(argv) > 3 :
         print ("The numbers of arguments is wrong.")
         print ("Usage: plot_Av_hist.py [sed data]")
         exit(1)
     sed_name = argv[1]
+    # This program allow you compare SNR.
+    if len(argv) == 3:
+        sed_name_2 = argv[2]
     #-----------------------------------
     # Load table
     sed_table = np.loadtxt(sed_name)
+    sed_table_2 = None
+    if len(argv) == 3:
+        sed_table_2 = np.loadtxt(sed_name_2)
     band_name = ['J', 'H', 'K', 'IRAC1', 'IRAC2', 'IRAC3', 'IRAC4', 'MIPS1']
     #-----------------------------------
     # Plot the ratio
     ratio = [0, 0, 0, 0.047, 0.047, 0.047, 0.047, 0.095]
     fig, axs = plt.subplots(3, 3, figsize = (12, 12), sharex = 'all', sharey = 'all')
-    plt.suptitle("Perseus_{0}".format(sed_name[:4]), fontsize=28)
+    plt.suptitle("SNR_{0}".format(sed_name[:4]), fontsize=28)
     axs = axs.ravel()
     for i in range(len(sed_table[0])//2):
         axs[i].set_title(band_name[i])
@@ -62,7 +68,10 @@ if __name__ == "__main__":
         axs[i].set_xscale('log', nonposy='clip')
         axs[i].set_ylim(ymin = 1e-3, ymax = 1e4)
         axs[i].set_xlim(xmin = 1e-3, xmax = 1e4)
-        axs[i].scatter(sed_table[:,i], sed_table[:,i+8], s = 5, marker = '+' )
+        axs[i].plot([3e-3, 3e3], [1e-3, 1e3], 'k--', alpha = 0.5)
+        axs[i].scatter(sed_table[:,i], sed_table[:,i+8], s = 5, c = 'r' )
+        if len(argv) ==3:
+            axs[i].scatter(sed_table_2[:,i], sed_table_2[:,i+8], s = 5, c = 'b' )
         if ratio[i] != 0:
             axs[i].plot([0.01, 2000], [0.01*ratio[i], 2000*ratio[i]], 'r-', label = r'$\frac{N}{S}$ = %.4f' % ratio[i])
         axs[i].legend()

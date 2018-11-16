@@ -39,8 +39,12 @@ class option_dat2npy():
                 '',
                 '# consider error:',
                 '# \t[consider error] means considering error or not during the convertion.',
-                '# Avialable options: yes, no',
-                '']
+                '# Available options: yes, no',
+                '',
+                '# High error-flux correlation:',
+                '# \t[error_flux_correlation] mean the program only select the source with high error-flux correlation.',
+                '# Available options: yes, no',
+                '',]
         np.savetxt('option_dat2npy.txt', s, fmt = '%s')
     def load(self, file_name):
         self.opts = np.loadtxt(file_name, dtype = str)

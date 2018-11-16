@@ -3,7 +3,9 @@
 Abstract:
     This is a program for plot the signal noise ratio of incorrectly predicted sources.
 Usage:
-    print_incorrect.py [keyword] [DIR where AI saved]
+    print_EFC.py [keyword] [HL incorrect sources] [DIR where AI saved]
+    EFC means error-flux correlation
+    HL means high light
 Editor:
     Jacob975
 
@@ -17,6 +19,8 @@ Editor:
 update log
 20181106 version alpha 1
     1. the code works
+20181116 version alpha 2
+    2. Print the original sources on the same plots.
 '''
 import numpy as np
 import time
@@ -29,7 +33,8 @@ import matplotlib.pyplot as plt
 def find_corresponding_sed(coords, ref_coords, ref_sed):
     sed_corresponding = []
     for coord in coords:
-        sed_corresponding.append(ref_sed[ref_coords[:,0] == coord[0]])
+        candidate = ref_sed[(ref_coords[:,0] == coord[0]) & (ref_coords[:,1] == coord[1])]
+        sed_corresponding.append(candidate)
     sed_corresponding_array = np.array(sed_corresponding).reshape(-1, 16)
     return sed_corresponding_array
 
@@ -41,13 +46,14 @@ if __name__ == "__main__":
     start_time = time.time()
     #-----------------------------------
     # Check argv
-    if len(argv) != 3:
-        print ("Error\nUsage: print_incorrect.py [keywords] [DIR where AI saved]")
-        print ("Example: print_incorrect.py MaxLoss15 data_A/alice")
+    if len(argv) != 4:
+        print ("Error\nUsage: print_EFC.py [keywords] [HL incorrect source] [DIR where AI saved]")
+        print ("Example: print_EFC.py MaxLoss15 1 data_A/alice")
         exit()
     # Load arguments
     keyword = argv[1]
-    ai_alice = argv[2]
+    HL_incorrect_source = int(argv[2])
+    ai_alice = argv[3]
     work_dir = os.getcwd()
     #----------------------------------------
     # Load prediction 1 and true labels
@@ -88,12 +94,22 @@ if __name__ == "__main__":
     ensemble_cls_true = np.array(ensemble_cls_true)
     alice_infos = confusion_matrix_infos(ensemble_cls_true, alice_ensemble_labels_pred)
     # Pick the coordinates of incorrectly predicted sources.
-    index_incorrect_star = np.where((ensemble_cls_true == 0) & (alice_ensemble_cls_pred != 0))
-    index_incorrect_gala = np.where((ensemble_cls_true == 1) & (alice_ensemble_cls_pred != 1))
-    index_incorrect_ysos = np.where((ensemble_cls_true == 2) & (alice_ensemble_cls_pred != 2))
-    coords_incorrect_star = ensemble_coords[index_incorrect_star]
-    coords_incorrect_gala = ensemble_coords[index_incorrect_gala]
-    coords_incorrect_ysos = ensemble_coords[index_incorrect_ysos]
+    coords_star = ensemble_coords[ensemble_cls_true == 0]
+    coords_gala = ensemble_coords[ensemble_cls_true == 1]
+    coords_ysos = ensemble_coords[ensemble_cls_true == 2]
+    index_incorrect_star = None
+    index_incorrect_gala = None
+    index_incorrect_ysos = None
+    coords_incorrect_star = None
+    coords_incorrect_gala = None
+    coords_incorrect_ysos = None
+    if HL_incorrect_source:
+        index_incorrect_star = np.where((ensemble_cls_true == 0) & (alice_ensemble_cls_pred != 0))
+        index_incorrect_gala = np.where((ensemble_cls_true == 1) & (alice_ensemble_cls_pred != 1))
+        index_incorrect_ysos = np.where((ensemble_cls_true == 2) & (alice_ensemble_cls_pred != 2))
+        coords_incorrect_star = ensemble_coords[index_incorrect_star]
+        coords_incorrect_gala = ensemble_coords[index_incorrect_gala]
+        coords_incorrect_ysos = ensemble_coords[index_incorrect_ysos]
     os.chdir('..')
     #-----------------------------------
     # Load tables contain original data
@@ -113,10 +129,16 @@ if __name__ == "__main__":
     gala_coord_table = np.loadtxt('{0}/gala_coord.dat'.format(ai_alice))
     ysos_coord_table = np.loadtxt('{0}/ysos_coord.dat'.format(ai_alice))
     # Find the corresponding sed via matching coordinates.
-    sed_incorrect_star = find_corresponding_sed(coords_incorrect_star, star_coord_table, star_sed_table)
-    sed_incorrect_gala = find_corresponding_sed(coords_incorrect_gala, gala_coord_table, gala_sed_table)
-    sed_incorrect_ysos = find_corresponding_sed(coords_incorrect_ysos, ysos_coord_table, ysos_sed_table)
-    sed_tables = [sed_incorrect_star, sed_incorrect_gala, sed_incorrect_ysos]
+    sed_star = find_corresponding_sed(coords_star, star_coord_table, star_sed_table)
+    sed_gala = find_corresponding_sed(coords_gala, gala_coord_table, gala_sed_table)
+    sed_ysos = find_corresponding_sed(coords_ysos, ysos_coord_table, ysos_sed_table)
+    sed_tables = [sed_star, sed_gala, sed_ysos]
+    sed_incorrect_tables = None
+    if HL_incorrect_source:
+        sed_incorrect_star = find_corresponding_sed(coords_incorrect_star, star_coord_table, star_sed_table)
+        sed_incorrect_gala = find_corresponding_sed(coords_incorrect_gala, gala_coord_table, gala_sed_table)
+        sed_incorrect_ysos = find_corresponding_sed(coords_incorrect_ysos, ysos_coord_table, ysos_sed_table)
+        sed_incorrect_tables = [sed_incorrect_star, sed_incorrect_gala, sed_incorrect_ysos]
     label_name = ['star', 'gala', 'ysos']
     band_name = ['J', 'H', 'K', 'IRAC1', 'IRAC2', 'IRAC3', 'IRAC4', 'MIPS1']
     ratio = [0, 0, 0, 0.047, 0.047, 0.047, 0.047, 0.095]
@@ -124,7 +146,7 @@ if __name__ == "__main__":
     # Plot the ratio
     for i in range(len(sed_tables)):
         fig, axs = plt.subplots(3, 3, figsize = (12, 12), sharex = 'all', sharey = 'all')
-        plt.suptitle("{0}_incorrect_{1}".format(ai_alice, label_name[i]), fontsize=28)
+        plt.suptitle("{0}_{1}".format(ai_alice, label_name[i]), fontsize=28)
         axs = axs.ravel()
         for j in range(len(sed_tables[i][0])//2):
             axs[j].set_title(band_name[j])
@@ -135,11 +157,14 @@ if __name__ == "__main__":
             axs[j].set_xscale('log', nonposy='clip')
             axs[j].set_ylim(ymin = 1e-3, ymax = 1e4)
             axs[j].set_xlim(xmin = 1e-3, xmax = 1e4)
-            axs[j].scatter(sed_tables[i][:,j], sed_tables[i][:,j+8], s = 5, marker = '+' )
+            axs[j].plot([3e-3, 3e3], [1e-3, 1e3], 'k--', alpha = 0.5)
             if ratio[j] != 0:
-                axs[j].plot([0.01, 2000], [0.01*ratio[j], 2000*ratio[j]], 'r-', label = r'$\frac{N}{S}$ = %.4f' % ratio[j])
+                axs[j].plot([0.01, 2000], [0.01*ratio[j], 2000*ratio[j]], 'k-', label = r'$\frac{N}{S}$ = %.4f' % ratio[j])
+            axs[j].scatter(sed_tables[i][:,j], sed_tables[i][:,j+8], s = 5, c = 'b')
+            if HL_incorrect_source:
+                axs[j].scatter(sed_incorrect_tables[i][:,j], sed_incorrect_tables[i][:,j+8], s = 5, c = 'r', label = 'incorrectly predicted.')
             axs[j].legend()
-        plt.savefig('incorrect_{0}_signal_noise_relation.png'.format(label_name[i]))
+        plt.savefig('SNR_{0}.png'.format(label_name[i]))
     #-----------------------------------
     # Measure time
     elapsed_time = time.time() - start_time
