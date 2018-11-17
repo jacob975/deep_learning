@@ -28,11 +28,11 @@ class option_dat2npy():
         s = [   '# mask code:',
                 '# \t[mask code should] be a 8 digit binary number.',
                 '# Example: 00000000 represent no masked; 11111111 represent all masked',
-                '',
+                '00000000',
                 '# number of lost:',
                 '# \t[number of lost] represent the tolerance for data',
                 '# Example: 0 means only data without loss will be saved, [number of lost] should be a integer between 0 and 15',
-                '',
+                '0',
                 '# do normalization:',
                 '# \t[do normalization] means normalize the SEDs or not during the convertion.',
                 '# Available options: yes, no',
@@ -44,7 +44,11 @@ class option_dat2npy():
                 '# High error-flux correlation:',
                 '# \t[error_flux_correlation] mean the program only select the source with high error-flux correlation.',
                 '# Available options: yes, no',
-                '',]
+                '',
+                '# Upper limit of number of sources:',
+                '# \t[upper limit of the number of sources] mean the maximum number of the sources',
+                '# It can only be a integer.',
+                '0']
         np.savetxt('option_dat2npy.txt', s, fmt = '%s')
     def load(self, file_name):
         self.opts = np.loadtxt(file_name, dtype = str)

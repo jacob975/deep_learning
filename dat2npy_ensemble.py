@@ -86,7 +86,12 @@ if __name__ == "__main__":
         exit()
     option_file_name = argv[1]
     data_name_list = argv[2:]
-    mask_code, number_of_lost, do_normalization, consider_error, high_flux_error_correlation = option_file.load(option_file_name)
+    mask_code, \
+    number_of_lost, \
+    do_normalization, \
+    consider_error, \
+    high_flux_error_correlation, \
+    upperlimit_num_sources = option_file.load(option_file_name)
     number_of_lost = int(number_of_lost)
     print ('mask code: {0}'.format(mask_code))
     print ('number_of_lost: {0}'.format(number_of_lost))
@@ -168,6 +173,13 @@ if __name__ == "__main__":
         sum_data[i] = np.reshape(sum_data[i], (-1, data_width))
         sum_label[i] = np.reshape(sum_label[i], (-1, 3))
         sum_coord[i] = np.reshape(sum_coord[i], (-1, 2))
+        if int(upperlimit_num_sources) != 0 and int(upperlimit_num_sources) < len(sum_data[i]):
+            randomize = np.arange(len(sum_data[i]))
+            np.random.shuffle(randomize)
+            sum_data[i] = sum_data[i][randomize[:int(upperlimit_num_sources)]]
+            sum_label[i] = sum_label[i][randomize[:int(upperlimit_num_sources)]]
+            sum_coord[i] = sum_coord[i][randomize[:int(upperlimit_num_sources)]]
+            sum_tracer[i] = sum_tracer[i][randomize[:int(upperlimit_num_sources)]]
         print ("number of data with MaxLoss {0} = {1}".format(i, len(sum_data[i])))
         if i == number_of_lost:
             np.savetxt("source_sed_MaxLoss{0}.txt".format(i), sum_data[i])
