@@ -3,7 +3,7 @@
 Abstract:
     This is a program for ploting 
 Usage:
-    plot_signal_noise.py [sed data]
+    plot_signal_noise_ratio.py [sed data]
     
     The input sed data should arranged like that:
     [ S1, S2, S3, ..., N1, N2, N3, ...], 
@@ -24,6 +24,8 @@ Editor:
 update log
 20181023 version alpha 1
     1. The code works
+20181119 version alpha 2
+    1. Allow you to upload two datalog for comparison
 '''
 import time
 import numpy as np
@@ -40,7 +42,7 @@ if __name__ == "__main__":
     # Load argv
     if len(argv) < 2 or len(argv) > 3 :
         print ("The numbers of arguments is wrong.")
-        print ("Usage: plot_Av_hist.py [sed data]")
+        print ("Usage: plot_signal_noise_ratio.py [sed data]")
         exit(1)
     sed_name = argv[1]
     # This program allow you compare SNR.

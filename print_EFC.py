@@ -29,6 +29,7 @@ from sys import argv
 from load_lib import load_cls_true, load_labels_pred, load_coords, load_arrangement, confusion_matrix_infos, cross_confusion_matrix_infos
 import glob
 import matplotlib.pyplot as plt
+from collections import Counter
 
 def find_corresponding_sed(coords, ref_coords, ref_sed):
     sed_corresponding = []
@@ -37,6 +38,15 @@ def find_corresponding_sed(coords, ref_coords, ref_sed):
         sed_corresponding.append(candidate)
     sed_corresponding_array = np.array(sed_corresponding).reshape(-1, 16)
     return sed_corresponding_array
+
+def find_corresponding_Q(coords, ref_coords, ref_qualities):
+    sed_corresponding = []
+    for coord in coords:
+        candidate = ref_qualities[(ref_coords[:,0] == coord[0]) & (ref_coords[:,1] == coord[1])]
+        sed_corresponding.append(candidate)
+    sed_corresponding_array = np.array(sed_corresponding).reshape(-1, 8)
+    return sed_corresponding_array
+
 
 #--------------------------------------------
 # main code
@@ -128,11 +138,18 @@ if __name__ == "__main__":
     star_coord_table = np.loadtxt('{0}/star_coord.dat'.format(ai_alice))
     gala_coord_table = np.loadtxt('{0}/gala_coord.dat'.format(ai_alice))
     ysos_coord_table = np.loadtxt('{0}/ysos_coord.dat'.format(ai_alice))
+    star_Q_table = np.loadtxt('{0}/star_Q.dat'.format(ai_alice), dtype = str)
+    gala_Q_table = np.loadtxt('{0}/gala_Q.dat'.format(ai_alice), dtype = str)
+    ysos_Q_table = np.loadtxt('{0}/ysos_Q.dat'.format(ai_alice), dtype = str)
     # Find the corresponding sed via matching coordinates.
     sed_star = find_corresponding_sed(coords_star, star_coord_table, star_sed_table)
     sed_gala = find_corresponding_sed(coords_gala, gala_coord_table, gala_sed_table)
     sed_ysos = find_corresponding_sed(coords_ysos, ysos_coord_table, ysos_sed_table)
+    Q_star = find_corresponding_Q(coords_star, star_coord_table, star_Q_table)
+    Q_gala = find_corresponding_Q(coords_gala, gala_coord_table, gala_Q_table)
+    Q_ysos = find_corresponding_Q(coords_ysos, ysos_coord_table, ysos_Q_table)
     sed_tables = [sed_star, sed_gala, sed_ysos]
+    Q_tables = [Q_star, Q_gala, Q_ysos]
     sed_incorrect_tables = None
     if HL_incorrect_source:
         sed_incorrect_star = find_corresponding_sed(coords_incorrect_star, star_coord_table, star_sed_table)
@@ -145,6 +162,7 @@ if __name__ == "__main__":
     #-----------------------------------
     # Plot the ratio
     for i in range(len(sed_tables)):
+        print (label_name[i])
         fig, axs = plt.subplots(3, 3, figsize = (12, 12), sharex = 'all', sharey = 'all')
         plt.suptitle("{0}_{1}".format(ai_alice, label_name[i]), fontsize=28)
         axs = axs.ravel()
@@ -158,9 +176,13 @@ if __name__ == "__main__":
             axs[j].set_ylim(ymin = 1e-3, ymax = 1e4)
             axs[j].set_xlim(xmin = 1e-3, xmax = 1e4)
             axs[j].plot([3e-3, 3e3], [1e-3, 1e3], 'k--', alpha = 0.5)
+            cnt = Counter(Q_tables[i][:,j])
+            print (cnt)
+            upperlimit_index = Q_tables[i][:,j] == 'U'
             if ratio[j] != 0:
                 axs[j].plot([0.01, 2000], [0.01*ratio[j], 2000*ratio[j]], 'k-', label = r'$\frac{N}{S}$ = %.4f' % ratio[j])
             axs[j].scatter(sed_tables[i][:,j], sed_tables[i][:,j+8], s = 5, c = 'b')
+            axs[j].scatter(sed_tables[i][upperlimit_index,j], sed_tables[i][upperlimit_index,j+8], s = 5, c = 'orange', label = 'Upperlimit detections') 
             if HL_incorrect_source:
                 axs[j].scatter(sed_incorrect_tables[i][:,j], sed_incorrect_tables[i][:,j+8], s = 5, c = 'r', label = 'incorrectly predicted.')
             axs[j].legend()

@@ -17,6 +17,8 @@ case ${1} in
         awk '$17~/star/ && $17!~/dust/ \
             {print "["$34"," $55"," $76"," $97"," $118"," $139"," $160"," $181"," \
             $35"," $56"," $77"," $98"," $119"," $140"," $161"," $182"],"}' catalog-SWIRE-v3.tbl > star_sed.dat
+        awk '$17~/star/ && $17!~/dust/ \
+            {print $38" " $59" " $80" " $101" " $122" " $143" " $164" " $185}' catalog-SWIRE-v3.tbl > star_Q.dat
         awk '$17~/star/ && $17!~/dust/ {print FNR }' catalog-SWIRE-v3.tbl > star_tracer.dat
         awk '$17~/star/ && $17!~/dust/ {print $1" "$3 }' catalog-SWIRE-v3.tbl > star_coord.dat
         awk '$17~/star/ && $17!~/dust/ {print $18" "$19 }' catalog-SWIRE-v3.tbl > star_catalog_Av.dat
@@ -27,7 +29,9 @@ case ${1} in
         awk '$17~/Galc/ \
             {print "["$34"," $55"," $76"," $97"," $118"," $139"," $160"," $181"," \
             $35"," $56"," $77"," $98"," $119"," $140"," $161"," $182"],"}' catalog-SWIRE-v3.tbl > gala_sed.dat
-	    awk '$17~/Galc/   {print FNR }' catalog-SWIRE-v3.tbl > gala_tracer.dat
+	    awk '$17~/Galc/ \
+            {print $38" " $59" " $80" " $101" " $122" " $143" " $164" " $185}' catalog-SWIRE-v3.tbl > gala_Q.dat
+        awk '$17~/Galc/   {print FNR }' catalog-SWIRE-v3.tbl > gala_tracer.dat
 	    awk '$17~/Galc/   {print $1" "$3 }' catalog-SWIRE-v3.tbl > gala_coord.dat
 	    awk '$17~/Galc/   {print $18" "$19 }' catalog-SWIRE-v3.tbl > gala_catalog_Av.dat
         exit 0
