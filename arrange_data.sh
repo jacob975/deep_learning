@@ -27,12 +27,15 @@ if [ "${option}" = "ELAIS_N1ui_OPHui_CHA_IIi" ]; then
     mv star_sed.dat CHA_II_star_sed.dat
     mv star_tracer.dat CHA_II_star_tracer.dat
     mv star_coord.dat CHA_II_star_coord.dat
+    mv star_Q.dat CHA_II_star_Q.dat
     mv gala_coord.dat CHA_II_gala_coord.dat
     mv gala_sed.dat CHA_II_gala_sed.dat
     mv gala_tracer.dat CHA_II_gala_tracer.dat
+    mv gala_Q.dat CHA_II_gala_Q.dat
     mv ysos_coord.dat CHA_II_ysos_coord.dat
     mv ysos_sed.dat CHA_II_ysos_sed.dat
     mv ysos_tracer.dat CHA_II_ysos_tracer.dat
+    mv ysos_Q.dat CHA_II_ysos_Q.dat
     echo "CHA_II done."
     get_catalog.sh catalog-OPH-HREL.tbl star
     get_catalog.sh catalog-OPH-HREL.tbl galaxy
@@ -40,21 +43,26 @@ if [ "${option}" = "ELAIS_N1ui_OPHui_CHA_IIi" ]; then
     mv gala_coord.dat OPH_gala_coord.dat
     mv gala_sed.dat OPH_gala_sed.dat
     mv gala_tracer.dat OPH_gala_tracer.dat
+    mv gala_Q.dat OPH_gala_Q.dat
     mv star_coord.dat OPH_star_coord.dat
     mv star_sed.dat OPH_star_sed.dat
     mv star_tracer.dat OPH_star_tracer.dat
+    mv star_Q.dat OPH_star_Q.dat
     mv ysos_coord.dat OPH_ysos_coord.dat
     mv ysos_sed.dat OPH_ysos_sed.dat
     mv ysos_tracer.dat OPH_ysos_tracer.dat
+    mv ysos_Q.dat OPH_ysos_Q.dat
     echo "OPH done."
     get_catalog_data_A.sh star
     get_catalog_data_A.sh galaxy
     mv star_coord.dat ELAIS_N1_star_coord.dat
     mv star_sed.dat ELAIS_N1_star_sed.dat
     mv star_tracer.dat ELAIS_N1_star_tracer.dat
+    mv star_Q.dat ELAIS_N1_star_Q.dat
     mv gala_coord.dat ELAIS_N1_gala_coord.dat
     mv gala_sed.dat ELAIS_N1_gala_sed.dat
     mv gala_tracer.dat ELAIS_N1_gala_tracer.dat
+    mv gala_Q.dat ELAIS_N1_gala_Q.dat
     echo "ELAIS N1 done."
     # replace old data with ukidss data and 2mass data
     echo "Replace JHK with UKIDSS data"
@@ -96,6 +104,9 @@ if [ "${option}" = "ELAIS_N1ui_OPHui_CHA_IIi" ]; then
     cat ELAIS_N1_star_tracer.dat OPH_star_tracer.dat CHA_II_star_tracer.dat > star_tracer.dat
     cat ELAIS_N1_gala_tracer.dat OPH_gala_tracer.dat CHA_II_gala_tracer.dat > gala_tracer.dat
     cat OPH_ysos_tracer.dat CHA_II_ysos_tracer.dat > ysos_tracer.dat
+    cat ELAIS_N1_star_Q.dat OPH_star_Q.dat CHA_II_star_Q.dat > star_Q.dat
+    cat ELAIS_N1_gala_Q.dat OPH_gala_Q.dat CHA_II_gala_Q.dat > gala_Q.dat
+    cat OPH_ysos_Q.dat CHA_II_ysos_Q.dat > ysos_Q.dat
     echo done
     exit 0
 fi
@@ -110,12 +121,15 @@ if [ "${option}" = "ELAIS_N1u_OPHu_CHA_II_slctEC" ]; then
     mv star_sed.dat CHA_II_star_sed.dat
     mv star_tracer.dat CHA_II_star_tracer.dat
     mv star_coord.dat CHA_II_star_coord.dat
+    mv star_Q.dat CHA_II_star_Q.dat
     mv gala_coord.dat CHA_II_gala_coord.dat
     mv gala_sed.dat CHA_II_gala_sed.dat
     mv gala_tracer.dat CHA_II_gala_tracer.dat
+    mv gala_Q.dat CHA_II_gala_Q.dat
     mv ysos_coord.dat CHA_II_ysos_coord.dat
     mv ysos_sed.dat CHA_II_ysos_sed.dat
     mv ysos_tracer.dat CHA_II_ysos_tracer.dat
+    mv ysos_Q.dat CHA_II_ysos_Q.dat
     echo "CHA_II done."
     get_catalog.sh catalog-OPH-HREL.tbl star
     get_catalog.sh catalog-OPH-HREL.tbl galaxy
@@ -123,21 +137,26 @@ if [ "${option}" = "ELAIS_N1u_OPHu_CHA_II_slctEC" ]; then
     mv gala_coord.dat OPH_gala_coord.dat
     mv gala_sed.dat OPH_gala_sed.dat
     mv gala_tracer.dat OPH_gala_tracer.dat
+    mv gala_Q.dat OPH_gala_Q.dat
     mv star_coord.dat OPH_star_coord.dat
     mv star_sed.dat OPH_star_sed.dat
     mv star_tracer.dat OPH_star_tracer.dat
+    mv star_Q.dat OPH_star_Q.dat
     mv ysos_coord.dat OPH_ysos_coord.dat
     mv ysos_sed.dat OPH_ysos_sed.dat
     mv ysos_tracer.dat OPH_ysos_tracer.dat
+    mv ysos_Q.dat OPH_ysos_Q.dat
     echo "OPH done."
     get_catalog_data_A.sh star
     get_catalog_data_A.sh galaxy
     mv star_coord.dat ELAIS_N1_star_coord.dat
     mv star_sed.dat ELAIS_N1_star_sed.dat
     mv star_tracer.dat ELAIS_N1_star_tracer.dat
+    mv star_Q.dat ELAIS_N1_star_Q.dat
     mv gala_coord.dat ELAIS_N1_gala_coord.dat
     mv gala_sed.dat ELAIS_N1_gala_sed.dat
     mv gala_tracer.dat ELAIS_N1_gala_tracer.dat
+    mv gala_Q.dat ELAIS_N1_gala_Q.dat
     echo "ELAIS N1 done."
     # replace old data with ukidss data and 2mass data
     echo "Replace JHK with UKIDSS data"
@@ -158,6 +177,8 @@ if [ "${option}" = "ELAIS_N1u_OPHu_CHA_II_slctEC" ]; then
     select_data.py filter ELAIS_N1_gala_coord.dat ../prototype_EC/ELAIS_N1_gala_sed_u_index_of_no_Av.txt
     select_data.py filter ELAIS_N1_star_tracer.dat ../prototype_EC/ELAIS_N1_star_sed_u_index_of_no_Av.txt
     select_data.py filter ELAIS_N1_gala_tracer.dat ../prototype_EC/ELAIS_N1_gala_sed_u_index_of_no_Av.txt
+    select_data.py filter ELAIS_N1_star_Q.dat ../prototype_EC/ELAIS_N1_star_sed_u_index_of_no_Av.txt
+    select_data.py filter ELAIS_N1_gala_Q.dat ../prototype_EC/ELAIS_N1_gala_sed_u_index_of_no_Av.txt
     select_data.py filter OPH_star_sed_u.txt ../prototype_EC/OPH_star_sed_u_index_of_no_Av.txt
     select_data.py filter OPH_gala_sed_u.txt ../prototype_EC/OPH_gala_sed_u_index_of_no_Av.txt
     select_data.py filter OPH_ysos_sed_u.txt ../prototype_EC/OPH_ysos_sed_u_index_of_no_Av.txt
@@ -167,6 +188,9 @@ if [ "${option}" = "ELAIS_N1u_OPHu_CHA_II_slctEC" ]; then
     select_data.py filter OPH_star_tracer.dat ../prototype_EC/OPH_star_sed_u_index_of_no_Av.txt
     select_data.py filter OPH_gala_tracer.dat ../prototype_EC/OPH_gala_sed_u_index_of_no_Av.txt
     select_data.py filter OPH_ysos_tracer.dat ../prototype_EC/OPH_ysos_sed_u_index_of_no_Av.txt
+    select_data.py filter OPH_star_Q.dat ../prototype_EC/OPH_star_sed_u_index_of_no_Av.txt
+    select_data.py filter OPH_gala_Q.dat ../prototype_EC/OPH_gala_sed_u_index_of_no_Av.txt
+    select_data.py filter OPH_ysos_Q.dat ../prototype_EC/OPH_ysos_sed_u_index_of_no_Av.txt
     select_data.py filter CHA_II_star_sed_u.txt ../prototype_EC/CHA_II_star_sed_u_index_of_no_Av.txt
     select_data.py filter CHA_II_gala_sed_u.txt ../prototype_EC/CHA_II_gala_sed_u_index_of_no_Av.txt
     select_data.py filter CHA_II_ysos_sed_u.txt ../prototype_EC/CHA_II_ysos_sed_u_index_of_no_Av.txt
@@ -176,6 +200,9 @@ if [ "${option}" = "ELAIS_N1u_OPHu_CHA_II_slctEC" ]; then
     select_data.py filter CHA_II_star_tracer.dat ../prototype_EC/CHA_II_star_sed_u_index_of_no_Av.txt
     select_data.py filter CHA_II_gala_tracer.dat ../prototype_EC/CHA_II_gala_sed_u_index_of_no_Av.txt
     select_data.py filter CHA_II_ysos_tracer.dat ../prototype_EC/CHA_II_ysos_sed_u_index_of_no_Av.txt
+    select_data.py filter CHA_II_star_Q.dat ../prototype_EC/CHA_II_star_sed_u_index_of_no_Av.txt
+    select_data.py filter CHA_II_gala_Q.dat ../prototype_EC/CHA_II_gala_sed_u_index_of_no_Av.txt
+    select_data.py filter CHA_II_ysos_Q.dat ../prototype_EC/CHA_II_ysos_sed_u_index_of_no_Av.txt
     echo done
     # stack all data
     echo "Stack all data"
@@ -188,6 +215,9 @@ if [ "${option}" = "ELAIS_N1u_OPHu_CHA_II_slctEC" ]; then
     cat ELAIS_N1_star_tracer.dat OPH_star_tracer.dat CHA_II_star_tracer.dat > star_tracer.dat
     cat ELAIS_N1_gala_tracer.dat OPH_gala_tracer.dat CHA_II_gala_tracer.dat > gala_tracer.dat
     cat OPH_ysos_tracer.dat CHA_II_ysos_tracer.dat > ysos_tracer.dat
+    cat ELAIS_N1_star_Q.dat OPH_star_Q.dat CHA_II_star_Q.dat > star_Q.dat
+    cat ELAIS_N1_gala_Q.dat OPH_gala_Q.dat CHA_II_gala_Q.dat > gala_Q.dat
+    cat OPH_ysos_Q.dat CHA_II_ysos_Q.dat > ysos_Q.dat
     echo done
     exit 0
 fi
@@ -202,12 +232,15 @@ if [ "${option}" = "ELAIS_N1u_OPHu_CHA_II" ]; then
     mv star_sed.dat CHA_II_star_sed.dat
     mv star_tracer.dat CHA_II_star_tracer.dat
     mv star_coord.dat CHA_II_star_coord.dat
+    mv star_Q.dat CHA_II_star_Q.dat
     mv gala_coord.dat CHA_II_gala_coord.dat
     mv gala_sed.dat CHA_II_gala_sed.dat
     mv gala_tracer.dat CHA_II_gala_tracer.dat
+    mv gala_Q.dat CHA_II_gala_Q.dat
     mv ysos_coord.dat CHA_II_ysos_coord.dat
     mv ysos_sed.dat CHA_II_ysos_sed.dat
     mv ysos_tracer.dat CHA_II_ysos_tracer.dat
+    mv ysos_Q.dat CHA_II_ysos_Q.dat
     echo "CHA_II done."
     get_catalog.sh catalog-OPH-HREL.tbl star
     get_catalog.sh catalog-OPH-HREL.tbl galaxy
@@ -215,21 +248,26 @@ if [ "${option}" = "ELAIS_N1u_OPHu_CHA_II" ]; then
     mv gala_coord.dat OPH_gala_coord.dat
     mv gala_sed.dat OPH_gala_sed.dat
     mv gala_tracer.dat OPH_gala_tracer.dat
+    mv gala_Q.dat OPH_gala_Q.dat
     mv star_coord.dat OPH_star_coord.dat
     mv star_sed.dat OPH_star_sed.dat
     mv star_tracer.dat OPH_star_tracer.dat
+    mv star_Q.dat OPH_star_Q.dat
     mv ysos_coord.dat OPH_ysos_coord.dat
     mv ysos_sed.dat OPH_ysos_sed.dat
     mv ysos_tracer.dat OPH_ysos_tracer.dat
+    mv ysos_Q.dat OPH_ysos_Q.dat
     echo "OPH done."
     get_catalog_data_A.sh star
     get_catalog_data_A.sh galaxy
     mv star_coord.dat ELAIS_N1_star_coord.dat
     mv star_sed.dat ELAIS_N1_star_sed.dat
     mv star_tracer.dat ELAIS_N1_star_tracer.dat
+    mv star_Q.dat ELAIS_N1_star_Q.dat
     mv gala_coord.dat ELAIS_N1_gala_coord.dat
     mv gala_sed.dat ELAIS_N1_gala_sed.dat
     mv gala_tracer.dat ELAIS_N1_gala_tracer.dat
+    mv gala_Q.dat ELAIS_N1_gala_Q.dat
     echo "ELAIS N1 done."
     # replace old data with ukidss data and 2mass data
     echo "Replace JHK with UKIDSS data"
@@ -253,6 +291,9 @@ if [ "${option}" = "ELAIS_N1u_OPHu_CHA_II" ]; then
     cat ELAIS_N1_star_tracer.dat OPH_star_tracer.dat CHA_II_star_tracer.dat > star_tracer.dat
     cat ELAIS_N1_gala_tracer.dat OPH_gala_tracer.dat CHA_II_gala_tracer.dat > gala_tracer.dat
     cat OPH_ysos_tracer.dat CHA_II_ysos_tracer.dat > ysos_tracer.dat
+    cat ELAIS_N1_star_Q.dat OPH_star_Q.dat CHA_II_star_Q.dat > star_Q.dat
+    cat ELAIS_N1_gala_Q.dat OPH_gala_Q.dat CHA_II_gala_Q.dat > gala_Q.dat
+    cat OPH_ysos_Q.dat CHA_II_ysos_Q.dat > ysos_Q.dat
     echo done
     exit 0
 fi
@@ -266,12 +307,15 @@ if [ "${option}" = "ELAIS_N1i_OPHi_CHA_IIi" ]; then
     mv star_sed.dat CHA_II_star_sed.dat
     mv star_tracer.dat CHA_II_star_tracer.dat
     mv star_coord.dat CHA_II_star_coord.dat
+    mv star_Q.dat CHA_II_star_Q.dat
     mv gala_coord.dat CHA_II_gala_coord.dat
     mv gala_sed.dat CHA_II_gala_sed.dat
     mv gala_tracer.dat CHA_II_gala_tracer.dat
+    mv gala_Q.dat CHA_II_gala_Q.dat
     mv ysos_coord.dat CHA_II_ysos_coord.dat
     mv ysos_sed.dat CHA_II_ysos_sed.dat
     mv ysos_tracer.dat CHA_II_ysos_tracer.dat
+    mv ysos_Q.dat CHA_II_ysos_Q.dat
     echo "CHA_II done."
     get_catalog.sh catalog-OPH-HREL.tbl star
     get_catalog.sh catalog-OPH-HREL.tbl galaxy
@@ -279,21 +323,26 @@ if [ "${option}" = "ELAIS_N1i_OPHi_CHA_IIi" ]; then
     mv gala_coord.dat OPH_gala_coord.dat
     mv gala_sed.dat OPH_gala_sed.dat
     mv gala_tracer.dat OPH_gala_tracer.dat
+    mv gala_Q.dat OPH_gala_Q.dat
     mv star_coord.dat OPH_star_coord.dat
     mv star_sed.dat OPH_star_sed.dat
     mv star_tracer.dat OPH_star_tracer.dat
+    mv star_Q.dat OPH_star_Q.dat
     mv ysos_coord.dat OPH_ysos_coord.dat
     mv ysos_sed.dat OPH_ysos_sed.dat
     mv ysos_tracer.dat OPH_ysos_tracer.dat
+    mv ysos_Q.dat OPH_ysos_Q.dat
     echo "OPH done."
     get_catalog_data_A.sh star
     get_catalog_data_A.sh galaxy
     mv star_coord.dat ELAIS_N1_star_coord.dat
     mv star_sed.dat ELAIS_N1_star_sed.dat
     mv star_tracer.dat ELAIS_N1_star_tracer.dat
+    mv star_Q.dat ELAIS_N1_star_Q.dat
     mv gala_coord.dat ELAIS_N1_gala_coord.dat
     mv gala_sed.dat ELAIS_N1_gala_sed.dat
     mv gala_tracer.dat ELAIS_N1_gala_tracer.dat
+    mv gala_Q.dat ELAIS_N1_gala_Q.dat
     echo "ELAIS N1 done."
     # replace old data with ukidss data and 2mass data
     echo "Replace JHK with UKIDSS data"
@@ -335,6 +384,9 @@ if [ "${option}" = "ELAIS_N1i_OPHi_CHA_IIi" ]; then
     cat ELAIS_N1_star_tracer.dat OPH_star_tracer.dat CHA_II_star_tracer.dat > star_tracer.dat
     cat ELAIS_N1_gala_tracer.dat OPH_gala_tracer.dat CHA_II_gala_tracer.dat > gala_tracer.dat
     cat OPH_ysos_tracer.dat CHA_II_ysos_tracer.dat > ysos_tracer.dat
+    cat ELAIS_N1_star_Q.dat OPH_star_Q.dat CHA_II_star_Q.dat > star_Q.dat
+    cat ELAIS_N1_gala_Q.dat OPH_gala_Q.dat CHA_II_gala_Q.dat > gala_Q.dat
+    cat OPH_ysos_Q.dat CHA_II_ysos_Q.dat > ysos_Q.dat
     echo done
     exit 0
 fi
@@ -348,12 +400,15 @@ if [ "${option}" = "ELAIS_N1_OPH_CHA_II" ]; then
     mv star_sed.dat CHA_II_star_sed.dat
     mv star_tracer.dat CHA_II_star_tracer.dat
     mv star_coord.dat CHA_II_star_coord.dat
+    mv star_Q.dat CHA_II_star_Q.dat
     mv gala_coord.dat CHA_II_gala_coord.dat
     mv gala_sed.dat CHA_II_gala_sed.dat
     mv gala_tracer.dat CHA_II_gala_tracer.dat
+    mv gala_Q.dat CHA_II_gala_Q.dat
     mv ysos_coord.dat CHA_II_ysos_coord.dat
     mv ysos_sed.dat CHA_II_ysos_sed.dat
     mv ysos_tracer.dat CHA_II_ysos_tracer.dat
+    mv ysos_Q.dat CHA_II_ysos_Q.dat
     echo "CHA_II done."
     get_catalog.sh catalog-OPH-HREL.tbl star
     get_catalog.sh catalog-OPH-HREL.tbl galaxy
@@ -361,21 +416,26 @@ if [ "${option}" = "ELAIS_N1_OPH_CHA_II" ]; then
     mv gala_coord.dat OPH_gala_coord.dat
     mv gala_sed.dat OPH_gala_sed.dat
     mv gala_tracer.dat OPH_gala_tracer.dat
+    mv gala_Q.dat OPH_gala_Q.dat
     mv star_coord.dat OPH_star_coord.dat
     mv star_sed.dat OPH_star_sed.dat
     mv star_tracer.dat OPH_star_tracer.dat
+    mv star_Q.dat OPH_star_Q.dat
     mv ysos_coord.dat OPH_ysos_coord.dat
     mv ysos_sed.dat OPH_ysos_sed.dat
     mv ysos_tracer.dat OPH_ysos_tracer.dat
+    mv ysos_Q.dat OPH_ysos_Q.dat
     echo "OPH done."
     get_catalog_data_A.sh star
     get_catalog_data_A.sh galaxy
     mv star_coord.dat ELAIS_N1_star_coord.dat
     mv star_sed.dat ELAIS_N1_star_sed.dat
     mv star_tracer.dat ELAIS_N1_star_tracer.dat
+    mv star_Q.dat ELAIS_N1_star_Q.dat
     mv gala_coord.dat ELAIS_N1_gala_coord.dat
     mv gala_sed.dat ELAIS_N1_gala_sed.dat
     mv gala_tracer.dat ELAIS_N1_gala_tracer.dat
+    mv gala_Q.dat ELAIS_N1_gala_Q.dat
     echo "ELAIS N1 done."
     # convert 2MASS band system to UKIDSS band system 
     echo "Convert 2MASS band system to UKIDSS band system"
@@ -399,6 +459,9 @@ if [ "${option}" = "ELAIS_N1_OPH_CHA_II" ]; then
     cat ELAIS_N1_star_tracer.dat OPH_star_tracer.dat CHA_II_star_tracer.dat > star_tracer.dat
     cat ELAIS_N1_gala_tracer.dat OPH_gala_tracer.dat CHA_II_gala_tracer.dat > gala_tracer.dat
     cat OPH_ysos_tracer.dat CHA_II_ysos_tracer.dat > ysos_tracer.dat
+    cat ELAIS_N1_star_Q.dat OPH_star_Q.dat CHA_II_star_Q.dat > star_Q.dat
+    cat ELAIS_N1_gala_Q.dat OPH_gala_Q.dat CHA_II_gala_Q.dat > gala_Q.dat
+    cat OPH_ysos_Q.dat CHA_II_ysos_Q.dat > ysos_Q.dat
     echo done
     exit 0
 fi
