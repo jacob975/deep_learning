@@ -84,7 +84,7 @@ if __name__ == "__main__":
         data[data[:,i] == 0.0, i] = pflux
         data[data[:,i+8] == 0.0, i+8] = perror
     # Save masked data set
-    np.savetxt('{0}_ul_mask.txt'.format(data_name[:-4]), data)
+    np.savetxt(data_name, data)
     #-----------------------------------
     # measure time
     elapsed_time = time.time() - start_time
