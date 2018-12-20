@@ -113,6 +113,7 @@ if __name__ == "__main__":
     sum_tracer = [[] for x in range(data_width)]
     sum_coord = [[] for x in range(data_width)]
     sum_quality = [[] for x in range(data_width)]
+    sum_Av = [[] for x in range(data_width)]
     num_sources = np.zeros((data_width, len(data_name_list)), dtype = int)
     for ind, data_name in enumerate(data_name_list, start = 0):
         print ("##############################")
@@ -123,9 +124,11 @@ if __name__ == "__main__":
         name_tracer = "{0}_tracer.dat".format(data_name[:4])
         name_coord = "{0}_coord.dat".format(data_name[:4])
         name_quality = "{0}_Q.dat".format(data_name[:4])
+        name_Av = "{0}_Av.dat".format(data_name[:4])
         tracer = np.loadtxt(name_tracer, dtype = int)
         coord = np.loadtxt(name_coord)
         quality = np.loadtxt(name_quality, dtype = str)
+        extinction = np.loadtxt(name_Av)
         # Convert the format from str to float
         data = np.array(str_data, dtype = float)
         # Mask low flux error correlated sources.
@@ -135,6 +138,7 @@ if __name__ == "__main__":
             tracer = tracer[~exclusion]
             coord = coord[~exclusion]
             quality = quality[~exclusion]
+            extinction = extinction[~exclusion]
         # Mask specified bands
         data_n = mask(data, mask_code)
         # Mask error or not
@@ -151,13 +155,15 @@ if __name__ == "__main__":
         tracer = tracer[~nan_filter]
         coord  = coord[~nan_filter]
         quality = quality[~nan_filter]
+        extinction = extinction[~nan_filter]
         # no observation filter
         # i is the tolarence of loss in a single datum
         for i in range(data_width):
             data_n_z, _filter= no_observation_filter_eq_0(data_n, i, data_width)
             tracer_outp = tracer[_filter]
             coord_outp = coord[_filter]
-            quality_oup = quality[_filter]
+            quality_outp = quality[_filter]
+            extinction_outp = extinction[_filter]
             num_sources[i, ind] = len(data_n_z)
             print ("MaxLoss = {0}, number of data = {1}".format(i, len(data_n_z)))
             # Generate labels
@@ -170,8 +176,9 @@ if __name__ == "__main__":
             sum_data[i] = np.append(sum_data[i], data_n_z)
             sum_label[i] = np.append(sum_label[i], label_z_f)
             sum_tracer[i] = np.append(sum_tracer[i], tracer_outp)
-            sum_quality[i] = np.append(sum_quality[i], quality_oup)
+            sum_quality[i] = np.append(sum_quality[i], quality_outp)
             sum_coord[i] = np.append(sum_coord[i], coord_outp)
+            sum_Av[i] = np.append(sum_Av[i], extinction_outp)
             #-----------------------------------------------------
     # save data, number of sources in different selection, label, tracer, and coordinate
     print ("###############################")
@@ -183,6 +190,7 @@ if __name__ == "__main__":
         sum_label[i] = np.reshape(sum_label[i], (-1, 3))
         sum_coord[i] = np.reshape(sum_coord[i], (-1, 2))
         sum_quality[i] = np.reshape(sum_quality[i], (-1,8))
+        sum_Av[i] = np.reshape(sum_Av[i], (-1, 2))
         if int(upperlimit_num_sources) != 0 and int(upperlimit_num_sources) < len(sum_data[i]):
             randomize = np.arange(len(sum_data[i]))
             np.random.shuffle(randomize)
@@ -191,6 +199,7 @@ if __name__ == "__main__":
             sum_coord[i] = sum_coord[i][randomize[:int(upperlimit_num_sources)]]
             sum_tracer[i] = sum_tracer[i][randomize[:int(upperlimit_num_sources)]]
             sum_quality[i] = sum_quality[i][randomize[:int(upperlimit_num_sources)]]
+            sum_Av[i] = sum_Av[i][randomize[:int(upperlimit_num_sources)]]
         print ("number of data with MaxLoss {0} = {1}".format(i, len(sum_data[i])))
         if i == number_of_lost:
             np.savetxt("source_sed_MaxLoss{0}.txt".format(i), sum_data[i])
@@ -198,6 +207,7 @@ if __name__ == "__main__":
             np.savetxt("source_tracer_MaxLoss{0}.txt".format(i), sum_tracer[i])
             np.savetxt("source_Q_MaxLoss{0}.txt".format(i), sum_quality[i], fmt ='%s')
             np.savetxt("source_coord_MaxLoss{0}.txt".format(i), sum_coord[i])
+            np.savetxt("source_Av_MaxLoss{0}.txt".format(i), sum_Av[i])
     #-----------------------------------
     # measuring time
     elapsed_time = time.time() - start_time

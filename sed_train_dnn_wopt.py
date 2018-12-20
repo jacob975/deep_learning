@@ -10,7 +10,7 @@ Abstract:
     This is a code for train AI to identify YSO from SED data
     with 64 neurals per layer, 8 layers.
 Usage:
-    sed_train_dnn_tmp.py [source] [label] [coords] [time_stamp]
+    sed_train_dnn_wopt.py [source] [label] [coords] [time_stamp]
 
 Result tree:
 

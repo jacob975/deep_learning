@@ -64,25 +64,37 @@ if __name__ == "__main__":
     # Load data
     ul_table = np.loadtxt(ul_table_name, dtype = str)
     data = np.loadtxt(data_name, dtype = np.float64)
+    # With or without error
+    no_error = False
+    with_error = False
+    if len(data[0,:]) == 8:
+        no_error = True
+    elif len(data[0,:]) == 16:
+        with_error = True
     #------------------------------------------
     # Mask dataset with chosen mask
     for i in range(len(ul_table[0])):
         if i < 3:
             continue
+        # Initialize
+        pflux = 0.0
+        perror = 0.0
         # Get the mask
         mask = ul_table[:,i] == 'U'
         index_valid_flux = (ul_table[:,i] != 'U') & (data[:,i] != 0.0)
-        index_valid_error = (ul_table[:,i] != 'U') & (data[:,i+8] != 0.0)
         # Find a proper value for upperlimit detections.
         pflux = proper_flux(data[index_valid_flux, i])
-        perror = proper_error(data[index_valid_error, i+8])
-        print (pflux, perror)
         # Mask all upper limit detection
         data[mask,i] = pflux 
-        data[mask,i+8] = perror 
         # Fill up all no-observation data
         data[data[:,i] == 0.0, i] = pflux
-        data[data[:,i+8] == 0.0, i+8] = perror
+        # Repeat again with error 
+        if with_error:
+            index_valid_error = (ul_table[:,i] != 'U') & (data[:,i+8] != 0.0)
+            perror = proper_error(data[index_valid_error, i+8])
+            #data[mask,i+8] = perror 
+            data[data[:,i+8] == 0.0, i+8] = perror
+        print (pflux, perror)
     # Save masked data set
     np.savetxt(data_name, data)
     #-----------------------------------
