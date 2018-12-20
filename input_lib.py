@@ -44,11 +44,15 @@ class option_dat2npy():
                 '# High error-flux correlation:',
                 '# \t[error_flux_correlation] mean the program only select the source with high error-flux correlation.',
                 '# Available options: yes, no',
-                '',
+                'no',
                 '# Upper limit of number of sources:',
                 '# \t[upper limit of the number of sources] mean the maximum number of the sources',
                 '# It can only be a integer.',
-                '0']
+                '0',
+                '# Trace the Av:',
+                '# If you do extinction correction before dat2npy_ensemble.py, you may like to keep the Av information.'
+                '# Available option: yes, no',
+                'no']
         np.savetxt('option_dat2npy.txt', s, fmt = '%s')
     def load(self, file_name):
         self.opts = np.loadtxt(file_name, dtype = str)
