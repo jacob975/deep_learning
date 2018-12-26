@@ -101,14 +101,12 @@ def mJy_to_Jy(flux_density, err_flux_density):
 
 def mag_to_Jy(zeropoint, magnitude, err_magnitude):
     flux_density = zeropoint * np.power( 10.0, -0.4 * magnitude )
-    upper_flux_density = zeropoint * np.power(10.0, -0.4 * (magnitude - err_magnitude))
-    err_flux_density = upper_flux_density - flux_density
+    err_flux_density = np.divide(err_magnitude * np.log(10.0) * flux_density, 2.5)
     return flux_density, err_flux_density
 
 def Jy_to_mag(zeropoint, flux_density, err_flux_density):
     magnitude = -2.5 * ( np.log(flux_density) - np.log(zeropoint) )/ np.log(10.0)
-    upper_magnitude = -2.5 * ( np.log(flux_density - err_flux_density) - np.log(zeropoint) )/ np.log(10.0)
-    err_magnitude = upper_magnitude - magnitude
+    err_magnitude = np.divide(-2.5 * err_flux_density, flux_density * np.log(10.0)) 
     return magnitude, err_magnitude
 
 def mag_to_mJy(zeropoint, magnitude, err_magnitude):
