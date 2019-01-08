@@ -49,21 +49,26 @@ if __name__ == "__main__":
     image_name = argv[2]
     #-----------------------------------
     # Load data
-    world_coord = np.loadtxt(coord_table_name)
+    world_coord = None
+    pixel_coord = None
+    if coord_table_name != 'skip':
+        world_coord = np.loadtxt(coord_table_name)
     image = pyfits.getdata(image_name) 
     header = pyfits.getheader(image_name)
     #-----------------------------------
     # Convert WCS coord to pixel coord
     w = wcs.WCS(header)
-    pixel_coord = w.wcs_world2pix(world_coord, 1)
+    if coord_table_name != 'skip':
+        pixel_coord = w.wcs_world2pix(world_coord, 1)
     # Plot and show
     fig = plt.figure(figsize = (8, 8))
     plt.subplot(111, projection = w)
     plt.title("Source on {0}".format(image_name))
     plt_image = plt.imshow(image)
     plt.colorbar()
-    plt.scatter(pixel_coord[:,0], pixel_coord[:,1], s= 2, c= 'r' )
-    plt.show()
+    if coord_table_name != 'skip':
+        plt.scatter(pixel_coord[:,0], pixel_coord[:,1], s= 2, c= 'r' )
+    plt.savefig('{0}.png'.format(image_name[:-5]))
     #-----------------------------------
     # Measure time
     elapsed_time = time.time() - start_time

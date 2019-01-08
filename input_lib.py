@@ -50,7 +50,7 @@ class option_dat2npy():
                 '# It can only be a integer.',
                 '0',
                 '# Trace the Av:',
-                '# If you do extinction correction before dat2npy_ensemble.py, you may like to keep the Av information.'
+                '# If you do extinction correction before dat2npy_ensemble.py, you may like to keep the Av information.',
                 '# Available option: yes, no',
                 'no']
         np.savetxt('option_dat2npy.txt', s, fmt = '%s')

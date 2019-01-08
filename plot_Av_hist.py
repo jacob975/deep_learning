@@ -41,12 +41,12 @@ if __name__ == "__main__":
     Av_table = np.loadtxt(Av_table_name)
     #-----------------------------------
     # plot
-    Av_hist = np.histogram(Av_table[:,0], np.arange(-10, 50))
+    Av_hist = np.histogram(Av_table[:,0], np.arange(-10, 30))
     Av_hist_plot = plt.figure("Av histogram")
     plt.title("Av histogram of file '{0}'".format(Av_table_name))
     plt.xlabel("Av")
     plt.ylabel("# of sources")
-    plt.bar(np.arange(-9.5, 49.5, 1), Av_hist[0])
+    plt.bar(np.arange(-9.5, 29.5, 1), Av_hist[0])
     Av_hist_plot.savefig("{0}_hist.png".format(Av_table_name[:-4]))
     #-----------------------------------
     # measure time

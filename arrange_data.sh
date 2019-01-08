@@ -37,8 +37,10 @@ available_sources=\
 ' LUP_I,'\
 ' LUP_I_slctEC,'\
 ' LUP_IIIi,'\
+' LUP_III_slctEC,'\
 ' LUP_III,'\
 ' LUP_IVi,'\
+' LUP_IV_slctEC,'\
 ' LUP_IV,'
 
 # check arguments
@@ -1028,6 +1030,35 @@ if [ "${option}" = "LUP_IIIi" ]; then
     exit 0
 fi
 
+if [ "${option}" = "LUP_III_slctEC" ]; then
+    # Cut data from dataset
+    echo "Cut data from catalog."
+    get_catalog.sh catalog-LUP_III-HREL.tbl star
+    get_catalog.sh catalog-LUP_III-HREL.tbl galaxy
+    get_catalog.sh catalog-LUP_III-HREL.tbl yso
+    echo "done."
+    # convert 2MASS band system to UKIDSS band system 
+    echo "Convert 2MASS band system to UKIDSS band system"
+    replace_jhk_with_ukidss.py GCS skip LUP_III_2mass/star_2mass.dat star_sed.dat
+    replace_jhk_with_ukidss.py GCS skip LUP_III_2mass/gala_2mass.dat gala_sed.dat
+    replace_jhk_with_ukidss.py GCS skip LUP_III_2mass/ysos_2mass.dat ysos_sed.dat
+    echo "done."
+    # Select sources with the extinction correction.
+    echo "Select sources with the extinction correction"
+    select_data.py filter star_sed_u.txt ../prototype_EC/star_sed_u_index_of_no_Av.txt
+    select_data.py filter gala_sed_u.txt ../prototype_EC/gala_sed_u_index_of_no_Av.txt
+    select_data.py filter ysos_sed_u.txt ../prototype_EC/ysos_sed_u_index_of_no_Av.txt
+    select_data.py filter star_coord.dat ../prototype_EC/star_sed_u_index_of_no_Av.txt
+    select_data.py filter gala_coord.dat ../prototype_EC/gala_sed_u_index_of_no_Av.txt
+    select_data.py filter ysos_coord.dat ../prototype_EC/ysos_sed_u_index_of_no_Av.txt
+    select_data.py filter star_tracer.dat ../prototype_EC/star_sed_u_index_of_no_Av.txt
+    select_data.py filter gala_tracer.dat ../prototype_EC/gala_sed_u_index_of_no_Av.txt
+    select_data.py filter ysos_tracer.dat ../prototype_EC/ysos_sed_u_index_of_no_Av.txt
+    echo "done."
+    exit 0
+fi
+
+
 if [ "${option}" = "LUP_III" ]; then
     # Cut data from dataset
     echo "Cut data from catalog."
@@ -1063,6 +1094,34 @@ if [ "${option}" = "LUP_IVi" ]; then
     remove_Av.py ukidss star_emap_150arcsec.txt star_sed_u.txt star_Av.dat star_coord.dat
     remove_Av.py ukidss star_emap_150arcsec.txt gala_sed_u.txt skip gala_coord.dat
     remove_Av.py ukidss star_emap_150arcsec.txt ysos_sed_u.txt skip ysos_coord.dat
+    echo "done."
+    exit 0
+fi
+
+if [ "${option}" = "LUP_IV_slctEC" ]; then
+    # Cut data from dataset
+    echo "Cut data from catalog."
+    get_catalog.sh catalog-LUP_IV-HREL.tbl star
+    get_catalog.sh catalog-LUP_IV-HREL.tbl galaxy
+    get_catalog.sh catalog-LUP_IV-HREL.tbl yso
+    echo "done."
+    # convert 2MASS band system to UKIDSS band system 
+    echo "Convert 2MASS band system to UKIDSS band system"
+    replace_jhk_with_ukidss.py GCS skip LUP_IV_2mass/star_2mass.dat star_sed.dat
+    replace_jhk_with_ukidss.py GCS skip LUP_IV_2mass/gala_2mass.dat gala_sed.dat
+    replace_jhk_with_ukidss.py GCS skip LUP_IV_2mass/ysos_2mass.dat ysos_sed.dat
+    echo "done."
+    # Select sources with the extinction correction.
+    echo "Select sources with the extinction correction"
+    select_data.py filter star_sed_u.txt ../prototype_EC/star_sed_u_index_of_no_Av.txt
+    select_data.py filter gala_sed_u.txt ../prototype_EC/gala_sed_u_index_of_no_Av.txt
+    select_data.py filter ysos_sed_u.txt ../prototype_EC/ysos_sed_u_index_of_no_Av.txt
+    select_data.py filter star_coord.dat ../prototype_EC/star_sed_u_index_of_no_Av.txt
+    select_data.py filter gala_coord.dat ../prototype_EC/gala_sed_u_index_of_no_Av.txt
+    select_data.py filter ysos_coord.dat ../prototype_EC/ysos_sed_u_index_of_no_Av.txt
+    select_data.py filter star_tracer.dat ../prototype_EC/star_sed_u_index_of_no_Av.txt
+    select_data.py filter gala_tracer.dat ../prototype_EC/gala_sed_u_index_of_no_Av.txt
+    select_data.py filter ysos_tracer.dat ../prototype_EC/ysos_sed_u_index_of_no_Av.txt
     echo "done."
     exit 0
 fi
