@@ -25,7 +25,7 @@ keyword_AI=${2}
 keyword_set=${3}
 
 echo "AI saved directory going to test:"
-for each in ${AI_POOL}/2018*/;
+for each in ${AI_POOL}/20*/;
 do
     # ${each##*/} means only take the last word of $each
     # ${each::-1} means take $each but the last latter. 
