@@ -49,9 +49,9 @@ if __name__ == "__main__":
     data = np.loadtxt(data_name, dtype = str)
     #------------------------------------------
     # Find the line with upper limits
-    data_no_ul = data[  (ul_table[:,0] != 'U') &\
-                        (ul_table[:,1] != 'U') &\
-                        (ul_table[:,2] != 'U') &\
+    data_no_ul = data[  #(ul_table[:,0] != 'U') &\
+                        #(ul_table[:,1] != 'U') &\
+                        #(ul_table[:,2] != 'U') &\
                         (ul_table[:,3] != 'U') &\
                         (ul_table[:,4] != 'U') &\
                         (ul_table[:,5] != 'U') &\

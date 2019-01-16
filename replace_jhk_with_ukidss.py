@@ -106,6 +106,13 @@ def wipe_out_non_physical_numbers(target_list):
     # remove -inf
     target_list[target_list < -1e308] = 0 
 
+def SEDname2Qname(name_dat_file, keyword):
+    position = name_dat_file.find(keyword)
+    if position >= 0:
+        name_Q_file = '{0}{1}_Q.dat'.format(name_dat_file[:position], keyword)
+        return 0, name_Q_file
+    return 1, ''
+
 #--------------------------------------------
 # main code
 if __name__ == "__main__":
@@ -125,9 +132,18 @@ if __name__ == "__main__":
     name_ukidss_catalog = argv[2]
     name_twomass_catalog = argv[3]
     name_dat_file = argv[4]
-    print ("Replace for {0}".format(name_dat_file))
     #-----------------------------------
-    # read the Database UKIDSSDR10PLUS as a catalog
+    # Find the name of Q dat 
+    keywords = ['star', 'gala', 'ysos']
+    name_Q = ''
+    for key in keywords:
+        failure, tmp_name_Q = SEDname2Qname(name_dat_file, key)
+        if not failure:
+            name_Q = tmp_name_Q
+    print ("Replace for {0}".format(name_dat_file))
+    print (name_Q)
+    #-----------------------------------
+    # Read the Database UKIDSSDR10PLUS as a catalog
     ukidss_j_mjy = None
     ukidss_h_mjy = None
     ukidss_k_mjy = None
@@ -271,6 +287,10 @@ if __name__ == "__main__":
         dat_file[replacement_k, 9] = ukidss_err_h_mjy[replacement_k]
         dat_file[replacement_k, 10] = ukidss_err_k_mjy[replacement_k]
         np.savetxt("replaced_with_ukidss_based_on_k_{0}.txt".format(name_dat_file[:-4]), replacement_k[0])
+        # Update the Q flag
+        Q_flags = np.loadtxt(name_Q, dtype = str)
+        Q_flags[replacement_k,:3] = 'R'
+        np.savetxt(name_Q, Q_flags, fmt = '%s')
     np.savetxt("{0}_u.txt".format(name_dat_file[:-4]), dat_file)
     #-----------------------------------
     # measuring time
