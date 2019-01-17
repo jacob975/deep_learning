@@ -72,6 +72,14 @@ from sys import argv
 from dat2npy_lib import mask, normalize, no_observation_filter_eq_0, read_well_known_data, select_high_flux_error_correlated_source
 from input_lib import option_dat2npy as option_files
 
+def SEDname2other_name(name_dat_file, keyword, subtitle):
+    position = name_dat_file.find(keyword)
+    if position >= 0:
+        new_name = '{0}{1}_{2}.dat'.format(name_dat_file[:position], keyword, subtitle)
+        print (new_name)
+        return 0, new_name
+    return 1, ''
+
 #--------------------------------------------
 # main code
 if __name__ == "__main__":
@@ -122,13 +130,32 @@ if __name__ == "__main__":
         print ("##############################")
         print ("data name = {0}".format(data_name))
         print ("label = {0}".format(ind))
-        # Load data, tracer and coord 
+        # Load data
         str_data = read_well_known_data(data_name)
-        name_tracer = "{0}_tracer.dat".format(data_name[:4])
-        name_coord = "{0}_coord.dat".format(data_name[:4])
-        name_quality = "{0}_Q.dat".format(data_name[:4])
-        name_Av = None
-        if do_extinction == 'yes': name_Av = "{0}_Av.dat".format(data_name[:4])
+        # Load tracer, coord, Q flag, and Av table.
+        keywords = ['star', 'gala', 'ysos']
+        name_tracer = ''
+        name_coord = ''
+        name_quality = ''
+        name_Av = '' 
+        for key in keywords:
+            # Tracer
+            failure, tmp_name_tracer = SEDname2other_name(data_name, key, 'tracer')
+            if not failure:
+                name_tracer = tmp_name_tracer
+            # Coordinate
+            failure, tmp_name_coord = SEDname2other_name(data_name, key, 'coord')
+            if not failure:
+                name_coord = tmp_name_coord
+            # Q flag
+            failure, tmp_name_quality =  SEDname2other_name(data_name, key, 'Q')
+            if not failure:
+                name_quality = tmp_name_quality
+            # Av
+            if do_extinction == 'yes': 
+                failure, name_Av = SEDname2other_name(data_name, key, 'Av') 
+                if not failure:
+                    name_Av = tmp_name_Av
         tracer = np.loadtxt(name_tracer, dtype = object)
         coord = np.loadtxt(name_coord)
         quality = np.loadtxt(name_quality, dtype = str)
@@ -165,7 +192,7 @@ if __name__ == "__main__":
         # i is the tolarence of loss in a single datum
         for i in range(data_width):
             data_n_z, _filter= no_observation_filter_eq_0(data_n, i, data_width)
-            tracer_outp = tracer[_filter]
+            tracer_outp = np.where(_filter == 1.0)
             coord_outp = coord[_filter]
             quality_outp = quality[_filter]
             extinction_outp = None

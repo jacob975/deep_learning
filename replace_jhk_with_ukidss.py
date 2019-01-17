@@ -141,7 +141,6 @@ if __name__ == "__main__":
         if not failure:
             name_Q = tmp_name_Q
     print ("Replace for {0}".format(name_dat_file))
-    print (name_Q)
     #-----------------------------------
     # Read the Database UKIDSSDR10PLUS as a catalog
     ukidss_j_mjy = None
