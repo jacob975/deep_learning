@@ -98,7 +98,10 @@ def mask(inp, mask_code = np.zeros(8)):
     for index, value in enumerate(mask_code):
         if value:
             inp[:,index] = 0.0
-            inp[:,index + 8] = 0.0
+            try:    
+                inp[:,index + 8] = 0.0
+            except:
+                pass
     # make each no observation having the same value
     inp[inp == -9.99e+02] = 0.0
     inp[inp == 0.0] = 0.0

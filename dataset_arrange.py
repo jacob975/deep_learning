@@ -3,7 +3,7 @@
 Abstract:
     This is a program randomly arranging the train, validate, and test dataset.
 Usage:
-    random_arrange.py [train size] [validate size] [test size]
+    dataset_arrange.py [train size] [validate size] [test size]
 Editor:
     Jacob975
 
@@ -19,6 +19,7 @@ update log
 import time
 from sys import argv
 import numpy as np
+import os
 
 #--------------------------------------------
 # Main code
@@ -30,7 +31,7 @@ if __name__ == "__main__":
     # Load argv
     if len(argv) != 5:
         print ("The number of arguments is wrong.")
-        print ("Usage: rand_arrange.py [# of data] [train size] [validate size] [test size]")
+        print ("Usage: dataset_arrange.py [# of data] [train size] [validate size] [test size]")
         exit()
     num_data = int(argv[1])
     train_weight = int(argv[2])
@@ -57,9 +58,12 @@ if __name__ == "__main__":
         file_for_validate = tmp_file[train_size:validate_size + train_size]
         file_for_test = tmp_file[validate_size + train_size:]
         # Save the data
-        np.savetxt("train_{0}".format(file_name),    file_for_train, fmt = '%s')
-        np.savetxt("validate_{0}".format(file_name), file_for_validate, fmt = '%s')
-        np.savetxt("test_{0}".format(file_name),     file_for_test, fmt = '%s')
+        os.system("mkdir -p train")
+        os.system("mkdir -p validate")
+        os.system("mkdir -p test")
+        np.savetxt("train/{0}".format(file_name),    file_for_train, fmt = '%s')
+        np.savetxt("validate/{0}".format(file_name), file_for_validate, fmt = '%s')
+        np.savetxt("test/{0}".format(file_name),     file_for_test, fmt = '%s')
         print("Done.")
     #-----------------------------------
     # Measure time

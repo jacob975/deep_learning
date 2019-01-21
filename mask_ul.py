@@ -42,7 +42,7 @@ def proper_error(error_list):
 def proper_flux(flux_list):
     flux_array = np.sort(flux_list)
     # Take the index of the 20% position.
-    flux = flux_array[0] * 0.1
+    flux = flux_array[0] * 0.01
     return flux
 
 #--------------------------------------------
