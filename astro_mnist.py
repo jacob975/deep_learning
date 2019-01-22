@@ -85,7 +85,6 @@ class DataSet(object):
       if dtype == dtypes.float32:
         # Convert from [0, 255] -> [0.0, 1.0].
         images = images.astype(numpy.float32)
-        #images = numpy.multiply(images, 1.0 / 255.0)
     self._images = images
     self._labels = labels
     self._epochs_completed = 0
@@ -107,7 +106,38 @@ class DataSet(object):
   def epochs_completed(self):
     return self._epochs_completed
 
-  def next_batch(self, batch_size, fake_data=False, shuffle=True):
+#--------------------
+  def next_proper_batch(self, batch_size, label):
+    cls_label = numpy.argmax(self.labels, axis = 1)
+    # Select the source match the label
+    bool_candidates = cls_label == label
+    # Count the number of source I pick.
+    num_candidates = numpy.sum(bool_candidates)
+    # Create a random index for the sources I pick.
+    perm = numpy.arange(num_candidates)
+    numpy.random.shuffle(perm)
+    # Get the data and labels of sources.
+    source_candidates = self.images[bool_candidates]
+    source_candidates = source_candidates[perm]
+    label_arr = numpy.array([ i == label for i in range(3)])
+    label_candidates = numpy.array([label_arr for i in range(num_candidates)])
+    return source_candidates[:batch_size], label_candidates[:batch_size]
+
+  def next_batch(self, batch_size, fake_data=False, shuffle=True, equal = False):
+    # Equal means I pick the same number of sources from different labels.
+    if equal:
+      equal_batch_size = batch_size//3
+      star_source, star_labels = self.next_proper_batch(equal_batch_size, label = 0)
+      gala_source, gala_labels = self.next_proper_batch(equal_batch_size, label = 1) 
+      ysos_source, ysos_labels = self.next_proper_batch(equal_batch_size, label = 2)
+      source = numpy.concatenate((star_source, gala_source, ysos_source), axis = 0)
+      labels = numpy.concatenate((star_labels, gala_labels, ysos_labels), axis = 0)
+      # Shuffle the source I pick
+      perm = numpy.arange(len(source))
+      numpy.random.shuffle(perm)
+      source = source[perm]
+      labels = labels[perm]
+      return source, labels
     """Return the next `batch_size` examples from this data set."""
     if fake_data:
       fake_image = [1] * 784
@@ -168,7 +198,7 @@ def read_data_sets(images_name,
                    # Total size are 10
                    train_weight = 7,
                    validation_weight=1,
-                   test_weight = 2,
+                   test_weight = 0,
                    seed=None):
 
   # load data, label, and coords
