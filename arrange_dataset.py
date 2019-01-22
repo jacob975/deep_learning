@@ -3,7 +3,7 @@
 Abstract:
     This is a program randomly arranging the train, validate, and test dataset.
 Usage:
-    dataset_arrange.py [train size] [validate size] [test size]
+    arrange_dataset.py [train size] [validate size] [test size]
 Editor:
     Jacob975
 
@@ -31,7 +31,7 @@ if __name__ == "__main__":
     # Load argv
     if len(argv) != 5:
         print ("The number of arguments is wrong.")
-        print ("Usage: dataset_arrange.py [# of data] [train size] [validate size] [test size]")
+        print ("Usage: arrange_dataset.py [# of data] [train size] [validate size] [test size]")
         exit()
     num_data = int(argv[1])
     train_weight = int(argv[2])
