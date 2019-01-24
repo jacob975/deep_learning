@@ -3,7 +3,7 @@
 Abstract:
     This is a code for testing AI with given sed data using CNN.
 Usage:
-    sed_test_cnn.py [source] [id] [coord] [where to save] [AI]
+    sed_test_cnn_eq.py [option file] [source] [id] [coord] [where to save] [AI]
 Editor and Practicer:
     Jacob975
 
@@ -17,6 +17,8 @@ Editor and Practicer:
 update log
 20181019 version alpha 1
     1. The code works.
+20190124 version alpha 2
+    1. Add more arguments to describe the format of datasets.
 '''
 import matplotlib.pyplot as plt
 import tensorflow as tf
@@ -28,6 +30,7 @@ from save_lib import save_cls_pred, save_cls_true, save_arrangement, save_coords
 from load_lib import print_precision, print_recall_rate
 import astro_mnist
 import os
+from input_lib import option_train_cnn
 
 def weight_variable(shape, std = 0.1):
     initial = tf.truncated_normal(shape) * std
@@ -90,24 +93,12 @@ def predict_cls(images, labels, cls_true):
     # Now calculate the predicted classes for the batches.
     # We will just iterate through all the batches.
     # There might be a more clever and Pythonic way of doing this.
-
     # The starting index for the next batch is denoted i.
-    i = 0
-
-    while i < num_images:
-        # The ending index for the next batch is denoted j.
-        j = min(i + batch_size, num_images)
-
-        # Create a feed-dict with the images and labels
-        # between index i and j.
-        feed_dict = {x: images[i:j, :],
-                     y_true: labels[i:j, :]}
-
-        # Calculate the predicted class using TensorFlow.
-        cls_pred[i:j] = session.run(y_pred_cls, feed_dict=feed_dict)
-        # Set the start-index for the next batch to the
-        # end-index of the current batch.
-        i = j
+    feed_dict = {x: images[:, pick_band_array[0]], y_true: labels[:]}
+    # Calculate the predicted class using TensorFlow.
+    cls_pred = session.run(y_pred_cls, feed_dict=feed_dict)
+    # Set the start-index for the next batch to the
+    # end-index of the current batch.
 
     # Create a boolean array whether each image is correctly classified.
     correct = (cls_true == cls_pred)
@@ -119,7 +110,7 @@ def predict_label(images, labels):
     num_images = len(images)
     # initialize
     label_pred = np.zeros(num_images*3).reshape((num_images, 3))
-    feed_dict = {x: images[:,:], y_true: labels[:,:]}
+    feed_dict = {x: images[:,pick_band_array[0]], y_true: labels[:]}
     # process 
     label_pred = session.run(y_pred, feed_dict=feed_dict)
     return label_pred
@@ -148,16 +139,19 @@ if __name__ == "__main__":
     start_time = time.time()
     #-----------------------------------
     # Load arguments
-    if len(argv) != 6:
-        print ("Error!")
+    stu = option_train_cnn()
+    if len(argv) != 7:
         print ("The number of arguments is wrong.")
-        print ("Usage: sed_test_cnn.py [source] [id] [coord] [where to save] [AI]")
+        print ("Usage: sed_test_cnn.py [option_file] [source] [id] [coord] [where to save] [AI]")
+        stu.create()
         exit(1)
-    images_name = argv[1]
-    labels_name = argv[2]
-    coords_name = argv[3]
-    directory = argv[4]
-    AI_saved_dir = argv[5]
+    option_file_name = argv[1]
+    imply_mask, consider_error = stu.load(option_file_name)
+    images_name = argv[2]
+    labels_name = argv[3]
+    coords_name = argv[4]
+    directory = argv[5]
+    AI_saved_dir = argv[6]
     #-------------------------------------
     # Load Data
     data, tracer, coords = astro_mnist.read_data_sets(images_name, labels_name, coords_name, train_weight = 0, validation_weight = 0, test_weight = 1)
@@ -175,32 +169,44 @@ if __name__ == "__main__":
         print ("coords are saved.")
     #-----------------------------------
     # Data dimension
-    img_maj = 8
-    image_shape = (2, img_maj)
-    kernal_shape = (2, 2)
+    img_maj = imply_mask.count('0')
+    width_of_data = None
+    pick_band_array = None
+    if consider_error == 'yes':
+        width_of_data = 2
+        repeat_imply_mask = imply_mask + imply_mask
+        pick_band_array = np.where(np.array(list(repeat_imply_mask), dtype = int) == 0)
+    elif consider_error == 'no':
+        width_of_data = 1
+        pick_band_array = np.where(np.array(list(imply_mask), dtype = int) == 0)
+    else:
+        print('Wrong error consideration.')
+        exit()
+    image_shape = (width_of_data, img_maj)
+    kernal_shape = (width_of_data, 2)
     num_kernal_1 = 32
     num_kernal_2 = 64
     num_conn_neural = 100
     num_label = len(data.test.labels[0])
     #-----------------------------------
     # Construct an AI
-    x = tf.placeholder(tf.float32, [None, 2 * img_maj], name = 'x')
+    x = tf.placeholder(tf.float32, [None, width_of_data * img_maj], name = 'x')
     y_true = tf.placeholder(tf.float32, [None, 3], name = 'y_true')
     y_true_cls = tf.argmax(y_true, axis=1)
     x_image = tf.reshape(x, [-1, image_shape[0], image_shape[1], 1])
     # First layer( First kernal)
     W_conv1 = weight_variable([kernal_shape[0], kernal_shape[1], 1, num_kernal_1])
     b_conv1 = bias_variable([num_kernal_1])
-    h_conv1 = tf.nn.relu(tf.nn.conv2d(x_image, W_conv1, [1,1,1,1], 'SAME') + b_conv1)
+    h_conv1 = tf.nn.selu(tf.nn.conv2d(x_image, W_conv1, [1,1,1,1], 'SAME') + b_conv1)
     # Second layer( Second kernal)
     W_conv2 = weight_variable([kernal_shape[0], kernal_shape[1], num_kernal_1, num_kernal_2])
     b_conv2 = bias_variable([num_kernal_2])
-    h_conv2 = tf.nn.relu(tf.nn.conv2d(h_conv1, W_conv2, [1,1,1,1], 'SAME') + b_conv2)
+    h_conv2 = tf.nn.selu(tf.nn.conv2d(h_conv1, W_conv2, [1,1,1,1], 'SAME') + b_conv2)
     # Third layer ( Fully connected)
     W_fc1 = weight_variable([image_shape[0] * image_shape[1] * num_kernal_2, num_conn_neural])
     b_fc1 = bias_variable([num_conn_neural])
     h_conv2_flat = tf.reshape(h_conv2, [ -1, image_shape[0] * image_shape[1] * num_kernal_2])
-    h_fc1 = tf.nn.relu(tf.matmul(h_conv2_flat, W_fc1) + b_fc1)
+    h_fc1 = tf.nn.selu(tf.matmul(h_conv2_flat, W_fc1) + b_fc1)
     # Output layer
     W_fc2 = weight_variable([num_conn_neural, num_label])
     b_fc2 = bias_variable([num_label])

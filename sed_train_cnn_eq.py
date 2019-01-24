@@ -36,6 +36,8 @@ Modifier:
 update log
 20181016 version alpha 1:
     1. The code works
+20190123 version alpha 2:
+    2. Update the CNN arguments
 '''
 import matplotlib.pyplot as plt
 import tensorflow as tf
@@ -47,6 +49,7 @@ from save_lib import save_arrangement, save_cls_pred, save_cls_true, save_coords
 import astro_mnist
 import math
 import os
+from input_lib import option_train_cnn
 
 def weight_variable(shape, std = 0.1):
     initial = tf.truncated_normal(shape) * std
@@ -74,7 +77,9 @@ def optimize(num_iterations):
         # Get a batch of training examples.
         # x_batch now holds a batch of images and
         # y_true_batch are the true labels for those images.
-        x_batch, y_true_batch = data.train.next_batch(train_batch_size)
+        x_batch, y_true_batch = data.train.next_batch(train_batch_size, equal = True)
+        x_batch = x_batch[:, pick_band_array[0]]
+
         # Put the batch into a dict with the proper names
         # for placeholder variables in the TensorFlow graph.
         feed_dict_train = {x: x_batch,
@@ -312,14 +317,16 @@ if __name__ == "__main__":
     # measure times
     start_time = time.time()
     #-----------------------------------
+    stu = option_train_cnn()
     # Load arguments
     if len(argv) != 6:
-        print ("Error!")
         print ("The number of arguments is wrong.")
-        print ("Usage: sed_train_cnn.py [imply mask] [source] [id] [coord] [time_stamp]")
-        print ("Example: sed_train_cnn.py 00000000 source_sed.txt source_id.txt source_coords.txt sometimes ")
+        print ("Usage: sed_train_cnn_eq.py [options file] [source] [id] [coord] [time_stamp]")
+        print ("Example: sed_train_cnn_eq.py option_train_cnn.txt source_sed.txt source_id.txt source_coords.txt sometimes ")
+        stu.create()
         exit(1)
-    imply_mask = argv[1]
+    option_file_name = argv[1]
+    imply_mask, consider_error = stu.load(option_file_name)
     global images_name
     images_name = argv[2]
     labels_name = argv[3]
@@ -346,31 +353,43 @@ if __name__ == "__main__":
     #-----------------------------------
     # Data dimension
     img_maj = imply_mask.count('0')
-    image_shape = (2, img_maj)
-    kernal_shape = (2, 2)
+    width_of_data = None
+    pick_band_array = None
+    if consider_error == 'yes':
+        width_of_data = 2
+        repeat_imply_mask = imply_mask + imply_mask
+        pick_band_array = np.where(np.array(list(repeat_imply_mask), dtype = int) == 0)
+    elif consider_error == 'no':
+        width_of_data = 1
+        pick_band_array = np.where(np.array(list(imply_mask), dtype = int) == 0)
+    else:
+        print('Wrong error consideration.')
+        exit()
+    image_shape = (width_of_data, img_maj)
+    kernal_shape = (width_of_data, 2)
     num_kernal_1 = 32
     num_kernal_2 = 64
     num_conn_neural = 100
     num_label = len(data.train.labels[0])
     #-----------------------------------
     # Construct an AI
-    x = tf.placeholder(tf.float32, [None, 2 * img_maj], name = 'x')
+    x = tf.placeholder(tf.float32, [None, width_of_data * img_maj], name = 'x')
     y_true = tf.placeholder(tf.float32, [None, 3], name = 'y_true')
     y_true_cls = tf.argmax(y_true, axis=1)
     x_image = tf.reshape(x, [-1, image_shape[0], image_shape[1], 1])
     # First layer( First kernal)
     W_conv1 = weight_variable([kernal_shape[0], kernal_shape[1], 1, num_kernal_1])
     b_conv1 = bias_variable([num_kernal_1])
-    h_conv1 = tf.nn.relu(tf.nn.conv2d(x_image, W_conv1, [1,1,1,1], 'SAME') + b_conv1)
+    h_conv1 = tf.nn.selu(tf.nn.conv2d(x_image, W_conv1, [1,1,1,1], 'SAME') + b_conv1)
     # Second layer( Second kernal)
     W_conv2 = weight_variable([kernal_shape[0], kernal_shape[1], num_kernal_1, num_kernal_2])
     b_conv2 = bias_variable([num_kernal_2])
-    h_conv2 = tf.nn.relu(tf.nn.conv2d(h_conv1, W_conv2, [1,1,1,1], 'SAME') + b_conv2)
+    h_conv2 = tf.nn.selu(tf.nn.conv2d(h_conv1, W_conv2, [1,1,1,1], 'SAME') + b_conv2)
     # Third layer ( Fully connected)
     W_fc1 = weight_variable([image_shape[0] * image_shape[1] * num_kernal_2, num_conn_neural])
     b_fc1 = bias_variable([num_conn_neural])
     h_conv2_flat = tf.reshape(h_conv2, [ -1, image_shape[0] * image_shape[1] * num_kernal_2])
-    h_fc1 = tf.nn.relu(tf.matmul(h_conv2_flat, W_fc1) + b_fc1)
+    h_fc1 = tf.nn.selu(tf.matmul(h_conv2_flat, W_fc1) + b_fc1)
     # Output layer
     W_fc2 = weight_variable([num_conn_neural, num_label])
     b_fc2 = bias_variable([num_label])
