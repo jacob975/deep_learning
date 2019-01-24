@@ -77,7 +77,7 @@ def optimize(num_iterations):
         # Get a batch of training examples.
         # x_batch now holds a batch of images and
         # y_true_batch are the true labels for those images.
-        x_batch, y_true_batch = data.train.next_batch(train_batch_size, equal = True)
+        x_batch, y_true_batch = data.train.next_batch(train_batch_size)
         x_batch = x_batch[:, pick_band_array[0]]
 
         # Put the batch into a dict with the proper names
@@ -267,6 +267,7 @@ def predict_cls(images, labels, cls_true):
         # between index i and j.
         feed_dict = {x: images[i:j, pick_band_array[0]],
                      y_true: labels[i:j, :]}
+
         # Calculate the predicted class using TensorFlow.
         cls_pred[i:j] = session.run(y_pred_cls, feed_dict=feed_dict)
 
