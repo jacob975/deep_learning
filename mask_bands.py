@@ -50,7 +50,7 @@ if __name__ == "__main__":
     data = np.loadtxt(data_name, dtype = np.float64)
     # mask dataset with chosen mask, then normalize to the maximun flux equals 1.
     masked_data = mask(data, mask_code)
-    masked_data = normalize(masked_data)
+    #masked_data = normalize(masked_data)
     # Save masked data set
     np.savetxt(data_name, masked_data)
     #-----------------------------------

@@ -140,6 +140,7 @@ if __name__ == "__main__":
     #-----------------------------------
     # Load arguments
     stu = option_train_cnn()
+    print(len(argv))
     if len(argv) != 7:
         print ("The number of arguments is wrong.")
         print ("Usage: sed_test_cnn.py [option_file] [source] [id] [coord] [where to save] [AI]")

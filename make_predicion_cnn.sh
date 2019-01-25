@@ -18,7 +18,7 @@ if [ "$#" -ne 3 ]; then
     exit 1
 fi
 # Initialize the format of your datasets.
-sed_test_dnn_wopt.py
+sed_test_cnn.py
 vim option_train_cnn.txt
 
 # Initialize variables
@@ -41,14 +41,14 @@ do
     mkdir -p "AI_${AI_NAME}_test_on_${keyword_set}"
     if [ "${keyword_AI}" -eq "0" ];then
         echo "MaxLoss${iters}"
-        sed_test_cnn.py option_train_cnn.txt
+        sed_test_cnn.py option_train_cnn.txt \
                         source_sed_${keyword_set}.txt source_id_${keyword_set}.txt source_coord_${keyword_set}.txt \
                         "AI_${AI_NAME}_test_on_${keyword_set}"\
                         "${each}checkpoint_AI_64_8_source_sed_MaxLoss${iters}" \
                         > "AI_${AI_NAME}_test_on_${keyword_set}/result_of_AI_test"
         ((iters++))
     else
-        sed_test_cnn.py option_train_cnn.txt
+        sed_test_cnn.py option_train_cnn.txt \
                         source_sed_${keyword_set}.txt source_id_${keyword_set}.txt source_coord_${keyword_set}.txt\
                         "AI_${AI_NAME}_test_on_${keyword_set}"\
                         "${each}checkpoint_AI_64_8_source_sed_${keyword_AI}" \
