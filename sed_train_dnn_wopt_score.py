@@ -108,6 +108,8 @@ def optimize(num_iterations):
         # for placeholder variables in the TensorFlow graph.
         feed_dict_train = {x: x_batch,
                            y_true: y_true_batch}
+        feed_dict_val = {x: data.validation.images,
+                         y_true: data.validation.labels}
 
         # Run the optimizer using this batch of training data.
         # TensorFlow assigns the variables in feed_dict_train
@@ -120,7 +122,7 @@ def optimize(num_iterations):
             # Calculate the accuracy on the training-batch.
             
             acc_train = session.run(accuracy, feed_dict=feed_dict_train)
-            loss_validation = session.run(loss, feed_dict=feed_dict_train)
+            loss_validation = session.run(loss, feed_dict=feed_dict_val)
             # Calculate the accuracy on the validation-set.
             # The function returns 2 values but we only need the first.
             val_correct, val_pred = predict_cls_validation()

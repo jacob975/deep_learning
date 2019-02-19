@@ -1,16 +1,10 @@
 #!/usr/bin/python3
 '''
-License (MIT)
-Copyright (c) 2016 by Magnus Erik Hvass Pedersen
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
 Abstract:
     This is a code for train AI to identify YSO from SED data with Convolutional Neural Network( CNN).
 Usage:
-    sed_train_cnn.py [imply mask] [source] [id] [coord] [time_stamp]
-    sed_train_cnn.py 00000000 source_sed.txt source_id.txt source_coords.txt sometimes 
+    sed_train_cnn_score.py [option file] [source] [id] [coord] [time_stamp]
+    sed_train_cnn_score.py option_file source_sed.txt source_id.txt source_coords.txt sometimes 
 
 Result tree:
 
@@ -49,7 +43,7 @@ from save_lib import save_arrangement, save_cls_pred, save_cls_true, save_coords
 import astro_mnist
 import math
 import os
-from input_lib import option_train_cnn
+from input_lib import option_train_cnn_customized
 
 def weight_variable(shape, std = 0.1):
     initial = tf.truncated_normal(shape) * std
@@ -59,11 +53,13 @@ def bias_variable(shape):
     initial = tf.constant(0.1, shape = shape)
     return tf.Variable(initial)
 
-def optimize(num_iterations):
+def optimize_cross_entropy(num_iterations):
     # Ensure we update the global variables rather than local copies.
     global total_iterations
-    global best_validation_accuracy
+    global best_score
     global last_improvement
+    global equal_batch
+    global best_validation_accuracy
     # Start-time used for printing time-usage below.
     start_time = time.time()
 
@@ -73,13 +69,12 @@ def optimize(num_iterations):
         # It is easier to update it in each iteration because
         # we need this number several times in the following.
         total_iterations += 1
-        
+
         # Get a batch of training examples.
         # x_batch now holds a batch of images and
         # y_true_batch are the true labels for those images.
-        x_batch, y_true_batch = data.train.next_batch(train_batch_size, equal = True)
+        x_batch, y_true_batch = data.train.next_batch(train_batch_size, equal = equal_batch)
         x_batch = x_batch[:, pick_band_array[0]]
-
         # Put the batch into a dict with the proper names
         # for placeholder variables in the TensorFlow graph.
         feed_dict_train = {x: x_batch,
@@ -107,6 +102,98 @@ def optimize(num_iterations):
             if acc_validation > best_validation_accuracy:
                 # Update the best-known validation accuracy.
                 best_validation_accuracy = acc_validation
+                # Set the iteration for the last improvement to current.
+                last_improvement = total_iterations
+                # Save the acc and loss of improved iter
+                improved_validation_list.append([total_iterations*100, acc_validation, loss_validation])
+                # Save all variables of the TensorFlow graph to file.
+                saver.save(sess=session, save_path=save_path)
+                # A string to be printed below, shows improvement found.
+                improved_str = '*'
+            else:
+                # An empty string to be printed below.
+                # Shows that no improvement was found.
+                improved_str = ''
+
+            # Status-message for printing.
+            msg = "Iter: {0:>6}, Train-Batch Accuracy: {1:>6.1%}, Validation Acc: {2:>6.1%} {3}"
+
+            # Print it.
+            print(msg.format(i + 1, acc_train, acc_validation, improved_str))
+
+        # If no improvement found in the required number of iterations.
+        if total_iterations - last_improvement > require_improvement:
+            print("No improvement found in a while, stopping optimization.")
+            # Break out from the for-loop.
+            break
+        elif total_iterations > num_iterations:
+            print("Reach {0} iteration, stop.".format(num_iterations))
+            break
+
+    # Ending time.
+    end_time = time.time()
+    # Difference between start and end-times.
+    time_dif = end_time - start_time
+    # Print the time-usage.
+    print("Time usage: {0} sec.".format(int(round(time_dif))))
+
+
+def optimize_GT_score(num_iterations):
+    # Ensure we update the global variables rather than local copies.
+    global total_iterations
+    global best_score
+    global last_improvement
+    global equal_batch
+    # Start-time used for printing time-usage below.
+    start_time = time.time()
+
+    for i in range(num_iterations):
+
+        # Increase the total number of iterations performed.
+        # It is easier to update it in each iteration because
+        # we need this number several times in the following.
+        total_iterations += 1
+        
+        # Get a batch of training examples.
+        # x_batch now holds a batch of images and
+        # y_true_batch are the true labels for those images.
+        x_batch, y_true_batch = data.train.next_batch(train_batch_size, equal = equal_batch)
+        x_batch = x_batch[:, pick_band_array[0]]
+        # Put the batch into a dict with the proper names
+        # for placeholder variables in the TensorFlow graph.
+        feed_dict_train = {x: x_batch,
+                           y_true: y_true_batch}
+        feed_dict_val = {x: data.validation.images,
+                         y_true: data.validation.labels}
+        # Run the optimizer using this batch of training data.
+        # TensorFlow assigns the variables in feed_dict_train
+        # to the placeholder variables and then runs the optimizer.
+        session.run(optimizer, feed_dict=feed_dict_train)
+
+        # Print status every 100 iterations and after last iteration.
+        if (total_iterations % 100 == 0) or (i == (num_iterations - 1)):
+
+            # Calculate the accuracy on the training-batch.
+            acc_train = session.run(accuracy, feed_dict=feed_dict_train)
+            loss_validation = session.run(loss, feed_dict=feed_dict_val)
+            # Calculate the accuracy on the validation-set.
+            # The function returns 2 values but we only need the first.
+            val_correct, val_pred = predict_cls_validation()
+            val_true = data.validation.cls
+            acc_validation, _ = cls_accuracy(val_correct)
+            val_star_recall = np.sum((val_true == 0) & (val_pred == 0)) / np.sum(val_true == 0)
+            val_gala_recall = np.sum((val_true == 1) & (val_pred == 1)) / np.sum(val_true == 1)
+            val_ysos_recall = np.sum((val_true == 2) & (val_pred == 2)) / np.sum(val_true == 2)
+            val_ysos_precision = np.sum((val_true == 2) & (val_pred == 2)) / np.sum(val_pred == 2)
+            # Save the acc and loss of each iter
+            validation_list.append([total_iterations, acc_validation, loss_validation])
+            # Determind a score for validating the AI.
+            score = acc_train + val_star_recall + 0.01*val_gala_recall + 10*val_ysos_recall + 10*val_ysos_precision
+
+            # If validation accuracy is an improvement over best-known.
+            if score > best_score:
+                # Update the best-known validation accuracy.
+                best_score = score
             
                 # Set the iteration for the last improvement to current.
                 last_improvement = total_iterations
@@ -123,16 +210,17 @@ def optimize(num_iterations):
                 improved_str = ''
 
             # Status-message for printing.
-            msg = "Iter: {0:>6}, Train-Batch Accuracy: {1:>6.1%}, Validation Acc: {2:>6.1%} {3}"
+            msg = "Iter: {0:>6}, Train-Batch Accuracy: {1:>6.1%}, Validation Acc: {2:>6.1%} Score: {3:.2f} {4}"
 
             # Print it.
-            print(msg.format(i + 1, acc_train, acc_validation, improved_str))
+            print(msg.format(i + 1, acc_train, acc_validation, score, improved_str))
         
         # If no improvement found in the required number of iterations.
         if total_iterations - last_improvement > require_improvement:
             print("No improvement found in a while, stopping optimization.")
-
-            # Break out from the for-loop.
+            break
+        elif total_iterations > num_iterations:
+            print("Reach {0} iteration, stop.".format(num_iterations))
             break
             
     # Ending time.
@@ -143,6 +231,8 @@ def optimize(num_iterations):
 
     # Print the time-usage.
     print("Time usage: {0} sec.".format(int(round(time_dif))))
+
+
 
 # the def is used to plot data and their labels
 def plot_images(images, cls_true, cls_pred=None):
@@ -269,6 +359,7 @@ def predict_cls(images, labels, cls_true):
         # between index i and j.
         feed_dict = {x: images[i:j, pick_band_array[0]],
                      y_true: labels[i:j, :]}
+
         # Calculate the predicted class using TensorFlow.
         cls_pred[i:j] = session.run(y_pred_cls, feed_dict=feed_dict)
 
@@ -318,16 +409,29 @@ if __name__ == "__main__":
     # measure times
     start_time = time.time()
     #-----------------------------------
-    stu = option_train_cnn()
+    stu = option_train_cnn_customized()
     # Load arguments
     if len(argv) != 6:
         print ("The number of arguments is wrong.")
-        print ("Usage: sed_train_cnn_eq.py [options file] [source] [id] [coord] [time_stamp]")
-        print ("Example: sed_train_cnn_eq.py option_train_cnn.txt source_sed.txt source_id.txt source_coords.txt sometimes ")
+        print ("Usage: sed_train_cnn_score.py [options file] [source] [id] [coord] [time_stamp]")
+        print ("Example: sed_train_cnn_score.py option_train_cnn.txt source_sed.txt source_id.txt source_coords.txt sometimes ")
         stu.create()
         exit(1)
     option_file_name = argv[1]
-    imply_mask, consider_error = stu.load(option_file_name)
+    imply_mask, consider_error, batch_format, iterations_upperlimit, validation_func = stu.load(option_file_name)
+    print ('imply mask: {0}'.format(imply_mask))
+    print ('consider error: {0}'.format(consider_error))
+    print ('batch format: {0}'.format(batch_format))
+    print ('iterations upper limit: {0}'.format(iterations_upperlimit))
+    print ('validation function: {0}'.format(validation_func))
+    iterations_upperlimit = int(iterations_upperlimit)
+    if batch_format == 'equal':
+        equal_batch = True
+    elif batch_format == 'random':
+        equal_batch = False
+    else:
+        print ("Wrong batch_format option")
+        exit()
     global images_name
     images_name = argv[2]
     labels_name = argv[3]
@@ -404,20 +508,22 @@ if __name__ == "__main__":
     regularizers = tf.nn.l2_loss(W_conv1) + tf.nn.l2_loss(W_conv2)
     loss = tf.reduce_mean(cross_entropy + beta * regularizers)
     # The number of iterations
-    iters = 1000000
+    iters = iterations_upperlimit
     print ("number of iterations = {0}".format(iters))
     # The size of a batch
-    if len(data.validation.labels) < 512:
-        train_batch_size = 128
+    if len(data.validation.labels) < 600:
+        train_batch_size = 200
     else:
-        train_batch_size = 512
+        train_batch_size = 600
     print ("train batch size = {0}".format(train_batch_size))
     # Split the data-set in batches of this size to limit RAM usage.
-    if len(data.validation.labels) < 512:
-        batch_size = 128
+    if len(data.validation.labels) < 600:
+        batch_size = 200
     else:
-        batch_size = 512
+        batch_size = 600
     print ("batch size = {0}".format(batch_size))
+    # Best validation accuracy seen so far.
+    best_validation_accuracy = 0.0
     #-----------------------------------
     # Get the true classes for those images.
     data.validation.cls = np.argmax(data.validation.labels, axis=1)
@@ -450,14 +556,17 @@ if __name__ == "__main__":
     # restore previous weight
     #saver.restore(sess=session, save_path=save_path)
     # Best validation accuracy seen so far.
-    best_validation_accuracy = 0.0
+    best_score = 0.0
     # Iteration-number for last improvement to validation accuracy.
     last_improvement = 0
     # Stop optimization if no improvement found in this many iterations.
     require_improvement = 100000
     # Counter for total number of iterations performed so far.
     total_iterations = 0
-    optimize(num_iterations=iters)
+    if validation_func == "GT_score":
+        optimize_GT_score(num_iterations=iters)
+    elif validation_func == "cross_entropy":
+        optimize_cross_entropy(num_iterations=iters)
     print ( "final_learning_rate = {0}".format(session.run(learning_rate)))
     #print_test_accuracy(show_example_errors=False, show_confusion_matrix=True)
     session.close()

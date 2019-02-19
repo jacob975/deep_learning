@@ -39,6 +39,36 @@ class option_train_cnn():
         self.opts = list(self.opts)
         return self.opts
 
+class option_train_cnn_customized():
+    def __init__(self):
+        self.opts = None
+    def create(self):
+        s = [   '# mask code:',
+                '# \t[mask code] should be a 8 digit binary number.',
+                '# Example: 00000000 represent no masked; 11111111 represent all masked',
+                '00000000',
+                '# consider error:',
+                '# \t[consider error] means considering error or not during the convertion.',
+                '# Available options: yes, no',
+                'yes',
+                '# batch format:',
+                '# \t[batch format] means how to get the next batch of sources.',
+                '# Available options: equal, random',
+                'random',
+                '# iterations upperlimits:',
+                '# \t[iterations upperlimits] means the training process will end if the model is train by this times.',
+                '# It should be an integer',
+                '500000',
+                '# validation function:',
+                '# \t[validation function] means the function we used to judge the model.',
+                '# Available options: GT_score, cross_entropy',
+                'cross_entropy']
+        np.savetxt('option_train_cnn.txt', s, fmt = '%s')
+    def load(self, file_name):
+        self.opts = np.loadtxt(file_name, dtype = str)
+        self.opts = list(self.opts)
+        return self.opts
+
 class option_dat2npy():
     def __init__(self):
         self.opts = None

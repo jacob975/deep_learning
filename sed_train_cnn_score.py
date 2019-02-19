@@ -9,8 +9,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Abstract:
     This is a code for train AI to identify YSO from SED data with Convolutional Neural Network( CNN).
 Usage:
-    sed_train_cnn.py [imply mask] [source] [id] [coord] [time_stamp]
-    sed_train_cnn.py 00000000 source_sed.txt source_id.txt source_coords.txt sometimes 
+    sed_train_cnn_score.py [option file] [source] [id] [coord] [time_stamp]
+    sed_train_cnn_score.py option_file source_sed.txt source_id.txt source_coords.txt sometimes 
 
 Result tree:
 
@@ -84,6 +84,8 @@ def optimize(num_iterations):
         # for placeholder variables in the TensorFlow graph.
         feed_dict_train = {x: x_batch,
                            y_true: y_true_batch}
+        feed_dict_val = {x: data.validation.images,
+                         y_true: data.validation.labels}
 
         # Run the optimizer using this batch of training data.
         # TensorFlow assigns the variables in feed_dict_train
@@ -95,7 +97,7 @@ def optimize(num_iterations):
 
             # Calculate the accuracy on the training-batch.
             acc_train = session.run(accuracy, feed_dict=feed_dict_train)
-            loss_validation = session.run(loss, feed_dict=feed_dict_train)
+            loss_validation = session.run(loss, feed_dict=feed_dict_val)
             # Calculate the accuracy on the validation-set.
             # The function returns 2 values but we only need the first.
             val_correct, val_pred = predict_cls_validation()
@@ -138,8 +140,9 @@ def optimize(num_iterations):
         # If no improvement found in the required number of iterations.
         if total_iterations - last_improvement > require_improvement:
             print("No improvement found in a while, stopping optimization.")
-
-            # Break out from the for-loop.
+            break
+        elif total_iterations > 10000:
+            print("Reach 10k iteration, stop.")
             break
             
     # Ending time.
@@ -330,8 +333,8 @@ if __name__ == "__main__":
     # Load arguments
     if len(argv) != 6:
         print ("The number of arguments is wrong.")
-        print ("Usage: sed_train_cnn_eq.py [options file] [source] [id] [coord] [time_stamp]")
-        print ("Example: sed_train_cnn_eq.py option_train_cnn.txt source_sed.txt source_id.txt source_coords.txt sometimes ")
+        print ("Usage: sed_train_cnn_score.py [options file] [source] [id] [coord] [time_stamp]")
+        print ("Example: sed_train_cnn_score.py option_train_cnn.txt source_sed.txt source_id.txt source_coords.txt sometimes ")
         stu.create()
         exit(1)
     option_file_name = argv[1]
