@@ -3,8 +3,8 @@
 Abstract:
     This is a code for train AI to identify YSO from SED data with Convolutional Neural Network( CNN).
 Usage:
-    sed_train_cnn_score.py [option file] [source] [id] [coord] [time_stamp]
-    sed_train_cnn_score.py option_file source_sed.txt source_id.txt source_coords.txt sometimes 
+    sed_train_cnn_custimized.py [option file] [source] [id] [coord] [time_stamp]
+    sed_train_cnn_custimized.py option_file source_sed.txt source_id.txt source_coords.txt sometimes 
 
 Result tree:
 
@@ -16,7 +16,7 @@ Result tree:
                                     |-  checkpoint_AI_64_8_[file_name]          // this is AI
 
 Quoted from:
-    Magnus Erik Hvass Pedersen
+    Magnus Erik Hvass Pedersen with MIT license.
 Modifier:
     Chi-Ting Ho, Jacob975
 
@@ -32,6 +32,8 @@ update log
     1. The code works
 20190123 version alpha 2:
     2. Update the CNN arguments
+20190219 version alpha 3:
+    1. add more option in option file for easier training.
 '''
 import matplotlib.pyplot as plt
 import tensorflow as tf
@@ -510,13 +512,15 @@ if __name__ == "__main__":
     # The number of iterations
     iters = iterations_upperlimit
     print ("number of iterations = {0}".format(iters))
-    # The size of a batch
+    #----------------------------------
+    # The size of a batch for training and validating
+    # Batch size for training
     if len(data.validation.labels) < 600:
         train_batch_size = 200
     else:
         train_batch_size = 600
     print ("train batch size = {0}".format(train_batch_size))
-    # Split the data-set in batches of this size to limit RAM usage.
+    # Batch size for validating 
     if len(data.validation.labels) < 600:
         batch_size = 200
     else:
