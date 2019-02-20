@@ -3,8 +3,8 @@
 Abstract:
     This is a code for train AI to identify YSO from SED data with Convolutional Neural Network( CNN).
 Usage:
-    sed_train_cnn_custimized.py [option file] [source] [id] [coord] [time_stamp]
-    sed_train_cnn_custimized.py option_file source_sed.txt source_id.txt source_coords.txt sometimes 
+    sed_train_dnn_custimized.py [option file] [source] [id] [coord] [time_stamp]
+    sed_train_dnn_custimized.py option_file source_sed.txt source_id.txt source_coords.txt sometimes 
 
 Result tree:
 
@@ -34,6 +34,7 @@ update log
     2. Update the CNN arguments
 20190219 version alpha 3:
     1. add more option in option file for easier training.
+    2. Convert to DNN
 '''
 import matplotlib.pyplot as plt
 import tensorflow as tf
@@ -47,18 +48,34 @@ import math
 import os
 from input_lib import option_train_cnn_customized
 
-def weight_variable(shape, std = 0.1):
-    initial = tf.truncated_normal(shape) * std
-    return tf.Variable(initial)
+def new_weights(shape):
+    return tf.Variable(tf.truncated_normal(shape, stddev=0.05))
 
-def bias_variable(shape):
-    initial = tf.constant(0.1, shape = shape)
-    return tf.Variable(initial)
+def new_biases(length):
+    return tf.Variable(tf.constant(0.05, shape=[length]))
+
+def new_fc_layer(input,          # The previous layer.
+                 num_inputs,     # Num. inputs from prev. layer.
+                 num_outputs,    # Num. outputs.
+                 use_relu=True): # Use Rectified Linear Unit (ReLU)?
+
+    # Create new weights and biases.
+    weights = new_weights(shape=[num_inputs, num_outputs])
+    biases = new_biases(length=num_outputs)
+
+    # Calculate the layer as the matrix multiplication of
+    # the input and weights, and then add the bias-values.
+    layer = tf.matmul(input, weights) + biases
+
+    # Use ReLU?
+    if use_relu:
+        layer = tf.nn.relu6(layer)
+
+    return layer
 
 def optimize_cross_entropy(num_iterations):
     # Ensure we update the global variables rather than local copies.
     global total_iterations
-    global best_score
     global last_improvement
     global equal_batch
     global best_validation_accuracy
@@ -167,7 +184,7 @@ def optimize_GT_score(num_iterations):
         feed_dict_train = {x: x_batch,
                            y_true: y_true_batch}
         val_x_batch = data.validation.images[:, pick_band_array[0]]
-        feed_dict_val = {x: val_x_batch, 
+        feed_dict_val = {x: val_x_batch,
                          y_true: data.validation.labels}
         # Run the optimizer using this batch of training data.
         # TensorFlow assigns the variables in feed_dict_train
@@ -417,8 +434,8 @@ if __name__ == "__main__":
     # Load arguments
     if len(argv) != 6:
         print ("The number of arguments is wrong.")
-        print ("Usage: sed_train_cnn_score.py [options file] [source] [id] [coord] [time_stamp]")
-        print ("Example: sed_train_cnn_score.py option_train_cnn.txt source_sed.txt source_id.txt source_coords.txt sometimes ")
+        print ("Usage: sed_train_dnn_score.py [options file] [source] [id] [coord] [time_stamp]")
+        print ("Example: sed_train_dnn_score.py option_train_cnn.txt source_sed.txt source_id.txt source_coords.txt sometimes ")
         stu.create()
         exit(1)
     option_file_name = argv[1]
@@ -475,42 +492,39 @@ if __name__ == "__main__":
         print('Wrong error consideration.')
         exit()
     image_shape = (width_of_data, img_maj)
-    kernal_shape = (width_of_data, 2)
-    num_kernal_1 = 32
-    num_kernal_2 = 64
-    num_conn_neural = 100
+    img_size = int(width_of_data * img_maj)
+    num_neural = 128
     num_label = len(data.train.labels[0])
     #-----------------------------------
     # Construct an AI
     x = tf.placeholder(tf.float32, [None, width_of_data * img_maj], name = 'x')
-    y_true = tf.placeholder(tf.float32, [None, 3], name = 'y_true')
+    x_image = tf.reshape(x, [-1, img_size])
+    y_true = tf.placeholder(tf.float32, [None, num_label], name = 'y_true')
     y_true_cls = tf.argmax(y_true, axis=1)
-    x_image = tf.reshape(x, [-1, image_shape[0], image_shape[1], 1])
-    # First layer( First kernal)
-    W_conv1 = weight_variable([kernal_shape[0], kernal_shape[1], 1, num_kernal_1])
-    b_conv1 = bias_variable([num_kernal_1])
-    h_conv1 = tf.nn.selu(tf.nn.conv2d(x_image, W_conv1, [1,1,1,1], 'SAME') + b_conv1)
-    # Second layer( Second kernal)
-    W_conv2 = weight_variable([kernal_shape[0], kernal_shape[1], num_kernal_1, num_kernal_2])
-    b_conv2 = bias_variable([num_kernal_2])
-    h_conv2 = tf.nn.selu(tf.nn.conv2d(h_conv1, W_conv2, [1,1,1,1], 'SAME') + b_conv2)
-    # Third layer ( Fully connected)
-    W_fc1 = weight_variable([image_shape[0] * image_shape[1] * num_kernal_2, num_conn_neural])
-    b_fc1 = bias_variable([num_conn_neural])
-    h_conv2_flat = tf.reshape(h_conv2, [ -1, image_shape[0] * image_shape[1] * num_kernal_2])
-    h_fc1 = tf.nn.selu(tf.matmul(h_conv2_flat, W_fc1) + b_fc1)
-    # Output layer
-    W_fc2 = weight_variable([num_conn_neural, num_label])
-    b_fc2 = bias_variable([num_label])
-    y_pred = tf.matmul(h_fc1, W_fc2) + b_fc2
+    
+    layer_fc1 = new_fc_layer(input = x_image,
+                            num_inputs = img_size,
+                            num_outputs = num_neural,
+                            use_relu=True)
+    layer_fc2 = new_fc_layer(input = layer_fc1,
+                            num_inputs = num_neural,
+                            num_outputs = num_neural,
+                            use_relu=True)
+    layer_fc3 = new_fc_layer(input = layer_fc2,
+                            num_inputs = num_neural,
+                            num_outputs = num_neural,
+                            use_relu=True)
+    layer_last = new_fc_layer(input = layer_fc3,
+                             num_inputs=num_neural,
+                             num_outputs=num_label,
+                             use_relu=False)
+    y_pred = tf.nn.softmax(layer_last)
     y_pred_cls = tf.argmax(y_pred, axis=1)
     correct_prediction = tf.equal(y_pred_cls, y_true_cls)
     accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
     # Calculate the loss
     cross_entropy = tf.reduce_sum(tf.nn.softmax_cross_entropy_with_logits(logits = y_pred, labels = y_true))
-    beta = 0.001
-    regularizers = tf.nn.l2_loss(W_conv1) + tf.nn.l2_loss(W_conv2)
-    loss = tf.reduce_mean(cross_entropy + beta * regularizers)
+    loss = tf.reduce_mean(cross_entropy)
     # The number of iterations
     iters = iterations_upperlimit
     print ("number of iterations = {0}".format(iters))

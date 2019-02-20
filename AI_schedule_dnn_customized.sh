@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Usage: AI_schedule_cnn_eq.sh [key word] [number of iterations]
+# Usage: AI_schedule_eq.sh [key word] [number of iterations]
 
 # 20180412 version alpha 1
 # The code work
@@ -14,7 +14,7 @@ fi
 
 keyword=${1}
 
-sed_train_cnn_eq.py
+sed_train_dnn_customized.py
 vim option_train_cnn.txt
 
 iter=1
@@ -24,7 +24,7 @@ do
         # time stamp is used as identification
         timestamp=`date --rfc-3339=seconds`
         mkdir "${timestamp}_trained_by_${keyword}"
-        sed_train_cnn_eq.py option_train_cnn.txt source_sed_${keyword}.txt source_id_${keyword}.txt source_coord_${keyword}.txt\
+        sed_train_dnn_customized.py option_train_cnn.txt source_sed_${keyword}.txt source_id_${keyword}.txt source_coord_${keyword}.txt\
                         "${timestamp}_trained_by_${keyword}" > "${timestamp}_trained_by_${keyword}/Iters_log"
         (( iter++ ))
 done
