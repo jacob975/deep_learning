@@ -196,8 +196,8 @@ def optimize_GT_score(num_iterations):
             score = acc_train + \
                     val_star_recall + \
                     0.01 * val_gala_recall + \
-                    1. * val_ysos_recall + \
-                    1. * val_ysos_precision
+                    0.1 * val_ysos_recall + \
+                    0.1 * val_ysos_precision
 
             # If validation accuracy is an improvement over best-known.
             if score > best_score:
@@ -460,16 +460,10 @@ if __name__ == "__main__":
     #----------------------------------
     # The size of a batch for training and validating
     # Batch size for training
-    if len(data.validation.labels) < 600:
-        train_batch_size = 200
-    else:
-        train_batch_size = 600
+    train_batch_size = 300
     print ("train batch size = {0}".format(train_batch_size))
     # Batch size for validating 
-    if len(data.validation.labels) < 600:
-        batch_size = 200
-    else:
-        batch_size = 600
+    batch_size = 300
     print ("batch size = {0}".format(batch_size))
     #-----------------------------------
     # Best validation accuracy seen so far.
