@@ -14,8 +14,8 @@ fi
 
 keyword=${1}
 
-sed_train_cnn_customized.py
-vim option_train_cnn.txt
+sed_train_dnn.py
+vim option_train.txt
 
 iter=1
 while [ $iter -le ${2} ]
@@ -24,7 +24,7 @@ do
         # time stamp is used as identification
         timestamp=`date --rfc-3339=seconds`
         mkdir "${timestamp}_trained_by_${keyword}"
-        sed_train_cnn_customized.py option_train_cnn.txt source_sed_${keyword}.txt source_id_${keyword}.txt source_coord_${keyword}.txt\
+        sed_train_dnn.py option_train.txt source_sed_${keyword}.txt source_id_${keyword}.txt source_coord_${keyword}.txt\
                         "${timestamp}_trained_by_${keyword}" > "${timestamp}_trained_by_${keyword}/Iters_log"
         (( iter++ ))
 done

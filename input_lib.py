@@ -21,7 +21,7 @@ update log
 import numpy as np
 import time
 
-class option_train_cnn():
+class option_test():
     def __init__(self):
         self.opts = None
     def create(self):
@@ -33,13 +33,13 @@ class option_train_cnn():
                 '# \t[consider error] means considering error or not during the convertion.',
                 '# Available options: yes, no',
                 'yes']
-        np.savetxt('option_train_cnn.txt', s, fmt = '%s')
+        np.savetxt('option_test.txt', s, fmt = '%s')
     def load(self, file_name):
         self.opts = np.loadtxt(file_name, dtype = str)
         self.opts = list(self.opts)
         return self.opts
 
-class option_train_cnn_customized():
+class option_train():
     def __init__(self):
         self.opts = None
     def create(self):
@@ -63,7 +63,7 @@ class option_train_cnn_customized():
                 '# \t[validation function] means the function we used to judge the model.',
                 '# Available options: GT_score, cross_entropy',
                 'cross_entropy']
-        np.savetxt('option_train_cnn.txt', s, fmt = '%s')
+        np.savetxt('option_train.txt', s, fmt = '%s')
     def load(self, file_name):
         self.opts = np.loadtxt(file_name, dtype = str)
         self.opts = list(self.opts)

@@ -3,7 +3,7 @@
 Abstract:
     This is a code for testing AI with given sed data using CNN.
 Usage:
-    sed_test_cnn_eq.py [option file] [source] [id] [coord] [where to save] [AI]
+    sed_test_dnn.py [option file] [source] [id] [coord] [where to save] [AI]
 Editor and Practicer:
     Jacob975
 
@@ -30,7 +30,7 @@ from save_lib import save_cls_pred, save_cls_true, save_arrangement, save_coords
 from load_lib import print_precision, print_recall_rate
 import astro_mnist
 import os
-from input_lib import option_train_cnn
+from input_lib import option_test
 
 def new_weights(shape):
     return tf.Variable(tf.truncated_normal(shape, stddev=0.05))
@@ -156,11 +156,11 @@ if __name__ == "__main__":
     start_time = time.time()
     #-----------------------------------
     # Load arguments
-    stu = option_train_cnn()
+    stu = option_test()
     print(len(argv))
     if len(argv) != 7:
         print ("The number of arguments is wrong.")
-        print ("Usage: sed_test_cnn.py [option_file] [source] [id] [coord] [where to save] [AI]")
+        print ("Usage: sed_test_dnn.py [option_file] [source] [id] [coord] [where to save] [AI]")
         stu.create()
         exit(1)
     option_file_name = argv[1]

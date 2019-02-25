@@ -3,8 +3,8 @@
 Abstract:
     This is a code for train AI to identify YSO from SED data with Convolutional Neural Network( CNN).
 Usage:
-    sed_train_cnn_custimized.py [option file] [source] [id] [coord] [time_stamp]
-    sed_train_cnn_custimized.py option_file source_sed.txt source_id.txt source_coords.txt sometimes 
+    sed_train_dnn.py [option file] [source] [id] [coord] [time_stamp]
+    sed_train_dnn.py option_file source_sed.txt source_id.txt source_coords.txt sometimes 
 
 Result tree:
 
@@ -34,6 +34,7 @@ update log
     2. Update the CNN arguments
 20190219 version alpha 3:
     1. add more option in option file for easier training.
+    2. Convert to DNN
 '''
 import matplotlib.pyplot as plt
 import tensorflow as tf
@@ -45,20 +46,36 @@ from save_lib import save_arrangement, save_cls_pred, save_cls_true, save_coords
 import astro_mnist
 import math
 import os
-from input_lib import option_train_cnn_customized
+from input_lib import option_train
 
-def weight_variable(shape, std = 0.1):
-    initial = tf.truncated_normal(shape) * std
-    return tf.Variable(initial)
+def new_weights(shape):
+    return tf.Variable(tf.truncated_normal(shape, stddev=0.05))
 
-def bias_variable(shape):
-    initial = tf.constant(0.1, shape = shape)
-    return tf.Variable(initial)
+def new_biases(length):
+    return tf.Variable(tf.constant(0.05, shape=[length]))
+
+def new_fc_layer(input,          # The previous layer.
+                 num_inputs,     # Num. inputs from prev. layer.
+                 num_outputs,    # Num. outputs.
+                 use_relu=True): # Use Rectified Linear Unit (ReLU)?
+
+    # Create new weights and biases.
+    weights = new_weights(shape=[num_inputs, num_outputs])
+    biases = new_biases(length=num_outputs)
+
+    # Calculate the layer as the matrix multiplication of
+    # the input and weights, and then add the bias-values.
+    layer = tf.matmul(input, weights) + biases
+
+    # Use ReLU?
+    if use_relu:
+        layer = tf.nn.relu6(layer)
+
+    return layer
 
 def optimize_cross_entropy(num_iterations):
     # Ensure we update the global variables rather than local copies.
     global total_iterations
-    global best_score
     global last_improvement
     global equal_batch
     global best_validation_accuracy
@@ -94,7 +111,8 @@ def optimize_cross_entropy(num_iterations):
         if (total_iterations % 100 == 0) or (i == (num_iterations - 1)):
 
             # Calculate the accuracy on the training-batch.
-            acc_train = session.run(accuracy, feed_dict=feed_dict_train)
+            train_correct, _ = predict_cls_train()
+            acc_train, _ = cls_accuracy(train_correct)
             loss_validation = session.run(loss, feed_dict=feed_dict_val)
             # Calculate the accuracy on the validation-set.
             # The function returns 2 values but we only need the first.
@@ -167,7 +185,7 @@ def optimize_GT_score(num_iterations):
         feed_dict_train = {x: x_batch,
                            y_true: y_true_batch}
         val_x_batch = data.validation.images[:, pick_band_array[0]]
-        feed_dict_val = {x: val_x_batch, 
+        feed_dict_val = {x: val_x_batch,
                          y_true: data.validation.labels}
         # Run the optimizer using this batch of training data.
         # TensorFlow assigns the variables in feed_dict_train
@@ -178,7 +196,8 @@ def optimize_GT_score(num_iterations):
         if (total_iterations % 100 == 0) or (i == (num_iterations - 1)):
 
             # Calculate the accuracy on the training-batch.
-            acc_train = session.run(accuracy, feed_dict=feed_dict_train)
+            train_correct, _ = predict_cls_train()
+            acc_train, _ = cls_accuracy(train_correct)
             loss_validation = session.run(loss, feed_dict=feed_dict_val)
             # Calculate the accuracy on the validation-set.
             # The function returns 2 values but we only need the first.
@@ -266,36 +285,7 @@ def plot_images(images, cls_true, cls_pred=None):
     plt.show()
     return
 
-def plot_example_errors(cls_pred, correct):
-    # This function is called from print_test_accuracy() below.
-
-    # cls_pred is an array of the predicted class-number for
-    # all images in the test-set.
-
-    # correct is a boolean array whether the predicted class
-    # is equal to the true class for each image in the test-set.
-
-    # Negate the boolean array.
-    incorrect = (correct == False)
-    
-    # Get the images from the test-set that have been
-    # incorrectly classified.
-    images = data.test.images[incorrect]
-    
-    # Get the predicted classes for those images.
-    cls_pred = cls_pred[incorrect]
-
-    # Get the true classes for those images.
-    cls_true = data.test.cls[incorrect]
-    
-    # Plot the first 9 images.
-    plot_images(images=images[0:9],
-                cls_true=cls_true[0:9],
-                cls_pred=cls_pred[0:9])
-
 def plot_confusion_matrix(cls_pred):
-    # This is called from print_test_accuracy() below.
-
     # cls_pred is an array of the predicted class-number for
     # all images in the test-set.
 
@@ -308,37 +298,6 @@ def plot_confusion_matrix(cls_pred):
     
     # Print the confusion matrix as text.
     print(cm)
-
-def print_test_accuracy(show_example_errors=False,
-                        show_confusion_matrix=False):
-
-    # For all the images in the test-set,
-    # calculate the predicted classes and whether they are correct.
-    correct, cls_pred = predict_cls_test()
-    #----------------------------------------
-    # save cls_pred and cls_true
-    save_cls_pred(images_name[:-4], time_stamp, cls_pred)
-    save_cls_true(images_name[:-4], time_stamp, data.test.cls)
-    #----------------------------------------
-    # Classification accuracy and the number of correct classifications.
-    acc, num_correct = cls_accuracy(correct)
-    
-    # Number of images being classified.
-    num_images = len(correct)
-
-    # Print the accuracy.
-    msg = "Accuracy on Test-Set: {0:.1%} ({1} / {2})"
-    print(msg.format(acc, num_correct, num_images))
-    
-    # Plot the confusion matrix, if desired.
-    if show_confusion_matrix:
-        print("Confusion Matrix:")
-        plot_confusion_matrix(cls_pred=cls_pred)
-
-    # Plot some examples of mis-classifications, if desired.
-    if show_example_errors:
-        print("Example errors:")
-        plot_example_errors(cls_pred=cls_pred, correct=correct)
 
 def predict_cls(images, labels, cls_true):
     # Number of images.
@@ -376,15 +335,15 @@ def predict_cls(images, labels, cls_true):
 
     return correct, cls_pred
 
-def predict_cls_test():
-    return predict_cls(images = data.test.images,
-                       labels = data.test.labels,
-                       cls_true = data.test.cls)
-
 def predict_cls_validation():
-    return predict_cls(images = data.validation.images,
+    return predict_cls(images = data.validation.images, 
                        labels = data.validation.labels,
                        cls_true = data.validation.cls)
+
+def predict_cls_train():
+    return predict_cls(images = data.validation.images,
+                       labels = data.train.labels,
+                       cls_true = data.train.cls)
 
 def cls_accuracy(correct):
     # Calculate the number of correctly classified images.
@@ -413,12 +372,12 @@ if __name__ == "__main__":
     # measure times
     start_time = time.time()
     #-----------------------------------
-    stu = option_train_cnn_customized()
+    stu = option_train()
     # Load arguments
     if len(argv) != 6:
         print ("The number of arguments is wrong.")
-        print ("Usage: sed_train_cnn_score.py [options file] [source] [id] [coord] [time_stamp]")
-        print ("Example: sed_train_cnn_score.py option_train_cnn.txt source_sed.txt source_id.txt source_coords.txt sometimes ")
+        print ("Usage: sed_train_dnn.py [options file] [source] [id] [coord] [time_stamp]")
+        print ("Example: sed_train_dnn.py option_train.txt source_sed.txt source_id.txt source_coords.txt sometimes ")
         stu.create()
         exit(1)
     option_file_name = argv[1]
@@ -450,7 +409,6 @@ if __name__ == "__main__":
     print("- Training-set:\t\t{}".format(len(data.train.labels)))
     print("- Test-set:\t\t{}".format(len(data.test.labels)))
     print("- Validation-set:\t{}".format(len(data.validation.labels)))
-    data.test.cls = np.argmax(data.test.labels, axis=1)
     #-----------------------------------
     # save arrangement and coords
     failure = save_arrangement(images_name[:-4], time_stamp, data, tracer)
@@ -475,42 +433,39 @@ if __name__ == "__main__":
         print('Wrong error consideration.')
         exit()
     image_shape = (width_of_data, img_maj)
-    kernal_shape = (width_of_data, 2)
-    num_kernal_1 = 32
-    num_kernal_2 = 64
-    num_conn_neural = 100
+    img_size = int(width_of_data * img_maj)
+    num_neural = 128
     num_label = len(data.train.labels[0])
     #-----------------------------------
     # Construct an AI
     x = tf.placeholder(tf.float32, [None, width_of_data * img_maj], name = 'x')
-    y_true = tf.placeholder(tf.float32, [None, 3], name = 'y_true')
+    x_image = tf.reshape(x, [-1, img_size])
+    y_true = tf.placeholder(tf.float32, [None, num_label], name = 'y_true')
     y_true_cls = tf.argmax(y_true, axis=1)
-    x_image = tf.reshape(x, [-1, image_shape[0], image_shape[1], 1])
-    # First layer( First kernal)
-    W_conv1 = weight_variable([kernal_shape[0], kernal_shape[1], 1, num_kernal_1])
-    b_conv1 = bias_variable([num_kernal_1])
-    h_conv1 = tf.nn.selu(tf.nn.conv2d(x_image, W_conv1, [1,1,1,1], 'SAME') + b_conv1)
-    # Second layer( Second kernal)
-    W_conv2 = weight_variable([kernal_shape[0], kernal_shape[1], num_kernal_1, num_kernal_2])
-    b_conv2 = bias_variable([num_kernal_2])
-    h_conv2 = tf.nn.selu(tf.nn.conv2d(h_conv1, W_conv2, [1,1,1,1], 'SAME') + b_conv2)
-    # Third layer ( Fully connected)
-    W_fc1 = weight_variable([image_shape[0] * image_shape[1] * num_kernal_2, num_conn_neural])
-    b_fc1 = bias_variable([num_conn_neural])
-    h_conv2_flat = tf.reshape(h_conv2, [ -1, image_shape[0] * image_shape[1] * num_kernal_2])
-    h_fc1 = tf.nn.selu(tf.matmul(h_conv2_flat, W_fc1) + b_fc1)
-    # Output layer
-    W_fc2 = weight_variable([num_conn_neural, num_label])
-    b_fc2 = bias_variable([num_label])
-    y_pred = tf.matmul(h_fc1, W_fc2) + b_fc2
+    
+    layer_fc1 = new_fc_layer(input = x_image,
+                            num_inputs = img_size,
+                            num_outputs = num_neural,
+                            use_relu=True)
+    layer_fc2 = new_fc_layer(input = layer_fc1,
+                            num_inputs = num_neural,
+                            num_outputs = num_neural,
+                            use_relu=True)
+    layer_fc3 = new_fc_layer(input = layer_fc2,
+                            num_inputs = num_neural,
+                            num_outputs = num_neural,
+                            use_relu=True)
+    layer_last = new_fc_layer(input = layer_fc3,
+                             num_inputs=num_neural,
+                             num_outputs=num_label,
+                             use_relu=False)
+    y_pred = tf.nn.softmax(layer_last)
     y_pred_cls = tf.argmax(y_pred, axis=1)
     correct_prediction = tf.equal(y_pred_cls, y_true_cls)
     accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
     # Calculate the loss
     cross_entropy = tf.reduce_sum(tf.nn.softmax_cross_entropy_with_logits(logits = y_pred, labels = y_true))
-    beta = 0.001
-    regularizers = tf.nn.l2_loss(W_conv1) + tf.nn.l2_loss(W_conv2)
-    loss = tf.reduce_mean(cross_entropy + beta * regularizers)
+    loss = tf.reduce_mean(cross_entropy)
     # The number of iterations
     iters = iterations_upperlimit
     print ("number of iterations = {0}".format(iters))
@@ -532,19 +487,11 @@ if __name__ == "__main__":
     best_validation_accuracy = 0.0
     #-----------------------------------
     # Get the true classes for those images.
+    data.test.cls = np.argmax(data.test.labels, axis=1)
+    data.train.cls = np.argmax(data.train.labels, axis=1)
     data.validation.cls = np.argmax(data.validation.labels, axis=1)
-    #-----------------------------------
-    # Tensorflow Graph
-    starter_learning_rate = 1e-4
-    print ("starter learning rate = {0}".format(starter_learning_rate))
-    base = 0.96
-    print ("base = {0}".format(base))
-    unit_step = 100000
-    print ("unit_step = {0}".format(unit_step))
-    global_step = tf.Variable(0, trainable=False)
-    learning_rate = tf.train.exponential_decay(starter_learning_rate, global_step , unit_step, base, staircase=True)
-    optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(loss, global_step = global_step)
-    #-----------------------------------
+    # Learning rate
+    optimizer = = tf.train.AdamOptimizer(learning_rate=0.005, epsilon=1e-7).minimize(loss)
     # Saver
     validation_list = []
     improved_validation_list = []
@@ -566,15 +513,13 @@ if __name__ == "__main__":
     # Iteration-number for last improvement to validation accuracy.
     last_improvement = 0
     # Stop optimization if no improvement found in this many iterations.
-    require_improvement = 100000
+    require_improvement = 50000
     # Counter for total number of iterations performed so far.
     total_iterations = 0
     if validation_func == "GT_score":
         optimize_GT_score(num_iterations=iters)
     elif validation_func == "cross_entropy":
         optimize_cross_entropy(num_iterations=iters)
-    print ( "final_learning_rate = {0}".format(session.run(learning_rate)))
-    #print_test_accuracy(show_example_errors=False, show_confusion_matrix=True)
     session.close()
     #-----------------------------------
     # measuring time
