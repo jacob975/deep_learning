@@ -61,7 +61,7 @@ class option_train():
                 '500000',
                 '# validation function:',
                 '# \t[validation function] means the function we used to judge the model.',
-                '# Available options: GT_score, cross_entropy',
+                '# Available options: GT_score, GT_score_newn, cross_entropy',
                 'cross_entropy']
         np.savetxt('option_train.txt', s, fmt = '%s')
     def load(self, file_name):

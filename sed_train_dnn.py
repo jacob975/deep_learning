@@ -211,7 +211,19 @@ def optimize_GT_score(num_iterations):
             # Save the acc and loss of each iter
             validation_list.append([total_iterations, acc_validation, loss_validation])
             # Determind a score for validating the AI.
-            score = acc_train + val_star_recall + 0.01*val_gala_recall + 10*val_ysos_recall + 10*val_ysos_precision
+            score = None
+            if validation_func == "GT_score":
+                score = acc_train + \
+                        val_star_recall + \
+                        0.01 * val_gala_recall + \
+                        0.1 * val_ysos_recall + \
+                        0.1 * val_ysos_precision
+            elif validation_func == "GT_score_newn":
+                score = acc_train + \
+                        val_star_recall + \
+                        0.01 * val_gala_recall + \
+                        0.01 * val_ysos_recall + \
+                        0.01 * val_ysos_precision
 
             # If validation accuracy is an improvement over best-known.
             if score > best_score:
@@ -510,7 +522,7 @@ if __name__ == "__main__":
     require_improvement = 50000
     # Counter for total number of iterations performed so far.
     total_iterations = 0
-    if validation_func == "GT_score":
+    if any([validation_func == "GT_score", validation_func == "GT_score_newn"]):
         optimize_GT_score(num_iterations=iters)
     elif validation_func == "cross_entropy":
         optimize_cross_entropy(num_iterations=iters)
