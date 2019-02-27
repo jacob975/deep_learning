@@ -67,6 +67,7 @@ if __name__ == "__main__":
     source_tracer = np.loadtxt("source_tracer_{0}.txt".format(keyword), dtype = str)
     source_coord = np.loadtxt("source_coord_{0}.txt".format(keyword), dtype = str)
     source_Q = np.loadtxt("source_Q_{0}.txt".format(keyword), dtype = str)
+    source_HL2013 = np.loadtxt("source_HL2013_{0}.txt".format(keyword), dtype = str)
     num_source = len(source_sed)
     #-----------------------------------
     # Shuffle the data
@@ -78,6 +79,7 @@ if __name__ == "__main__":
     source_tracer = source_tracer[randomize]
     source_coord = source_coord[randomize]
     source_Q = source_Q[randomize]
+    source_HL2013 = source_HL2013[randomize]
     # Seperate the dataset into given # of partitions.
     print ('Generate ticks and partitions')
     ticks = np.linspace(0, num_source, num_partition+1, dtype = int)
@@ -88,6 +90,7 @@ if __name__ == "__main__":
     tracer_partitions = gen_part(source_tracer, ticks)
     coord_partitions = gen_part(source_coord, ticks)
     Q_partitions = gen_part(source_Q, ticks)
+    HL2013_partitions = gen_part(source_HL2013, ticks)
     # Save the partitions
     print ("Saving the partitions")
     failure = save_part(sed_partitions, 'sed', keyword)
@@ -95,6 +98,7 @@ if __name__ == "__main__":
     failure = save_part(tracer_partitions, 'tracer', keyword)
     failure = save_part(coord_partitions, 'coord', keyword)
     failure = save_part(Q_partitions, 'Q', keyword)
+    failure = save_part(HL2013_partitions, 'HL2013', keyword)
     for i in range(num_partition):
         print ("Round {0}".format(i+1))
         os.system("mkdir -p part{0}_test".format(i+1))
@@ -104,6 +108,7 @@ if __name__ == "__main__":
         failure = save_to(i+1, tracer_partitions, 'tracer', keyword)
         failure = save_to(i+1, coord_partitions, 'coord', keyword)
         failure = save_to(i+1, Q_partitions, 'Q', keyword)
+        failure = save_to(i+1, HL2013_partitions, 'HL2013', keyword)
     #-----------------------------------
     # Measure time
     elapsed_time = time.time() - start_time

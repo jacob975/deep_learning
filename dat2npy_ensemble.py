@@ -98,13 +98,16 @@ if __name__ == "__main__":
         exit()
     option_file_name = argv[1]
     data_name_list = argv[2:]
+    
     mask_code, \
     number_of_lost, \
     do_normalization, \
     consider_error, \
     high_flux_error_correlation, \
     upperlimit_num_sources, \
-    do_extinction = option_file.load(option_file_name)
+    do_extinction, \
+    do_HL2013 = option_file.load(option_file_name)
+    
     number_of_lost = int(number_of_lost)
     print ('mask code: {0}'.format(mask_code))
     print ('number_of_lost: {0}'.format(number_of_lost))
@@ -125,6 +128,7 @@ if __name__ == "__main__":
     sum_coord = [[] for x in range(data_width)]
     sum_quality = [[] for x in range(data_width)]
     sum_Av = [[] for x in range(data_width)]
+    sum_HL2013 = [[] for x in range(data_width)]
     num_sources = np.zeros((data_width, len(data_name_list)), dtype = int)
     for ind, data_name in enumerate(data_name_list, start = 0):
         print ("##############################")
@@ -137,7 +141,8 @@ if __name__ == "__main__":
         name_tracer = ''
         name_coord = ''
         name_quality = ''
-        name_Av = '' 
+        name_Av = ''
+        name_HL2013 = '' 
         for key in keywords:
             # Tracer
             failure, tmp_name_tracer = SEDname2other_name(data_name, key, 'tracer')
@@ -153,14 +158,20 @@ if __name__ == "__main__":
                 name_quality = tmp_name_quality
             # Av
             if do_extinction == 'yes': 
-                failure, name_Av = SEDname2other_name(data_name, key, 'Av') 
+                failure, tmp_name_Av = SEDname2other_name(data_name, key, 'Av') 
                 if not failure:
                     name_Av = tmp_name_Av
+            # HL 2013
+            if do_HL2013 == 'yes':
+                failure, tmp_name_HL2013 = SEDname2other_name(data_name, key, 'HL2013_label')
+                if not failure:
+                    name_HL2013 = tmp_name_HL2013
         tracer = np.loadtxt(name_tracer, dtype = object)
         coord = np.loadtxt(name_coord)
         quality = np.loadtxt(name_quality, dtype = str)
         extinction = None
         if do_extinction == 'yes': extinction = np.loadtxt(name_Av)
+        if do_HL2013 == 'yes': HL2013 = np.loadtxt(name_HL2013)
         # Convert the format from str to float
         data = np.array(str_data, dtype = float)
         # Mask low flux error correlated sources.
@@ -171,6 +182,7 @@ if __name__ == "__main__":
             coord = coord[~exclusion]
             quality = quality[~exclusion]
             if do_extinction == 'yes': extinction = extinction[~exclusion]
+            if do_HL2013 == 'yes': HL2013 = HL2013[~exclusion]
         # Mask specified bands
         data_n = mask(data, mask_code)
         # Mask error or not
@@ -188,6 +200,7 @@ if __name__ == "__main__":
         coord  = coord[~nan_filter]
         quality = quality[~nan_filter]
         if do_extinction == 'yes': extinction = extinction[~nan_filter]
+        if do_HL2013 == 'yes': HL2013 = HL2013[~nan_filter]
         # no observation filter
         # i is the tolarence of loss in a single datum
         for i in range(data_width):
@@ -196,7 +209,9 @@ if __name__ == "__main__":
             coord_outp = coord[_filter]
             quality_outp = quality[_filter]
             extinction_outp = None
+            HL2013_outp = None
             if do_extinction == 'yes': extinction_outp = extinction[_filter]
+            if do_HL2013 == 'yes': HL2013_outp = HL2013[_filter]
             num_sources[i, ind] = len(data_n_z)
             print ("MaxLoss = {0}, number of data = {1}".format(i, len(data_n_z)))
             # Generate labels
@@ -212,6 +227,7 @@ if __name__ == "__main__":
             sum_quality[i] = np.append(sum_quality[i], quality_outp)
             sum_coord[i] = np.append(sum_coord[i], coord_outp)
             if do_extinction == 'yes': sum_Av[i] = np.append(sum_Av[i], extinction_outp)
+            if do_HL2013 == 'yes': sum_HL2013[i] = np.append(sum_HL2013[i], HL2013_outp)
             #-----------------------------------------------------
     # save data, number of sources in different selection, label, tracer, and coordinate
     print ("###############################")
@@ -233,6 +249,7 @@ if __name__ == "__main__":
             sum_tracer[i] = sum_tracer[i][randomize[:int(upperlimit_num_sources)]]
             sum_quality[i] = sum_quality[i][randomize[:int(upperlimit_num_sources)]]
             if do_extinction == 'yes': sum_Av[i] = sum_Av[i][randomize[:int(upperlimit_num_sources)]]
+            if do_HL2013 == 'yes': sum_HL2013[i] = sum_HL2013[i][randomize[:int(upperlimit_num_sources)]]
         print ("number of data with MaxLoss {0} = {1}".format(i, len(sum_data[i])))
         if i == number_of_lost:
             np.savetxt("source_sed_MaxLoss{0}.txt".format(i), sum_data[i])
@@ -241,6 +258,7 @@ if __name__ == "__main__":
             np.savetxt("source_Q_MaxLoss{0}.txt".format(i), sum_quality[i], fmt ='%s')
             np.savetxt("source_coord_MaxLoss{0}.txt".format(i), sum_coord[i])
             if do_extinction == 'yes': np.savetxt("source_Av_MaxLoss{0}.txt".format(i), sum_Av[i])
+            if do_HL2013 == 'yes': np.savetxt("source_HL2013_MaxLoss0.txt".format(i), sum_HL2013[i])
     #-----------------------------------
     # measuring time
     elapsed_time = time.time() - start_time

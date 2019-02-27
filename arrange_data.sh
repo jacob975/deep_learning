@@ -219,18 +219,122 @@ if [ "${option}" = "ALLu" ]; then
     echo done
     # stack all data
     echo "Stack all data"
-    cat ELAIS_N1_star_sed_u.txt OPH_star_sed_u.txt SER_star_sed_u.txt PER_star_sed_u_u.txt CHA_II_star_sed_u.txt LUP_I_star_sed_u.txt LUP_III_star_sed_u.txt LUP_IV_star_sed_u.txt > star_sed_u.txt
-    cat ELAIS_N1_gala_sed_u.txt OPH_gala_sed_u.txt SER_gala_sed_u.txt PER_gala_sed_u_u.txt CHA_II_gala_sed_u.txt LUP_I_gala_sed_u.txt LUP_III_gala_sed_u.txt LUP_IV_gala_sed_u.txt > gala_sed_u.txt
-    cat OPH_ysos_sed_u.txt SER_ysos_sed_u.txt PER_ysos_sed_u_u.txt CHA_II_ysos_sed_u.txt LUP_I_ysos_sed_u.txt LUP_III_ysos_sed_u.txt LUP_IV_ysos_sed_u.txt > ysos_sed_u.txt
-    cat ELAIS_N1_star_coord.dat OPH_star_coord.dat SER_star_coord.dat PER_star_coord.dat CHA_II_star_coord.dat LUP_I_star_coord.dat LUP_III_star_coord.dat LUP_IV_star_coord.dat > star_coord.dat
-    cat ELAIS_N1_gala_coord.dat OPH_gala_coord.dat SER_gala_coord.dat PER_gala_coord.dat CHA_II_gala_coord.dat LUP_I_gala_coord.dat LUP_III_gala_coord.dat LUP_IV_gala_coord.dat > gala_coord.dat
-    cat OPH_ysos_coord.dat SER_ysos_coord.dat PER_ysos_coord.dat CHA_II_ysos_coord.dat LUP_I_ysos_coord.dat LUP_III_ysos_coord.dat LUP_IV_ysos_coord.dat > ysos_coord.dat
-    cat ELAIS_N1_star_tracer.dat OPH_star_tracer.dat SER_star_tracer.dat PER_star_tracer.dat CHA_II_star_tracer.dat LUP_I_star_tracer.dat LUP_III_star_tracer.dat LUP_IV_star_tracer.dat > star_tracer.dat
-    cat ELAIS_N1_gala_tracer.dat OPH_gala_tracer.dat SER_gala_tracer.dat PER_gala_tracer.dat CHA_II_gala_tracer.dat LUP_I_gala_tracer.dat LUP_III_gala_tracer.dat LUP_IV_gala_tracer.dat > gala_tracer.dat
-    cat OPH_ysos_tracer.dat SER_ysos_tracer.dat PER_ysos_tracer.dat CHA_II_ysos_tracer.dat LUP_I_ysos_tracer.dat LUP_III_ysos_tracer.dat LUP_IV_ysos_tracer.dat > ysos_tracer.dat
-    cat ELAIS_N1_star_Q.dat OPH_star_Q.dat SER_star_Q.dat PER_star_Q.dat CHA_II_star_Q.dat LUP_I_star_Q.dat LUP_III_star_Q.dat LUP_IV_star_Q.dat > star_Q.dat
-    cat ELAIS_N1_gala_Q.dat OPH_gala_Q.dat SER_gala_Q.dat PER_gala_Q.dat CHA_II_gala_Q.dat LUP_I_gala_Q.dat LUP_III_gala_Q.dat LUP_IV_gala_Q.dat > gala_Q.dat
-    cat OPH_ysos_Q.dat SER_ysos_Q.dat PER_ysos_Q.dat CHA_II_ysos_Q.dat LUP_I_ysos_Q.dat LUP_III_ysos_Q.dat LUP_IV_ysos_Q.dat > ysos_Q.dat
+    cat ELAIS_N1_star_sed_u.txt \
+        OPH_star_sed_u.txt \
+        SER_star_sed_u.txt \
+        PER_star_sed_u_u.txt \
+        CHA_II_star_sed_u.txt \
+        LUP_I_star_sed_u.txt \
+        LUP_III_star_sed_u.txt \
+        LUP_IV_star_sed_u.txt > star_sed_u.txt
+    cat ELAIS_N1_gala_sed_u.txt \
+        OPH_gala_sed_u.txt \
+        SER_gala_sed_u.txt \
+        PER_gala_sed_u_u.txt \
+        CHA_II_gala_sed_u.txt \
+        LUP_I_gala_sed_u.txt \
+        LUP_III_gala_sed_u.txt \
+        LUP_IV_gala_sed_u.txt > gala_sed_u.txt
+    cat OPH_ysos_sed_u.txt \
+        SER_ysos_sed_u.txt \
+        PER_ysos_sed_u_u.txt \
+        CHA_II_ysos_sed_u.txt \
+        LUP_I_ysos_sed_u.txt \
+        LUP_III_ysos_sed_u.txt \
+        LUP_IV_ysos_sed_u.txt > ysos_sed_u.txt
+    cat ELAIS_N1_star_coord.dat \
+        OPH_star_coord.dat \
+        SER_star_coord.dat \
+        PER_star_coord.dat \
+        CHA_II_star_coord.dat \
+        LUP_I_star_coord.dat \
+        LUP_III_star_coord.dat \
+        LUP_IV_star_coord.dat > star_coord.dat
+    cat ELAIS_N1_gala_coord.dat \
+        OPH_gala_coord.dat \
+        SER_gala_coord.dat \
+        PER_gala_coord.dat \
+        CHA_II_gala_coord.dat \
+        LUP_I_gala_coord.dat \
+        LUP_III_gala_coord.dat \
+        LUP_IV_gala_coord.dat > gala_coord.dat
+    cat OPH_ysos_coord.dat \
+        SER_ysos_coord.dat \
+        PER_ysos_coord.dat \
+        CHA_II_ysos_coord.dat \
+        LUP_I_ysos_coord.dat \
+        LUP_III_ysos_coord.dat \
+        LUP_IV_ysos_coord.dat > ysos_coord.dat
+    cat ELAIS_N1_star_tracer.dat \
+        OPH_star_tracer.dat \
+        SER_star_tracer.dat \
+        PER_star_tracer.dat \
+        CHA_II_star_tracer.dat \
+        LUP_I_star_tracer.dat \
+        LUP_III_star_tracer.dat \
+        LUP_IV_star_tracer.dat > star_tracer.dat
+    cat ELAIS_N1_gala_tracer.dat \
+        OPH_gala_tracer.dat \
+        SER_gala_tracer.dat \
+        PER_gala_tracer.dat \
+        CHA_II_gala_tracer.dat \
+        LUP_I_gala_tracer.dat \
+        LUP_III_gala_tracer.dat \
+        LUP_IV_gala_tracer.dat > gala_tracer.dat
+    cat OPH_ysos_tracer.dat \
+        SER_ysos_tracer.dat \
+        PER_ysos_tracer.dat \
+        CHA_II_ysos_tracer.dat \
+        LUP_I_ysos_tracer.dat \
+        LUP_III_ysos_tracer.dat \
+        LUP_IV_ysos_tracer.dat > ysos_tracer.dat
+    cat ELAIS_N1_star_Q.dat \
+        OPH_star_Q.dat \
+        SER_star_Q.dat \
+        PER_star_Q.dat \
+        CHA_II_star_Q.dat \
+        LUP_I_star_Q.dat \
+        LUP_III_star_Q.dat \
+        LUP_IV_star_Q.dat > star_Q.dat
+    cat ELAIS_N1_gala_Q.dat \
+        OPH_gala_Q.dat \
+        SER_gala_Q.dat \
+        PER_gala_Q.dat \
+        CHA_II_gala_Q.dat \
+        LUP_I_gala_Q.dat \
+        LUP_III_gala_Q.dat \
+        LUP_IV_gala_Q.dat > gala_Q.dat
+    cat OPH_ysos_Q.dat \
+        SER_ysos_Q.dat \
+        PER_ysos_Q.dat \
+        CHA_II_ysos_Q.dat \
+        LUP_I_ysos_Q.dat \
+        LUP_III_ysos_Q.dat \
+        LUP_IV_ysos_Q.dat > ysos_Q.dat
+    
+    cat HL_2013/HL_ELAIS_N1_gala_label.txt \
+        HL_2013/HL_OPH_gala_label.txt \
+        HL_2013/HL_SER_gala_label.txt \
+        HL_2013/HL_PER_gala_label.txt \
+        HL_2013/HL_CHA_II_gala_label.txt \
+        HL_2013/HL_LUP_I_gala_label.txt \
+        HL_2013/HL_LUP_III_gala_label.txt \
+        HL_2013/HL_LUP_IV_gala_label.txt > HL_gala_label.dat
+    cat HL_2013/HL_ELAIS_N1_star_label.txt \
+        HL_2013/HL_OPH_star_label.txt \
+        HL_2013/HL_SER_star_label.txt \
+        HL_2013/HL_PER_star_label.txt \
+        HL_2013/HL_CHA_II_star_label.txt \
+        HL_2013/HL_LUP_I_star_label.txt \
+        HL_2013/HL_LUP_III_star_label.txt \
+        HL_2013/HL_LUP_IV_star_label.txt > HL_star_label.dat
+    cat HL_2013/HL_OPH_ysos_label.txt \
+        HL_2013/HL_SER_ysos_label.txt \
+        HL_2013/HL_PER_ysos_label.txt \
+        HL_2013/HL_CHA_II_ysos_label.txt \
+        HL_2013/HL_LUP_I_ysos_label.txt \
+        HL_2013/HL_LUP_III_ysos_label.txt \
+        HL_2013/HL_LUP_IV_ysos_label.txt > HL_ysos_label.dat
     echo done
     exit 0
 fi

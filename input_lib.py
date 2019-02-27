@@ -100,6 +100,9 @@ class option_dat2npy():
                 '# Trace the Av:',
                 '# If you do extinction correction before dat2npy_ensemble.py, you may like to keep the Av information.',
                 '# Available option: yes, no',
+                'no',
+                '# Trace the HL 2013 labels:',
+                '# Available option: yes, no',
                 'no']
         np.savetxt('option_dat2npy.txt', s, fmt = '%s')
     def load(self, file_name):
