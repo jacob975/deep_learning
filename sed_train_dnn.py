@@ -476,7 +476,7 @@ if __name__ == "__main__":
     correct_prediction = tf.equal(y_pred_cls, y_true_cls)
     accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
     # Calculate the loss
-    cross_entropy = tf.reduce_sum(tf.nn.softmax_cross_entropy_with_logits(logits = y_pred, labels = y_true))
+    cross_entropy = tf.reduce_sum(tf.nn.softmax_cross_entropy_with_logits(logits = layer_last, labels = y_true))
     loss = tf.reduce_mean(cross_entropy)
     # The number of iterations
     iters = iterations_upperlimit

@@ -211,7 +211,8 @@ if __name__ == "__main__":
     # Output layer
     W_fc2 = weight_variable([num_conn_neural, num_label])
     b_fc2 = bias_variable([num_label])
-    y_pred = tf.matmul(h_fc1, W_fc2) + b_fc2
+    layer_last = tf.matmul(h_fc1, W_fc2) + b_fc2
+    y_pred = tf.nn.softmax(layer_last)
     y_pred_cls = tf.argmax(y_pred, axis=1)
     correct_prediction = tf.equal(y_pred_cls, y_true_cls)
     accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))

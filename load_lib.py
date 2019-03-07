@@ -18,7 +18,6 @@ update log
 
 20180411 version alpha 1:
     1. The library work...no
-
 20180412 version alpha 2:
     1. It is hard to create pointer in python, so I back to call by value
     2. Add a func to print confusion matrix
@@ -204,12 +203,71 @@ def print_recall_rate(y_true, y_pred):
 
 #-------------------------------------------------------------------
 # This class is used to print infomations about prediction and truth
+class confusion_matrix_infos_lite():
+    objects = ['star', 'galaxy', 'yso']
+    def __init__(self, cls_true, cls_pred):
+        self.cls_true = cls_true
+        self.cls_pred = cls_pred 
+        return
+
+    def confusion_matrix(self):
+        from sklearn.metrics import confusion_matrix
+        # all of them
+        cm = confusion_matrix(y_true=self.cls_true,
+                              y_pred=self.cls_pred)
+        return 0, cm
+    
+    def print_accuracy(self):
+        # all of them
+        print("### accuracy ###")
+        correctly_predicted = np.where((self.cls_pred == self.cls_true))
+        accuracy = len(correctly_predicted[0])/len(self.cls_true)
+        print("accuracy of prediction: {0:.2f}% ({1} /{2} )"\
+        .format(accuracy*100, len(correctly_predicted[0]), len(self.cls_true)))
+        return
+    
+    def print_precision(self):
+        # all of them
+        print ("### precision ###")
+        for label in range(3):
+            denominator = np.where(self.cls_pred == label)
+            numerator = np.where((self.cls_pred == label) & (self.cls_true == label))
+            precision = 0
+            if len(denominator[0]) == 0:
+                if len(numerator[0]) == 0:
+                    precision = 0
+                else:
+                    precision = np.inf
+            else:
+                precision = len(numerator[0])/len(denominator[0])
+            print("precision for predict {0} is : {1:.2f}% ({2} /{3} )"\
+            .format(self.objects[label], precision*100, len(numerator[0]), len(denominator[0])))
+        return
+    
+    def print_recall_rate(self):
+        # all of them
+        print ("### recall-rate ###")
+        for label in range(3):
+            denominator = np.where(self.cls_true == label)
+            numerator = np.where((self.cls_pred == label) & (self.cls_true == label))
+            precision = 0
+            if len(denominator[0]) == 0:
+                if len(numerator[0]) == 0:
+                    precision = 0
+                else:
+                    precision = np.inf
+            else:
+                precision = len(numerator[0])/len(denominator[0])
+            print("recall-rate for true {0} is : {1:.2f}% ({2} /{3} )"\
+            .format(self.objects[label], precision*100, len(numerator[0]), len(denominator[0])))
+        return
+
 class confusion_matrix_infos():
     objects = ['star', 'galaxy', 'yso']
     def __init__(self, cls_true, labels_pred):
         self.cls_true = cls_true
         self.labels_pred = labels_pred
-        self.cls_pred = np.argmax(self.labels_pred, axis = 1)
+        self.cls_pred = np.array(np.argmax(self.labels_pred, axis = 1), dtype = int)
         self.reliable = np.where((np.max(self.labels_pred, axis = 1) > 0.8))
         self.cls_true_reliable = self.cls_true[self.reliable]
         self.cls_pred_reliable = self.cls_pred[self.reliable]
@@ -315,10 +373,3 @@ class cross_confusion_matrix_infos(confusion_matrix_infos):
         self.cls_pred_reliable = self.cls_pred[self.reliable]
         return 
 
-class SED_datasets():
-    def __init__(self, images_name, labels_name, coords_name, num_sources_name):
-        pass
-        return
-    def next_batch(self):
-        pass
-        return
