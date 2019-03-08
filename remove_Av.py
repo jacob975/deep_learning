@@ -56,10 +56,18 @@ if __name__ == "__main__":
     #--------------------------------------------
     # Load argv
     if len(argv) != 6:
-        print ("Error!\nUsage: Remove_Av.py [band system] [extinction table] [sed table] [Av table] [coord table]") 
+        print (("Error!\nUsage: Remove_Av.py [band system] "
+                                            "[extinction table] "
+                                            "[sed table] "
+                                            "[Av table] "
+                                            "[coord table] ")) 
         print ("Available band systems: ukidss, twomass")
         print ("You can skip [Av table]")
-        print ("Example: remove_Av.py ukidss extinction_table sed_table.txt Av.txt coord.txt")
+        print (("Example: remove_Av.py  ukidss "
+                                        "extinction_table "
+                                        "sed_table.txt "
+                                        "Av.txt "
+                                        "coord.txt "))
         exit()
     band_system = argv[1]
     extinction_table_name = argv[2]
@@ -80,11 +88,15 @@ if __name__ == "__main__":
         Av_table = np.loadtxt(Av_table_name, dtype = float)
         # Calculate the deviation of Av.
         Av_table_allOBS = Av_table[Av_table[:,0] != 0.0]
-        numbers, bin_edges = np.histogram(Av_table_allOBS[:,0], np.arange(-10, 20))
+        numbers, bin_edges = np.histogram(  Av_table_allOBS[:,0], 
+                                            np.arange(-10, 20))
         index_max = np.argmax(numbers)
         #numbers = numbers[:index_max + 1]
         bin_middles = 0.5*(bin_edges[1:] + bin_edges[:-1])
-        paras, cov = optimize.curve_fit(gaussian, bin_middles[:index_max + 1], numbers[:index_max + 1], p0 = [1000, 0, 1])
+        paras, cov = optimize.curve_fit(gaussian, 
+                                        bin_middles[:index_max + 1], 
+                                        numbers[:index_max + 1], 
+                                        p0 = [1000, 0, 1])
         if paras[2] < np.sqrt(cov[2][2]):
             print ('The fitting seems failed.')
             exit(1)
@@ -93,15 +105,22 @@ if __name__ == "__main__":
         Av_lower_bond = Av_mean - 3 * Av_deviation
         if Av_lower_bond >= 0.0:
             Av_lower_bond = 0.0
-        print ("{0}: < Av > = {1:.2f}+-{2:.2f}".format(Av_table_name, Av_mean, Av_deviation))
+        print ("{0}: < Av > = {1:.2f}+-{2:.2f}"\
+                .format(Av_table_name, Av_mean, Av_deviation))
         print ("Lower bond: Av = {0:.2f}".format(Av_lower_bond))
         # Plot the result
         Av_hist_plot = plt.figure("Av_hist fitting result")
         plt.title("Av_hist fitting result")
         plt.xlabel("Av")
         plt.ylabel("# of sources")
-        plt.scatter(bin_middles[index_max + 1:], numbers[index_max + 1:], color = 'b', label = "Datapoints not for fitting")
-        plt.scatter(bin_middles[:index_max + 1], numbers[:index_max + 1], color = 'r', label = "Datapoints for fitting")
+        plt.scatter(bin_middles[index_max + 1:], 
+                    numbers[index_max + 1:], 
+                    color = 'b', 
+                    label = "Datapoints not for fitting")
+        plt.scatter(bin_middles[:index_max + 1], 
+                    numbers[:index_max + 1], 
+                    color = 'r', 
+                    label = "Datapoints for fitting")
         x = np.arange(-10, 10, 0.1)
         y = gaussian(x, paras[0], paras[1], paras[2])
         plt.plot(x, y, label = "Fitting result")

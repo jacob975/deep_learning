@@ -126,6 +126,7 @@ if __name__ == "__main__":
     infos.print_accuracy()
     infos.print_precision()
     infos.print_recall_rate()
+    np.savetxt("source_label_pred_{0}.txt".format(keyword), infos.labels_pred)
     #----------------------------------------
     # measuring time
     elapsed_time = time.time() - start_time

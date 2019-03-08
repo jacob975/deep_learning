@@ -73,7 +73,7 @@ if __name__ == "__main__":
     control_coord = SkyCoord(control_coord, frame='icrs', unit='deg')
     control_mag = np.loadtxt("{0}/ELAIS_N1_NICER_control_image/twomass_mag.txt".format(DL_conf.path_of_data), dtype = float)
     control_err_mag = np.loadtxt("{0}/ELAIS_N1_NICER_control_image/err_twomass_mag.txt".format(DL_conf.path_of_data), dtype = float)
-    # read source which is allOBS in JHK band only
+    # Read source which is allOBS in JHK band only
     index_science_allOBS = np.where((science_mag[:,0] != 0) & (science_mag[:,1] != 0) &(science_mag[:,2] != 0))
     index_control_allOBS = np.where((control_mag[:,0] != 0) & (control_mag[:,1] != 0) &(control_mag[:,2] != 0))
     science_coord = science_coord[index_science_allOBS]
