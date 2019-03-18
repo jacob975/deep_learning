@@ -12,70 +12,67 @@ The module you need
 
 # How to train our AI?
 1. Getting SED data of sources in c2d legacy catalog, and also corresponding data from 2MASS or UKIDSS catalog.
-2. ```arrange_data.sh```
-  + This program is used to pick SED data from c2d legacy catalog based on some selection, e.g.:
-    + source_type
-    + ability of extinction correction
-    + data quality
-    + TBA
-  + The program will generate several available options for you.
-3. ```arrange_data.sh [option]```
+2. ```arrange_data.sh [option]```
+  + This program is used to pick SED data from c2d legacy catalog based on some selection, including:
+    + SED data in band J, H, K, IRAC 1, 2, 3, 4, and MIPS 1, respectively.
+    + Source_type, including star, galaxies, and YSOc(s)
+    + Data quality
+  + Type ```arrange_data.sh``` and hit enter, it will show you available options
   + The option could be the one of the regions in c2d legacy survey.
-  + ```i``` means the program will do extinction correction.
-  + ```slct``` means the program will select data only could be done by extinction correction.
-  + ```u``` means UKIDSS data will be used to replace data in JHK bands.
-  + e.g. PERui means the program takes data in PER region, uses UKIDSS data to replace data in JHK bands, and do extinction correction.
-4. ```dat2npy_ensemble.py```
-  + The program will generate an option file for you, you should edit that file and go on.
-5. ```dat2npy_ensemble.py [option file] [SED data 1] [SED data 2] [SED data 3] ...and so on```
+    + ```i``` means the program will do extinction correction.
+    + ```slct``` means the program will select data only could be done by extinction correction.
+    + ```u``` means UKIDSS data will be used to replace data in JHK bands.
+    + e.g. PERui means the program takes data in PER region, uses UKIDSS data to replace data in JHK bands, and do extinction correction.
+4. ```dat2npy_ensemble.py [option file] [SED data 1] [SED data 2] [SED data 3] ...and so on```
+  + Type ```dat2npy_ensemble.py``` and hit enter, it will show you available options and generate an option file for you, you should edit that file and then go on.
   + The program will further select and modify the data, e.g.:
-    + normalize or not
-    + pick error or not
-    + the tolerance of the number of lost data.
+    + Normalizing the SEDs or not
+    + Loading the error of SEDs or not
+    + The tolerance of the number of lost data for a SED.
     + The upper limit of the number of data.
-    + TBA
-6. Optional: ```mask_bands.py [mask code] [SED data]```
+    + Tracing Av, HL 2013 label, or Evans 2009 label
+5. Optional: ```mask_bands.py [mask code] [SED data]```
   + This is a program to mask data in some bands by 0.
-7. Optional: ```mask_ul.py [upper limit table] [SED data]```
+6. Optional: ```mask_ul.py [upper limit table] [SED data]```
   + This is a program to mask data which are upper limit.
-8. ```AI_schedule_wopt.sh MaxLoss[number] [iteration]```
+7. ```AI_schedule_cnn.sh MaxLoss[number] [iteration]```
   + Train AIs by SED data which tolerate ```[number]``` of lost data points, and repeat by ```[iteration]``` times, ```[iteration]``` AIs will be generated.
-9. In previoud program, all logs and corresponding SED data will be saved in a folder name as the following.
+  + You can pick  ```AI_schedule_dnn.sh``` with the same arguments as well.
+8. In previoud program, all logs and corresponding SED data will be saved in a folder name as the following.
   + `yyyy-mm-dd hh:mm:ss+UTC_trained_by_MaxLoss15`
-    + test
-      + tracer	        // tracer index
-      + labels		    // true label
-      + data set		    // data
+    + checkpoint_AI_64_8_`file_name`        // All the parameters of AI
+    + Iters_log                             // The log file from training programs.
     + training
-      + tracer            // tracer index
-      + labels            // true label
-      + data set          // data
+      + coordinates
+      + Source types
+      + SEDs
+      + Tracers
     + validation
-      + tracer             // tracer index
-      + labels            // true label
-      + data set          // data
-    + checkpoint_AI_64_8_`file_name`          // All the parameters of AI
+      + coordinates
+      + Source types
+      + SEDs
+      + Tracers
+        
 # How to test our AI on SED data.
-10. Find SED data which are not included in previous steps.
-11. Repeat 1~7 using test data.
-12. ```make_prediction_wopt.sh [DIR where AI saved] [Keyword of AI] [keyword of dataset]```
+10. Find SEDs which are not included in training sets either validation sets in previous steps.
+11. Repeat step 1 ~ 6 on test data.
+12. ```make_prediction_cnn.sh [DIR where AI saved] [Keyword of AI] [keyword of dataset]```
   + This is the program for testing AI.
   + ```[DIR where AI saved]``` means the absolute of relative directory of our trained-AI
   + ```[Keyword of AI]``` should be ```MaxLoss[number]``` of AI.
   + ```[Keyword of dataset]``` should be ```MaxLoss[number]``` of testing SED data.
+  + You should pick ```make_prediction_dnn.sh``` if you train your models using ```AI_schedule_dnn.sh```.
 13. In previoud program, all logs and corresponding SED data will be saved in a folder name as the following.
   + `AI_yyyy-mm-dd hh:mm:ss+UTC_trained_by_MaxLoss15_test_on_MaxLoss15`
+    + result_of_AI_test                     // The log file from testing programs.
     + test
-      + tracer            // tracer index
-      + labels            // true label
-      + data set          // data
-    + cls true of test                        // predicted label of test set
-    + cls pred of test                        // true label of test set
-    + result_of_AI_test
+      + cls true of test                    // predicted label of test set
+      + cls pred of test                    // actual label of test set
+      + The probabilities of each actual label of each source.
+      + The propabilities of each predicted label of each source.
+      + coordinates
+      + SEDs
+      + Tracers
 14. ```print_test_result.py [keyword of dataset]```
   + This program is used to print the confusion matrixes, recall-rate, and precision, ... several statistial result.
   + ```[Keyword of dataset]``` should be ```MaxLoss[number]``` of testing SED data.
-
-# Tracer tree
-https://github.com/jacob975/deep_learning/data_selection.png
-https://github.com/jacob975/deep_learning/data_tracer.png
