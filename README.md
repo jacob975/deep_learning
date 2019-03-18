@@ -23,7 +23,7 @@ The module you need
     + ```slct``` means the program will select data only could be done by extinction correction.
     + ```u``` means UKIDSS data will be used to replace data in JHK bands.
     + e.g. PERui means the program takes data in PER region, uses UKIDSS data to replace data in JHK bands, and do extinction correction.
-4. ```dat2npy_ensemble.py [option file] [SED data 1] [SED data 2] [SED data 3] ...and so on```
+3. ```dat2npy_ensemble.py [option file] [SED data 1] [SED data 2] [SED data 3] ...and so on```
   + Type ```dat2npy_ensemble.py``` and hit enter, it will show you available options and generate an option file for you, you should edit that file and then go on.
   + The program will further select and modify the data, e.g.:
     + Normalizing the SEDs or not
@@ -31,14 +31,14 @@ The module you need
     + The tolerance of the number of lost data for a SED.
     + The upper limit of the number of data.
     + Tracing Av, HL 2013 label, or Evans 2009 label
-5. Optional: ```mask_bands.py [mask code] [SED data]```
+4. Optional: ```mask_bands.py [mask code] [SED data]```
   + This is a program to mask data in some bands by 0.
-6. Optional: ```mask_ul.py [upper limit table] [SED data]```
+5. Optional: ```mask_ul.py [upper limit table] [SED data]```
   + This is a program to mask data which are upper limit.
-7. ```AI_schedule_cnn.sh MaxLoss[number] [iteration]```
+6. ```AI_schedule_cnn.sh MaxLoss[number] [iteration]```
   + Train AIs by SED data which tolerate ```[number]``` of lost data points, and repeat by ```[iteration]``` times, ```[iteration]``` AIs will be generated.
   + You can pick  ```AI_schedule_dnn.sh``` with the same arguments as well.
-8. In previoud program, all logs and corresponding SED data will be saved in a folder name as the following.
+7. In previoud program, all logs and corresponding SED data will be saved in a folder name as the following.
   + `yyyy-mm-dd hh:mm:ss+UTC_trained_by_MaxLoss15`
     + checkpoint_AI_64_8_`file_name`        // All the parameters of AI
     + Iters_log                             // The log file from training programs.
@@ -54,15 +54,15 @@ The module you need
       + Tracers
         
 # How to test our AI on SED data.
-10. Find SEDs which are not included in training sets either validation sets in previous steps.
-11. Repeat step 1 ~ 6 on test data.
-12. ```make_prediction_cnn.sh [DIR where AI saved] [Keyword of AI] [keyword of dataset]```
+8. Find SEDs which are not included in training sets either validation sets in previous steps.
+9. Repeat step 1 ~ 6 on test data.
+10. ```make_prediction_cnn.sh [DIR where AI saved] [Keyword of AI] [keyword of dataset]```
   + This is the program for testing AI.
   + ```[DIR where AI saved]``` means the absolute of relative directory of our trained-AI
   + ```[Keyword of AI]``` should be ```MaxLoss[number]``` of AI.
   + ```[Keyword of dataset]``` should be ```MaxLoss[number]``` of testing SED data.
   + You should pick ```make_prediction_dnn.sh``` if you train your models using ```AI_schedule_dnn.sh```.
-13. In previoud program, all logs and corresponding SED data will be saved in a folder name as the following.
+11. In previoud program, all logs and corresponding SED data will be saved in a folder name as the following.
   + `AI_yyyy-mm-dd hh:mm:ss+UTC_trained_by_MaxLoss15_test_on_MaxLoss15`
     + result_of_AI_test                     // The log file from testing programs.
     + test
@@ -73,6 +73,6 @@ The module you need
       + coordinates
       + SEDs
       + Tracers
-14. ```print_test_result.py [keyword of dataset]```
+12. ```print_test_result.py [keyword of dataset]```
   + This program is used to print the confusion matrixes, recall-rate, and precision, ... several statistial result.
   + ```[Keyword of dataset]``` should be ```MaxLoss[number]``` of testing SED data.
