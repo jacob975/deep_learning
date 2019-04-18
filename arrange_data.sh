@@ -213,8 +213,9 @@ if [ "${option}" = "ALLui" ] || [ "${option}" = "ALLu" ]; then
     replace_jhk_with_ukidss.py GCS skip LUP_IV_2mass/gala_2mass.dat LUP_IV_gala_sed.dat
     replace_jhk_with_ukidss.py GCS skip LUP_IV_2mass/ysos_2mass.dat LUP_IV_ysos_sed.dat
     echo done
-    sub_name = '_intrinsic'
+    sub_name=''
     if [ "${option}" = "ALLui" ]; then
+        sub_name='_intrinsic'
         # Make an extinction map
         echo "Make an extinction map."
         calculate_extinction.py ELAIS_N1_star_coord.dat ELAIS_N1_star_sed_twomass_mag.txt ELAIS_N1_star_sed_err_twomass_mag.txt WD55B 4.5
