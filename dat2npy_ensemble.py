@@ -258,7 +258,7 @@ if __name__ == "__main__":
             np.savetxt("source_Q_MaxLoss{0}.txt".format(i), sum_quality[i], fmt ='%s')
             np.savetxt("source_coord_MaxLoss{0}.txt".format(i), sum_coord[i])
             if do_extinction == 'yes': np.savetxt("source_Av_MaxLoss{0}.txt".format(i), sum_Av[i])
-            if do_HL2013 == 'yes': np.savetxt("source_HL2013_MaxLoss0.txt".format(i), sum_HL2013[i])
+            if do_HL2013 == 'yes': np.savetxt("source_HL2013_MaxLoss{0}.txt".format(i), sum_HL2013[i])
     #-----------------------------------
     # measuring time
     elapsed_time = time.time() - start_time

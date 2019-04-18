@@ -54,15 +54,15 @@ class option_train():
                 '# batch format:',
                 '# \t[batch format] means how to get the next batch of sources.',
                 '# Available options: equal, random',
-                'random',
+                'equal',
                 '# iterations upperlimits:',
                 '# \t[iterations upperlimits] means the training process will end if the model is train by this times.',
                 '# It should be an integer',
-                '500000',
+                '50000',
                 '# validation function:',
                 '# \t[validation function] means the function we used to judge the model.',
                 '# Available options: GT_score, GT_score_newn, cross_entropy',
-                'cross_entropy']
+                'GT_score']
         np.savetxt('option_train.txt', s, fmt = '%s')
     def load(self, file_name):
         self.opts = np.loadtxt(file_name, dtype = str)

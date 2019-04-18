@@ -75,7 +75,7 @@ if __name__ == "__main__":
     # Mask dataset with chosen mask
     for i in range(len(ul_table[0])):
         '''
-        if i < 3:
+        if i < 5:
             continue
         '''
         # Initialize
