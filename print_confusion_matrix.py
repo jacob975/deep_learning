@@ -3,7 +3,7 @@
 Abstract:
     This is a program to show the basic result of AI testing.
 Usage:
-    print_test_result_lite.py [cls true table] [cls pred table]
+    print_confusion_matrix.py [cls true table] [cls pred table]
 Editor:
     Jacob975
 
@@ -37,12 +37,12 @@ if __name__ == "__main__":
     #----------------------------------------
     # Load argv
     if len(argv) != 3:
-        print ("Error!\nUsage: print_test_result_lite.py [cls true table] [cls pred table]")
+        print ("Error!\nUsage: print_confusion_matrix.py [cls true table] [cls pred table]")
         exit()
     cls_true_name = argv[1]
     cls_pred_name = argv[2]
     cls_true = np.loadtxt(cls_true_name)
-    cls_true = np.argmax(cls_true, axis=1)
+    #cls_true = np.argmax(cls_true, axis=1)
     cls_pred = np.loadtxt(cls_pred_name, dtype = int)
     #-----------------------------------
     # print the properties of sources
