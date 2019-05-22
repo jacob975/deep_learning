@@ -1,9 +1,12 @@
 #!/usr/bin/python3
 '''
 Abstract:
-    This is a program to demo how to code deep learning code.
+    This is a program for matching the sources in ALLWISE catalogue and c2d+SWIRE catalogue. 
 Usage:
-    std_code.py
+    match_sp_wise.py [spitzer coord] [wise coord]
+Output:
+    1. coordinates of matched sources
+    2. coordinates of un-matched sources
 Editor:
     Jacob975
 
@@ -25,6 +28,8 @@ update log
     1. Make all sentence with initial upper case letter.
 20190121 version alpha 5
     1. Add a new standard on 'argv'
+20190522 version alpha 6
+    1. Specify the output.
 '''
 import tensorflow as tf
 import time
