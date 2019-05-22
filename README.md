@@ -7,8 +7,6 @@ The module you need
 2. sklearn
 3. tkinter
 4. IPython
-5. prettytensor (No need in the future)
-4. TBA
 
 # How to train our AI?
 1. Getting SED data of sources in c2d legacy catalog, and also corresponding data from 2MASS or UKIDSS catalog.
@@ -85,6 +83,6 @@ Please follow the step 7, step 8.
       + coordinates
       + SEDs
       + Tracers
-13. ```print_test_result.py [keyword of dataset]```
+16. ```print_test_result.py [keyword of dataset]```
   + This program is used to print the confusion matrixes, recall-rate, and precision, ... several statistial result.
   + ```[Keyword of dataset]``` should be ```MaxLoss[number]``` of testing SED data.
