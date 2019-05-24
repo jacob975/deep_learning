@@ -1,12 +1,13 @@
 #!/bin/bash
 # 
 # Abstract:
-#     This is a program for matching the sources in ALLWISE catalogue and c2d+SWIRE catalogue. 
+#     This is a program for retrieve data from the WISE allwise table. 
 # Usage:
-#     match_sp_wise.py [spitzer coord] [wise coord]
+#     get_wise.sh [input wise table] 
 # Output:
-#     1. coordinates of matched sources
-#     2. coordinates of un-matched sources
+#       1. The SEDs of sources.
+#       2. The coordinates of sources.
+#       3. The Quality label of sources.
 # Editor:
 #     Jacob975
 # 
@@ -15,23 +16,25 @@
 # #   This code is made in python3 #
 # ##################################
 # 
-# 20180104
+# 20190522
 # ####################################
 # update log
 # 20190522 version alpha 1
-#   This is the program for getting data from wise-allwise catalogues 
+#   The code works 
+# 20190524 version alpha 2
+#   Correct the comments, name the output files by the original name. 
 #-------------------
 
-if [ "$#" -ne 2 ]; then
+if [ "$#" -ne 1 ]; then
     echo "Illegal number of parameters"
-    echo "Usage: ${0} [file name]"
+    echo "Usage: ${0##*/} [file name]"
     exit 1
 fi
 
-awk '{print "["$22"," $26"," $30"," $42"," $60"," $78"," $96"," $114"," \
-    $23"," $27"," $31"," $43"," $61"," $79"," $97"," $115"],"}' ${1} > wise_sed.dat
-awk '{print $25" " $29" " $33" " $45" " $63" " $81" " $99" " $117}' ${1} > wise_Q.dat
-awk '{print FNR }' ${1} > wise_tracer.dat
-awk '{print $3" "$5 }' ${1} > wise_coord.dat
+awk -F "|" '{print  $17"|" $21"|" $25"|" $29"|" \
+                    $18"|" $22"|" $26"|" $30}' ${1} > ${1}_sed.dat
+awk -F "|" '{print $60}' ${1} > ${1}_Q.dat
+awk -F "|" '{print $2" "$3 }' ${1} > ${1}_coord.dat
+#awk -F "|" '{print FNR }' ${1} > wise_tracer.dat
 exit 0
     

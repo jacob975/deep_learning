@@ -3,7 +3,7 @@
 Abstract:
     This is a program for matching the sources in ALLWISE catalogue and c2d+SWIRE catalogue. 
 Usage:
-    match_sp_wise.py [spitzer coord] [wise coord]
+    match_spitzer_wise.py [spitzer coord] [wise coord]
 Output:
     1. index of matched sources
     2. coordinates of matched sources
@@ -25,6 +25,8 @@ update log
 '''
 import time
 import numpy as np
+from astropy.coordinates import SkyCoord
+from astropy import units as u
 from sys import argv
 
 # This is a class for match the coordinates efficiently.
@@ -65,26 +67,30 @@ if __name__ == "__main__":
     # Load data
     spitzer_coord = np.loadtxt(spitzer_coord_table_name)
     wise_coord = np.loadtxt(wise_coord_table_name)
+    #wise_coord = np.loadtxt(wise_coord_table_name, delimiter = '|')
     match_wise_index_list = []
     unmatch_wise_index_list = []
     # Find the matched detections.
     # The tolerance is 1 arcsec.
-    stu = find_source(spitzer_coord, tolerance = 0.00028)
-    for wise in wise_coord:
+    stu = find_sources(spitzer_coord, tolerance = 0.00028)
+    num_source_in_wise = len(wise_coord)
+    for i, wise in enumerate(wise_coord):
+        if i%1000 == 0:
+            print ('({0}/{1})'.format(i, num_source_in_wise))
         failure, distance, index = stu.find(wise)
         if not failure:
-            match_wise_index_list.append(index)
+            match_wise_index_list.append(i)
         elif failure:
-            unmatch_wise_index_list.append(index)
+            unmatch_wise_index_list.append(i)
     # Save the result
     match_wise_index_array = np.array(match_wise_index_list)
     unmatch_wise_index_array = np.array(unmatch_wise_index_list)
     match_coord = wise_coord[match_wise_index_list]
     unmatch_coord = wise_coord[unmatch_wise_index_list] 
-    np.savetxt("match_wise_index.txt", match_wise_index_array)
-    np.savetxt("match_wise_coord.txt", match_coord)
-    np.savetxt("unmatch_wise_index.txt", unmatch_wise_index_array)
-    np.savetxt("unmatch_wise_coord.txt", unmatch_coord)
+    np.savetxt("{0}_match_index.txt".format(wise_coord_table_name[:-4]), match_wise_index_array, fmt = '%d')
+    np.savetxt("{0}_match_coord.txt".format(wise_coord_table_name[:-4]), match_coord)
+    np.savetxt("{0}_unmatch_index.txt".format(wise_coord_table_name[:-4]), unmatch_wise_index_array, fmt = '%d')
+    np.savetxt("{0}_unmatch_coord.txt".format(wise_coord_table_name[:-4]), unmatch_coord)
     #-----------------------------------
     # Measure time
     elapsed_time = time.time() - start_time
