@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 '''
 Abstract:
-    This is a program for remove Av and show the intrinsic flux of sources. 
+    This is a program for extinction correction and showing the intrinsic flux of sources. 
     This correction can only apply on molecular cloud CHA, LUP, OPH, PER, SER
     Citations: Chapman et al. (2009)
 Usage:
