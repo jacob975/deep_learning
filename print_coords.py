@@ -3,7 +3,7 @@
 Abstract:
     This is a program to print coords of data in certain positions of confusion matrix.
 Usage:
-    print_coords.py [DIR where AI saved] [keyword] [true_label] [pred_label]
+    print_coords.py [DIR where AI saved] [main_name] [true_label] [pred_label]
 Editor:
     Jacob975
 
@@ -34,22 +34,22 @@ if __name__ == "__main__":
     #-----------------------------------
     # Load argv
     if len(argv) != 5:
-        print ("Error!\nUsage:\tprint_coords.py [DIR where AI saved] [keyword] [true_label] [pred_label]")
+        print ("Error!\nUsage:\tprint_coords.py [DIR where AI saved] [main_name] [true_label] [pred_label]")
         print ("Example:print_coords.py . MaxLoss15 1 1")
         exit()
     directory = argv[1]
-    keyword = argv[2]
+    main_name = argv[2]
     true_label = int(argv[3])
     pred_label = int(argv[4])
     # Load files
-    failure, labels_pred = load_lib.load_labels_pred(keyword, directory)
+    failure, labels_pred = load_lib.load_labels_pred(main_name, directory)
     if not failure:
         print ("load labels_pred success")
-    failure, cls_true = load_lib.load_cls_true(keyword, directory)
+    failure, cls_true = load_lib.load_cls_true(main_name, directory)
     if not failure:
         print ("load cls_true success")
     # load_coord haven't done in load_lib
-    failure, coords = load_lib.load_coords(keyword, directory)
+    failure, coords = load_lib.load_coords(main_name, directory)
     if not failure:
         print ("load coordinates success")
     infos = load_lib.confusion_matrix_infos(cls_true, labels_pred)

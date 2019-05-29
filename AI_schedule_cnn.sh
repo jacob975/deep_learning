@@ -5,6 +5,9 @@
 # 20180412 version alpha 1
 # The code work
 
+# 20190529 version alpha 2
+# Using main name to replace keyword, and the function become more flexible.
+
 if [ "$#" -ne 2 ]; then
     echo "Illegal number of parameters"
     echo "Usage:    ${0##*/} [main name] [number of iterations]"

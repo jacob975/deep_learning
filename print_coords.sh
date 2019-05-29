@@ -17,7 +17,7 @@ if [ "$#" -ne 2 ]; then
 fi
 
 WORK_DIR=${1}
-keyword=${2}
+main_name=${2}
 
 # print coordinates of data in each elements.
 iter=0
@@ -27,8 +27,8 @@ do
     while [ $jter -le 2 ]
     do
         echo "###############"
-        echo "print_coords.py ${WORK_DIR} ${keyword} ${iter} ${jter}"
-        print_coords.py "${WORK_DIR}" "${keyword}" ${iter} ${jter}
+        echo "print_coords.py ${WORK_DIR} ${main_name} ${iter} ${jter}"
+        print_coords.py "${WORK_DIR}" "${main_name}" ${iter} ${jter}
         ((jter++))
     done
     ((iter++))

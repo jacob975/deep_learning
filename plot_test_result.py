@@ -3,7 +3,7 @@
 Abstract:
     This is a program to show the basic result of AI testing.
 Usage:
-    plot_test_result.py [keyword fo test set]
+    plot_test_result.py [main_name of test set]
 Editor:
     Jacob975
 
@@ -41,21 +41,21 @@ if __name__ == "__main__":
     #----------------------------------------
     # Load argv
     if len(argv) != 2:
-        print ("Error!\nUsage: plot_test_result.py [keyword for test set]")
+        print ("Error!\nUsage: plot_test_result.py [main_name for test set]")
         exit()
-    keyword = argv[1]
+    main_name = argv[1]
     #----------------------------------------
     # Load data
     print("Loading ...")
-    labels_pred = np.loadtxt("source_labels_pred_{0}.txt".format(keyword))
-    cls_pred = np.argmax(labels_pred, axis = 1)
-    cls_true = np.loadtxt("source_cls_true_{0}.txt".format(keyword), dtype = int)
-    data = np.loadtxt("source_sed_{0}.txt".format(keyword))
-    Q = np.loadtxt("source_Q_{0}.txt".format(keyword), dtype = str)
-    coord = np.loadtxt("source_coord_{0}.txt".format(keyword))
-    template = np.loadtxt("source_template_{0}.txt".format(keyword))
-    Sp = np.loadtxt("source_Sp_{0}.txt".format(keyword), dtype = str)
-    Av = np.loadtxt("source_Av_{0}.txt".format(keyword))
+    labels_pred = np.loadtxt("{0}_labels_pred.txt".format(main_name))
+    cls_pred    = np.argmax(labels_pred, axis = 1)
+    cls_true    = np.loadtxt("{0}_cls_true.txt".format(main_name), dtype = int)
+    data        = np.loadtxt("{0}_sed.txt".format(main_name))
+    Q           = np.loadtxt("{0}_Q.txt".format(main_name), dtype = str)
+    coord       = np.loadtxt("{0}_coord.txt".format(main_name))
+    template    = np.loadtxt("{0}_template.txt".format(main_name))
+    Sp          = np.loadtxt("{0}_Sp.txt".format(main_name), dtype = str)
+    Av          = np.loadtxt("{0}_Av.txt".format(main_name))
     print("done")
     #----------------------------------------
     # ploting

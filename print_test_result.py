@@ -3,7 +3,7 @@
 Abstract:
     This is a program to show the basic result of AI testing.
 Usage:
-    print_test_result.py [keyword fo test set]
+    print_test_result.py [main_name fo test set]
 Example:
     print_test_result.py MaxLoss15
 Editor:
@@ -21,6 +21,8 @@ update log
     1. The code work
 20180601 version alpha 2:
     1. add func to print reliable data out 
+20190529 version alpha 3:
+    1. Using main name to replace the keyword.
 '''
 import numpy as np
 import time
@@ -44,30 +46,30 @@ if __name__ == "__main__":
     #----------------------------------------
     # Load argv
     if len(argv) != 2:
-        print ("Error!\nUsage: print_test_result.py [keyword for test set]")
+        print ("Error!\nUsage: print_test_result.py [main name of the test set]")
         exit()
-    keyword = argv[1]
+    main_name = argv[1]
     #----------------------------------------
     # Load data
     print (os.getcwd())
-    data_list = glob("AI*test_on*{0}".format(keyword))
+    data_list = glob("AI*test_on*{0}".format(main_name))
     ensemble_cls_true = None
     labels_pred_set = []
     for directory in data_list:
         print ("#################################")
         print ("start to loading data saved in {0}".format(directory))
         # load tracer
-        failure, data, tracer = load_arrangement(keyword, directory)
+        failure, data, tracer = load_arrangement(main_name, directory)
         if not failure:
             print ("load data and tracer success")
         # load label_pred
-        failure, labels_pred = load_labels_pred(keyword, directory)
+        failure, labels_pred = load_labels_pred(main_name, directory)
         if not failure:
             print ("load labels_pred success")
             temp_labels_pred =  [ value for _,value in sorted(zip(tracer.test, labels_pred))]
             labels_pred_set.append(temp_labels_pred)
         # load cls_true
-        failure, cls_true = load_cls_true(keyword, directory)
+        failure, cls_true = load_cls_true(main_name, directory)
         if not failure:
             print ("load cls_true success")
             if ensemble_cls_true == None:
@@ -126,7 +128,7 @@ if __name__ == "__main__":
     infos.print_accuracy()
     infos.print_precision()
     infos.print_recall_rate()
-    np.savetxt("source_label_pred_{0}.txt".format(keyword), infos.labels_pred)
+    np.savetxt("{0}_label_pred.txt".format(main_name), infos.labels_pred)
     #----------------------------------------
     # measuring time
     elapsed_time = time.time() - start_time

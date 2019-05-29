@@ -3,7 +3,7 @@
 Abstract:
     This is a program to show the data with different true and prediction 
 Usage:
-    plot_loss_freq.py [keyword] [no-observation value ] [true label] [pred label]
+    plot_loss_freq.py [main_name] [no-observation value ] [true label] [pred label]
 Example:
     plot_loss_freq.py MaxLoss15 '0.0' 1 2
 Editor:
@@ -64,10 +64,10 @@ if __name__ == "__main__":
     #----------------------------------------
     # load argv
     if len(argv) != 5:
-        print ("Error!\nUsage: plot_sed.py [keyword] [ no-observation value ] [true label] [pred label]")
+        print ("Error!\nUsage: plot_sed.py [main_name] [ no-observation value ] [true label] [pred label]")
         print ("Example: plot_loss_freq.py MaxLoss15 '0.0' 1 2")
         exit()
-    keyword = argv[1]
+    main_name = argv[1]
     no_obs = float(argv[2])
     true_label = int(argv[3])
     pred_label = int(argv[4])
@@ -77,15 +77,15 @@ if __name__ == "__main__":
         print ("#################################")
         print ("start to loading data saved in {0}".format(directory))
         # load tracer
-        failure, data, tracer = load_lib.load_arrangement(keyword, directory)
+        failure, data, tracer = load_lib.load_arrangement(main_name, directory)
         if not failure:
             print ("load data and tracer success")
         # load cls_pred
-        failure, cls_pred = load_lib.load_cls_pred(keyword, directory)
+        failure, cls_pred = load_lib.load_cls_pred(main_name, directory)
         if not failure:
             print ("load cls_pred success")
         # load cls_true
-        failure, cls_true = load_lib.load_cls_true(keyword, directory)
+        failure, cls_true = load_lib.load_cls_true(main_name, directory)
         if not failure:
             print ("load cls_true success")
         # confusion matrix
@@ -105,7 +105,7 @@ if __name__ == "__main__":
         collected_tracer_in_confusion_matrix = np.append(collected_tracer_in_confusion_matrix, tracer_in_confusion_matrix)
         print ("number of gala to yso: {0}".format(len(tracer_in_confusion_matrix)))
         # save tracer_in_confusion_matrix
-        np.savetxt("{0}/{1}_tracer_true_{2}_pred_{3}.txt".format(directory, keyword, true_[true_label], pred_[pred_label]), 
+        np.savetxt("{0}/{1}_tracer_true_{2}_pred_{3}.txt".format(directory, main_name, true_[true_label], pred_[pred_label]), 
                 tracer_in_confusion_matrix)
     # save collected_tracer_in_confusion_matrix
     np.savetxt("all_tracer_true_{0}_pred_{1}.txt".format(true_[true_label], pred_[pred_label]), collected_tracer_in_confusion_matrix)

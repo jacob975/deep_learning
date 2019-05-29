@@ -3,7 +3,7 @@
 Abstract:
     This is a program to generate confusion matrix with predictions of two AIs. 
 Usage:
-    print_crossAI.py [keyword] [DIR where AI saved] [DIR where AI saved]
+    print_crossAI.py [main_name] [DIR where AI saved] [DIR where AI saved]
 Editor:
     Jacob975
 
@@ -33,11 +33,11 @@ if __name__ == "__main__":
     #-----------------------------------
     # Check argv
     if len(argv) != 4:
-        print ("Error\nUsage: crossAI.py [keywords] [DIR where AI saved] [DIR where AI saved]")
+        print ("Error\nUsage: crossAI.py [main_names] [DIR where AI saved] [DIR where AI saved]")
         print ("Example: print_crossAI.py MaxLoss15 data_A/alice data_OPH/bob")
         exit()
     # Load arguments
-    keyword = argv[1]
+    main_name = argv[1]
     ai_alice = argv[2]
     ai_bob = argv[3]
     work_dir = os.getcwd()
@@ -46,19 +46,19 @@ if __name__ == "__main__":
     print ("### Prediction 1 ###")
     print ("AI DIR = {0}".format(ai_alice))
     os.chdir(ai_alice)
-    data_list = glob.glob("AI*test_on*{0}".format(keyword))
+    data_list = glob.glob("AI*test_on*{0}".format(main_name))
     ensemble_cls_true = None
     alice_labels_pred_set = []
     for directory in data_list:
         # load tracer
-        failure, data, tracer = load_arrangement(keyword, directory)
+        failure, data, tracer = load_arrangement(main_name, directory)
         # load label_pred
-        failure, labels_pred = load_labels_pred(keyword, directory)
+        failure, labels_pred = load_labels_pred(main_name, directory)
         if not failure:
             temp_labels_pred =  [ value for _,value in sorted(zip(tracer.test, labels_pred))]
             alice_labels_pred_set.append(temp_labels_pred)
         # load cls_true
-        failure, cls_true = load_cls_true(keyword, directory)
+        failure, cls_true = load_cls_true(main_name, directory)
         if not failure:
             if ensemble_cls_true == None:
                 ensemble_cls_true = [ value for _,value in sorted(zip(tracer.test, cls_true))]
@@ -76,13 +76,13 @@ if __name__ == "__main__":
     print ("### Prediction 2 ###")
     print ("AI DIR = {0}".format(ai_bob))
     os.chdir(ai_bob)
-    data_list = glob.glob("AI*test_on*{0}".format(keyword))
+    data_list = glob.glob("AI*test_on*{0}".format(main_name))
     bob_labels_pred_set = []
     for directory in data_list:
         # load tracer
-        failure, data, tracer = load_arrangement(keyword, directory)
+        failure, data, tracer = load_arrangement(main_name, directory)
         # load label_pred
-        failure, labels_pred = load_labels_pred(keyword, directory)
+        failure, labels_pred = load_labels_pred(main_name, directory)
         if not failure:
             temp_labels_pred =  [ value for _,value in sorted(zip(tracer.test, labels_pred))]
             bob_labels_pred_set.append(temp_labels_pred)

@@ -3,7 +3,7 @@
 Abstract:
     This is a program for plot the signal noise ratio of incorrectly predicted sources.
 Usage:
-    print_EFC.py [keyword] [HL incorrect sources] [DIR where AI saved]
+    print_EFC.py [main_name] [HL incorrect sources] [DIR where AI saved]
     EFC means error-flux correlation
     HL means high light
 Editor:
@@ -57,11 +57,11 @@ if __name__ == "__main__":
     #-----------------------------------
     # Check argv
     if len(argv) != 4:
-        print ("Error\nUsage: print_EFC.py [keywords] [HL incorrect source] [DIR where AI saved]")
+        print ("Error\nUsage: print_EFC.py [main_names] [HL incorrect source] [DIR where AI saved]")
         print ("Example: print_EFC.py MaxLoss15 1 data_A/alice")
         exit()
     # Load arguments
-    keyword = argv[1]
+    main_name = argv[1]
     HL_incorrect_source = int(argv[2])
     ai_alice = argv[3]
     work_dir = os.getcwd()
@@ -69,7 +69,7 @@ if __name__ == "__main__":
     # Load prediction 1 and true labels
     print ("AI DIR = {0}".format(ai_alice))
     os.chdir(ai_alice)
-    data_list = glob.glob("AI*test_on*{0}".format(keyword))
+    data_list = glob.glob("AI*test_on*{0}".format(main_name))
     ensemble_cls_true = None
     ensemble_coords = None
     alice_labels_pred_set = []
@@ -77,22 +77,22 @@ if __name__ == "__main__":
         print ('Loading {0}'.format(directory))
         print ('--- Load tracer of the random generator ---')
         # load tracer
-        failure, data, tracer = load_arrangement(keyword, directory)
+        failure, data, tracer = load_arrangement(main_name, directory)
         print ('--- Load prediction labels---')
         # load label_pred
-        failure, labels_pred = load_labels_pred(keyword, directory)
+        failure, labels_pred = load_labels_pred(main_name, directory)
         if not failure:
             temp_labels_pred =  [ value for _,value in sorted(zip(tracer.test, labels_pred))]
             alice_labels_pred_set.append(temp_labels_pred)
         print ('--- Load catalog labels ---')
         # load cls_true
-        failure, cls_true = load_cls_true(keyword, directory)
+        failure, cls_true = load_cls_true(main_name, directory)
         if not failure:
             if ensemble_cls_true == None:
                 ensemble_cls_true = [ value for _,value in sorted(zip(tracer.test, cls_true))]
         print ('--- Load coordinates of sources ---')
         # load coord
-        failure, coords = load_coords(keyword, directory)
+        failure, coords = load_coords(main_name, directory)
         if not failure:
             if ensemble_coords == None:
                 ensemble_coords = [ value for _,value in sorted(zip(tracer.test, coords.test))]
