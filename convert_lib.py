@@ -49,23 +49,37 @@ from uncertainties import unumpy, ufloat
 # I find that band J is inconsistent with 2mass, so I modified the zeropoint of band J.
 
 # This is copy from paper "Hewett, P. C. et al. 2006" 
+
 def set_ukirt():
-    ukirt_system = {'u' : ["u", 0.3546, 1545] ,\
-                    'g' : ["g", 0.4670, 3991] ,\
-                    'r' : ["r", 0.6156, 3174] ,\
-                    'i' : ["i", 0.7471, 2593] ,\
-                    'z' : ["z", 0.8918, 2222] ,\
-                    'Z' : ["Z", 0.8817, 2232] ,\
-                    'Y' : ["Y", 1.0305, 2026] ,\
-                    'J' : ["J", 1.2483, 1530] ,\
-                    'H' : ["H", 1.6313, 1019] ,\
+    # system    key: [name, middle wavelength, F_0]
+    ukirt_system = {'u' : ["u", 0.3546, 1545],\
+                    'g' : ["g", 0.4670, 3991],\
+                    'r' : ["r", 0.6156, 3174],\
+                    'i' : ["i", 0.7471, 2593],\
+                    'z' : ["z", 0.8918, 2222],\
+                    'Z' : ["Z", 0.8817, 2232],\
+                    'Y' : ["Y", 1.0305, 2026],\
+                    'J' : ["J", 1.2483, 1530],\
+                    'H' : ["H", 1.6313, 1019],\
                     'K' : ["K", 2.2010, 631] }
     return ukirt_system
 
 # This is copy from https://www.ipac.caltech.edu/2mass/releases/allsky/doc/sec6_4a.html
 def set_twomass():
-    twomass_system = { 'J' : ["J", 1.235, 1594] , 'H' : ["H", 1.662, 1024] , 'Ks' : ["Ks", 2.159, 666.7] }
+    # system    key: [name, middle wavelength, F_0]
+    twomass_system = {  'J' : ["J", 1.235, 1594],\
+                        'H' : ["H", 1.662, 1024],\
+                       'Ks' : ["Ks", 2.159, 666.7] }
     return twomass_system
+
+# This is copy from a paper "Wright et al. 2010"
+def set_wise():
+    # system    key: [name, middle wavelength, F_0]
+    wise_system = { 'W1' : ["W1", 3.3526, 306.681],\
+                    'W2' : ["W2", 4.6028, 170.663],\
+                    'W3' : ["W3", 11.5608,29.0448],\
+                    'W4' : ["W4", 22.0883, 8.2839]}
+    return wise_system
 
 def Jy_to_mJy(flux_density):
     return 1000 * flux_density

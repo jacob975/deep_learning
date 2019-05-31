@@ -23,7 +23,7 @@ import numpy as np
 import convert_lib
 from convert_lib import TWOMASS_to_UKIDSS, fill_up_error
 from sys import argv
-from dat2npy_noobs_nodet import read_well_known_data
+#from dat2npy_noobs_nodet import read_well_known_data
 
 # the function for read csv catalogs
 def readfile(filename):
@@ -45,7 +45,7 @@ def mag_to_mjy(mags, band, system):
     # initialize variables
     j_mjy = []
     err_j_mjy = []
-    print("zeropoint: {0} mJy".format(system[band][2]))
+    print("{1}, zeropoint: {0} Jy".format(system[band][2], band))
     for i in range(len(mags)):
         # If no observation, put 0 as value
         if mags[i,0] == 0 or mags[i,1] == 0:
@@ -66,7 +66,7 @@ def mjy_to_mag(mjys, band, system):
     # initialize variables
     j_mag = []
     err_j_mag = []
-    print("zeropoint: {0} mJy".format(system[band][2]))
+    print("{1}, zeropoint: {0} Jy".format(system[band][2], band))
     for i in range(len(mjys)):
         # If no observation, put 0 as value.
         if mjys[i,0] == 0 or mjys[i,1] == 0:

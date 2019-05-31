@@ -42,8 +42,9 @@ if __name__ == "__main__":
     cls_true_name = argv[1]
     cls_pred_name = argv[2]
     cls_true = np.loadtxt(cls_true_name)
-    #cls_true = np.argmax(cls_true, axis=1)
-    cls_pred = np.loadtxt(cls_pred_name, dtype = int)
+    cls_true = np.argmax(cls_true, axis=1)
+    cls_pred = np.loadtxt(cls_pred_name)
+    cls_pred = np.argmax(cls_pred, axis=1)
     #-----------------------------------
     # print the properties of sources
     infos = confusion_matrix_infos(cls_true, cls_pred)
