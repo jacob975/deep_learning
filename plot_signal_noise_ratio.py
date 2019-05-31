@@ -58,10 +58,11 @@ if __name__ == "__main__":
     #-----------------------------------
     # Plot the ratio
     ratio = [0, 0, 0, 0.047, 0.047, 0.047, 0.047, 0.095]
+    number_of_bands = len(sed_table[0])//2
     fig, axs = plt.subplots(3, 3, figsize = (16, 12), sharex = 'all', sharey = 'all')
     plt.suptitle("SNR_{0}".format(sed_name[:4]), fontsize=28)
     axs = axs.ravel()
-    for i in range(len(sed_table[0])//2):
+    for i in range(number_of_bands):
         axs[i].set_title(band_name[i])
         axs[i].set_ylabel('uncertainties(mJy)')
         axs[i].set_xlabel('flux(mJy)')
@@ -73,9 +74,9 @@ if __name__ == "__main__":
         # Plot the S/N = 3 line
         axs[i].plot([3e-3, 3e3], [1e-3, 1e3], 'k--', alpha = 0.5)
         # Scatter all sources.
-        axs[i].scatter(sed_table[:,i], sed_table[:,i+8], s = 5, c = 'orange' )
+        axs[i].scatter(sed_table[:,i], sed_table[:,i+number_of_bands], s = 5, c = 'orange' )
         if len(argv) ==3:
-            axs[i].scatter(sed_table_2[:,i], sed_table_2[:,i+8], s = 5, c = 'r' )
+            axs[i].scatter(sed_table_2[:,i], sed_table_2[:,i+number_of_bands], s = 5, c = 'r' )
         if ratio[i] != 0:
             axs[i].plot([0.01, 2000], [0.01*ratio[i], 2000*ratio[i]], 'k-', label = r'$\frac{N}{S}$ = %.4f' % ratio[i])
         # Basic settings
