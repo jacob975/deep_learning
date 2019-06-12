@@ -126,7 +126,7 @@ def optimize_cross_entropy(num_iterations):
                 # Set the iteration for the last improvement to current.
                 last_improvement = total_iterations
                 # Save the acc and loss of improved iter
-                improved_validation_list.append([total_iterations*100, acc_validation, loss_validation])
+                improved_validation_list.append([total_iterations, acc_validation, loss_validation])
                 # Save all variables of the TensorFlow graph to file.
                 saver.save(sess=session, save_path=save_path)
                 # A string to be printed below, shows improvement found.
@@ -233,7 +233,7 @@ def optimize_GT_score(num_iterations):
                 # Set the iteration for the last improvement to current.
                 last_improvement = total_iterations
                 # Save the acc and loss of improved iter
-                improved_validation_list.append([total_iterations*100, acc_validation, loss_validation])
+                improved_validation_list.append([total_iterations, acc_validation, loss_validation])
                 # Save all variables of the TensorFlow graph to file.
                 saver.save(sess=session, save_path=save_path)
 
@@ -526,6 +526,7 @@ if __name__ == "__main__":
         optimize_GT_score(num_iterations=iters)
     elif validation_func == "cross_entropy":
         optimize_cross_entropy(num_iterations=iters)
+    np.savetxt('{0}/validation_acc_loss.txt'.format(save_dir), validation_list, fmt = '%s')
     session.close()
     #-----------------------------------
     # measuring time
