@@ -81,6 +81,20 @@ def set_wise():
                     'W4' : ["W4", 22.0883, 8.2839]}
     return wise_system
 
+# This is copy from papers "Reach et al. 2005"(IRAC) 
+# and the website https://irsa.ipac.caltech.edu/data/SPITZER/docs/mips/mipsinstrumenthandbook/49/ (MIPS) 
+def set_spitzer():
+    # system    key: [name, middle wavelength, F_0]
+    spitzer_system = {  'IR1': ["IR1", 3.550, 280.9],\
+                        'IR2': ["IR2", 4.493, 179.7],\
+                        'IR3': ["IR3", 5.731, 115.0],\
+                        'IR4': ["IR4", 7.872, 64.13],\
+                        'MP1': ["MP1", 23.68, 7.17 ],\
+                        'MP2': ["MP2", 71.42, 0.778],\
+                        'MP3': ["MP3", 155.9, 0.159],\
+                        }
+    return spitzer_system
+
 def Jy_to_mJy(flux_density):
     return 1000 * flux_density
 

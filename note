@@ -105,3 +105,11 @@ awk '$17~/Galc/ && $17!~/dust/ { print $1" "$3 }' catalog-SWIRE-v3.tbl > coord_o
 ###############################################
 # I want to add a function for reading options from a file instead of arguments.
 #
+###############################################
+# 20190621
+# After our submission is rejected, we plan to add:
+# 1. More clear definition of source type.
+# 2. Science result of our classification.
+# 3. More convincing result.
+#
+# We might show the correlation of YSO on the Pearson’s correlation coefficient
