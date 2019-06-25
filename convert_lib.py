@@ -95,6 +95,21 @@ def set_spitzer():
                         }
     return spitzer_system
 
+# This is the system describe our SCAO dataset, contains J, H, K from UKIDSS, and  IR1, IR2, IR3, IR4, MP1 from spitzer.
+def set_SCAO():
+    # system    key: [name, middle wavelength, F_0]
+    SCAO_system = { 'J' : ["J", 1.2483, 1530],\
+                    'H' : ["H", 1.6313, 1019],\
+                    'K' : ["K", 2.2010, 631],\
+                    'IR1': ["IR1", 3.550, 280.9],\
+                    'IR2': ["IR2", 4.493, 179.7],\
+                    'IR3': ["IR3", 5.731, 115.0],\
+                    'IR4': ["IR4", 7.872, 64.13],\
+                    'MP1': ["MP1", 23.68, 7.17 ],\
+                        }
+    return SCAO_system
+    
+
 def Jy_to_mJy(flux_density):
     return 1000 * flux_density
 

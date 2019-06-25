@@ -39,6 +39,29 @@ class option_test():
         self.opts = list(self.opts)
         return self.opts
 
+class option_ccdiag():
+    def __init__(self):
+        self.opts = None
+    def create(self):
+        s = [   '# Please indicate the band you like below',
+                '# Available bands: J, H, K in UKIDSS, and IR1, IR2, IR3, IR4, MP1 in spitzer',
+                '# Put "N" indicate skip that band when ploting, and that color would be magnitude.',
+                '# Mag 3 - Mag 4 vs. Mag 1 - Mag 2',
+                '#--------------------------------',
+                '# Mag 1',
+                'IR3',
+                '# Mag 2',
+                'IR4',
+                '# Mag 3',
+                'IR4',
+                '# Mag 4',
+                'MP1']
+        np.savetxt('option_ccdiag.txt', s, fmt = '%s')
+    def load(self, file_name):
+        self.opts = np.loadtxt(file_name, dtype = str)
+        self.opts = list(self.opts)
+        return self.opts
+
 class option_train():
     def __init__(self):
         self.opts = None
