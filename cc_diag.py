@@ -38,6 +38,16 @@ class band_manager():
         if band_name == 'N':
             self.mag = np.zeros((len(sed_array), 2))
             self.index_detected = np.arange(len(sed_array))
+        elif band_name == 'max':
+            band_col = np.argmax(sed_array[:,:5], axis = 1)
+            band_col_flux = np.array(list(enumerate(band_col)))
+            band_col_err = np.array(list(enumerate(band_col+8)))
+            flux = np.transpose(np.array([  sed_array[band_col_flux[:,0], band_col_flux[:,1]], 
+                                            sed_array[band_col_err[:,0], band_col_err[:,1]]]))
+            # Warning!!!!!!!!!!!!
+            # That could not be band_3
+            self.mag = mjy_to_mag(flux, band_name_3, SCAO_system)
+            self.index_detected = np.where(Q_array[band_col_flux[:,0], band_col_flux[:,1]] != 'U')[0]
         else:
             band_col = np.where(SCAO_bands == band_name)[0][0]
             flux = np.transpose(np.array([sed_array[:,band_col], sed_array[:,band_col+8]]))
@@ -105,7 +115,6 @@ if __name__ == "__main__":
                                                 index_detected_2,
                                                 index_detected_3,
                                                 index_detected_4))
-    print (index_detected_all)
     # Select only detected sources.
     color_1 = mag_1[:,0] - mag_2[:,0]
     color_2 = mag_3[:,0] - mag_4[:,0]
@@ -135,6 +144,8 @@ if __name__ == "__main__":
     plt.xlabel('{0} - {1}'.format(band_name_1, band_name_2))
     plt.ylabel('{0} - {1}'.format(band_name_3, band_name_4))
     #plt.gca().invert_yaxis()
+    #plt.xlim(-1, 4)
+    #plt.ylim(-5, 6)
     plt.legend()
     # Name the result plot
     if band_name_2 == 'N':
