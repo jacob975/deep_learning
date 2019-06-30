@@ -155,7 +155,14 @@ if __name__ == "__main__":
     AI_saved_dir = argv[6]
     #-------------------------------------
     # Load Data
-    data, tracer, coords = astro_mnist.read_data_sets(images_name, labels_name, coords_name, train_weight = 0, validation_weight = 0, test_weight = 1)
+    data, \
+    tracer, \
+    coords = astro_mnist.read_data_sets(images_name, 
+                                        labels_name, 
+                                        coords_name, 
+                                        train_weight = 0, 
+                                        validation_weight = 0, 
+                                        test_weight = 1)
     print("Size of:")
     print("- Training-set:\t\t{}".format(len(data.train.labels)))
     print("- Test-set:\t\t{}".format(len(data.test.labels)))

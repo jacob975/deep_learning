@@ -110,28 +110,28 @@ def set_SCAO():
     return SCAO_system
     
 
-def Jy_to_mJy(flux_density):
+def Jy_to_mJy_noerr(flux_density):
     return 1000 * flux_density
 
-def mJy_to_Jy(flux_density):
+def mJy_to_Jy_noerr(flux_density):
     return flux_density / 1000
 
-def mag_to_Jy(zeropoint, magnitude):
+def mag_to_Jy_noerr(zeropoint, magnitude):
     flux_density = zeropoint * np.power( 10.0, -0.4 * magnitude )
     return flux_density
 
-def Jy_to_mag(zeropoint, flux_density):
+def Jy_to_mag_noerr(zeropoint, flux_density):
     magnitude = -2.5 * ( np.log(flux_density) - np.log(zeropoint) )/ np.log(10.0)
     return magnitude
 
-def mag_to_mJy(zeropoint, magnitude):
-    flux_density = mag_to_Jy(zeropoint, magnitude)
-    flux_density = Jy_to_mJy(flux_density)
+def mag_to_mJy_noerr(zeropoint, magnitude):
+    flux_density = mag_to_Jy_noerr(zeropoint, magnitude)
+    flux_density = Jy_to_mJy_noerr(flux_density)
     return flux_density
 
-def mJy_to_mag(zeropoint, flux_density):
-    flux_density = mJy_to_Jy(flux_density)
-    magnitude = Jy_to_mag(zeropoint, flux_density)
+def mJy_to_mag_noerr(zeropoint, flux_density):
+    flux_density = mJy_to_Jy_noerr(flux_density)
+    magnitude = Jy_to_mag_noerr(zeropoint, flux_density)
     return magnitude
 #-----------------------------------------------------
 # convertion with error
@@ -161,6 +161,50 @@ def mJy_to_mag(zeropoint, flux_density, err_flux_density):
     flux_density, err_flux_density = mJy_to_Jy(flux_density, err_flux_density)
     magnitude, err_magnitude = Jy_to_mag(zeropoint, flux_density, err_flux_density)
     return magnitude, err_magnitude
+
+######################################################
+# The lazy version of converter
+
+def ensemble_mag_to_mjy(mags, band, system):
+    # initialize variables
+    j_mjy = []
+    err_j_mjy = []
+    print("{1}, zeropoint: {0} Jy".format(system[band][2], band))
+    for i in range(len(mags)):
+        # If no observation, put 0 as value
+        if mags[i,0] == 0 or mags[i,1] == 0:
+            mjy = err_mjy = 0.0
+        # Convert
+        else:
+            mjy, err_mjy = mag_to_mJy(system[band][2], mags[i,0], mags[i,1])
+        j_mjy.append(mjy)
+        err_j_mjy.append(err_mjy)
+    # Remove exotic answers
+    j_mjy = np.nan_to_num(j_mjy)
+    err_j_mjy = np.nan_to_num(err_j_mjy)
+    j_mjy = np.transpose(np.stack((j_mjy, err_j_mjy)))
+    return np.array(j_mjy)
+
+# This function for converting mini Janskey to magnitude
+def ensemble_mjy_to_mag(mjys, band, system):
+    # initialize variables
+    j_mag = []
+    err_j_mag = []
+    print("{1}, zeropoint: {0} Jy".format(system[band][2], band))
+    for i in range(len(mjys)):
+        # If no observation, put 0 as value.
+        if mjys[i,0] == 0 or mjys[i,1] == 0:
+            mag = err_mag = 0.0
+        # Convert
+        else:
+            mag, err_mag = mJy_to_mag(system[band][2], mjys[i,0], mjys[i,1])
+        j_mag.append(mag)
+        err_j_mag.append(err_mag)
+    # Remove exotic answers
+    j_mag = np.nan_to_num(j_mag)
+    err_j_mag = np.nan_to_num(err_j_mag)
+    j_mag = np.transpose(np.stack((j_mag, err_j_mag)))
+    return np.array(j_mag)
 
 ######################################################
 # Convert quantities between 2MASS mag system and UKIRT mag system
