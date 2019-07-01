@@ -78,23 +78,33 @@ if __name__ == "__main__":
         # print the properties of sources
         infos = confusion_matrix_infos(cls_true, labels_pred)
         print("### sources in dataset ### ")
-        star_length = len(infos.cls_true[infos.cls_true == 0])
+        try:
+            star_length = len(infos.cls_true[infos.cls_true == 0])
+        except:
+            star_length = 0
         print ("number of stars: {0}".format(star_length))
-        galaxy_length = len(infos.cls_true[infos.cls_true == 1])
+        try:
+            galaxy_length = len(infos.cls_true[infos.cls_true == 1])
+        except:
+            galaxy_length = 0
         print ("number of galaxies: {0}".format(galaxy_length))
-        yso_length = len(infos.cls_true[infos.cls_true == 2])
-        print ("number of ysos: {0}".format(yso_length))
-        print("### reliable sources in dataset ### ")
-        star_length = len(infos.cls_true_reliable[infos.cls_true_reliable == 0])
-        print ("number of stars: {0}".format(star_length))
-        galaxy_length = len(infos.cls_true_reliable[infos.cls_true_reliable == 1])
-        print ("number of galaxies: {0}".format(galaxy_length))
-        yso_length = len(infos.cls_true_reliable[infos.cls_true_reliable == 2])
+        try:
+            yso_length = len(infos.cls_true[infos.cls_true == 2])
+        except:
+            yso_length = 0
         print ("number of ysos: {0}".format(yso_length))
         # print the properties of predictions
         failure, cm, cm_reliable = infos.confusion_matrix()
         print("confusion matrix:\n{0}".format(cm))
-        print("reliable confusion matrix:\n{0}".format(cm_reliable))
+        if infos.reliable:
+            print("### reliable sources in dataset ### ")
+            star_length = len(infos.cls_true_reliable[infos.cls_true_reliable == 0])
+            print ("number of stars: {0}".format(star_length))
+            galaxy_length = len(infos.cls_true_reliable[infos.cls_true_reliable == 1])
+            print ("number of galaxies: {0}".format(galaxy_length))
+            yso_length = len(infos.cls_true_reliable[infos.cls_true_reliable == 2])
+            print ("number of ysos: {0}".format(yso_length))
+            print("reliable confusion matrix:\n{0}".format(cm_reliable))
         infos.print_accuracy()
         infos.print_precision()
         infos.print_recall_rate()

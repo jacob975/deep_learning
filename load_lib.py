@@ -268,9 +268,16 @@ class confusion_matrix_infos():
         self.cls_true = cls_true
         self.labels_pred = labels_pred
         self.cls_pred = np.array(np.argmax(self.labels_pred, axis = 1), dtype = int)
-        self.reliable = np.where((np.max(self.labels_pred, axis = 1) > 0.8))
-        self.cls_true_reliable = self.cls_true[self.reliable]
-        self.cls_pred_reliable = self.cls_pred[self.reliable]
+        try:
+            self.reliable = np.where((np.max(self.labels_pred, axis = 1) > 0.8))
+            self.cls_true_reliable = self.cls_true[self.reliable]
+            self.cls_pred_reliable = self.cls_pred[self.reliable]
+            self.reliable = True
+        except:
+            self.reliable = None
+            self.cls_true_reliable = None
+            self.cls_pred_reliable = None
+            self.reliable = False
         return
 
     def confusion_matrix(self):
@@ -279,7 +286,11 @@ class confusion_matrix_infos():
         cm = confusion_matrix(y_true=self.cls_true,
                               y_pred=self.cls_pred)
         # only reliable
-        cm_reliable = confusion_matrix(y_true=self.cls_true_reliable, y_pred=self.cls_pred_reliable)
+        if self.reliable:
+            cm_reliable = confusion_matrix( y_true=self.cls_true_reliable, 
+                                            y_pred=self.cls_pred_reliable)
+        else:
+            cm_reliable = None
         return 0, cm, cm_reliable
     
     def print_accuracy(self):
