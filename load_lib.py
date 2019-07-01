@@ -268,9 +268,17 @@ class confusion_matrix_infos():
         self.cls_true = cls_true
         self.labels_pred = labels_pred
         self.cls_pred = np.array(np.argmax(self.labels_pred, axis = 1), dtype = int)
-        self.reliable = np.where((np.max(self.labels_pred, axis = 1) > 0.8))
-        self.cls_true_reliable = self.cls_true[self.reliable]
-        self.cls_pred_reliable = self.cls_pred[self.reliable]
+        try:
+            self.reliable = np.where((np.max(self.labels_pred, axis = 1) > 0.8))
+            self.cls_true_reliable = self.cls_true[self.reliable]
+            self.cls_pred_reliable = self.cls_pred[self.reliable]
+            self.reliable = True
+        except:
+            self.reliable = None 
+            self.cls_true_reliable = None 
+            self.cls_pred_reliable = None 
+            self.reliable = False 
+            
         return
 
     def confusion_matrix(self):
@@ -279,7 +287,11 @@ class confusion_matrix_infos():
         cm = confusion_matrix(y_true=self.cls_true,
                               y_pred=self.cls_pred)
         # only reliable
-        cm_reliable = confusion_matrix(y_true=self.cls_true_reliable, y_pred=self.cls_pred_reliable)
+        if self.reliable:
+            cm_reliable = confusion_matrix( y_true=self.cls_true_reliable, 
+                                            y_pred=self.cls_pred_reliable)
+        else:
+            cm_reliable = None
         return 0, cm, cm_reliable
     
     def print_accuracy(self):
@@ -290,11 +302,12 @@ class confusion_matrix_infos():
         print("accuracy of prediction: {0:.2f}% ({1} /{2} )"\
         .format(accuracy*100, len(correctly_predicted[0]), len(self.cls_true)))
         # only reliable
-        print("### reliable accuracy ###")
-        correctly_predicted = np.where((self.cls_pred_reliable == self.cls_true_reliable))
-        accuracy = len(correctly_predicted[0])/len(self.cls_true_reliable)
-        print("accuracy of prediction: {0:.2f}% ({1} /{2} )"\
-        .format(accuracy*100, len(correctly_predicted[0]), len(self.cls_true_reliable)))
+        if self.reliable:
+            print("### reliable accuracy ###")
+            correctly_predicted = np.where((self.cls_pred_reliable == self.cls_true_reliable))
+            accuracy = len(correctly_predicted[0])/len(self.cls_true_reliable)
+            print("accuracy of prediction: {0:.2f}% ({1} /{2} )"\
+            .format(accuracy*100, len(correctly_predicted[0]), len(self.cls_true_reliable)))
         return
     
     def print_precision(self):
@@ -314,20 +327,21 @@ class confusion_matrix_infos():
             print("precision for predict {0} is : {1:.2f}% ({2} /{3} )"\
             .format(self.objects[label], precision*100, len(numerator[0]), len(denominator[0])))
         # only reliable
-        print ("### reliable precision ###")
-        for label in range(3):
-            denominator = np.where(self.cls_pred_reliable == label)
-            numerator = np.where((self.cls_pred_reliable == label) & (self.cls_true_reliable == label))
-            precision = 0
-            if len(denominator[0]) == 0:
-                if len(numerator[0]) == 0:
-                    precision = 0
+        if self.reliable:
+            print ("### reliable precision ###")
+            for label in range(3):
+                denominator = np.where(self.cls_pred_reliable == label)
+                numerator = np.where((self.cls_pred_reliable == label) & (self.cls_true_reliable == label))
+                precision = 0
+                if len(denominator[0]) == 0:
+                    if len(numerator[0]) == 0:
+                        precision = 0
+                    else:
+                        precision = np.inf
                 else:
-                    precision = np.inf
-            else:
-                precision = len(numerator[0])/len(denominator[0])
-            print("precision for predict {0} is : {1:.2f}% ({2} /{3} )"\
-            .format(self.objects[label], precision*100, len(numerator[0]), len(denominator[0])))
+                    precision = len(numerator[0])/len(denominator[0])
+                print("precision for predict {0} is : {1:.2f}% ({2} /{3} )"\
+                .format(self.objects[label], precision*100, len(numerator[0]), len(denominator[0])))
         return
     
     def print_recall_rate(self):
@@ -347,19 +361,20 @@ class confusion_matrix_infos():
             print("recall-rate for true {0} is : {1:.2f}% ({2} /{3} )"\
             .format(self.objects[label], precision*100, len(numerator[0]), len(denominator[0])))
         # only reliable
-        print ("### reliable recall-rate ###")
-        for label in range(3):
-            denominator = np.where(self.cls_true_reliable == label)
-            numerator = np.where((self.cls_pred_reliable == label) & (self.cls_true_reliable == label))
-            if len(denominator[0]) == 0:
-                if len(numerator[0]) == 0:
-                    precision = 0
+        if self.reliable:
+            print ("### reliable recall-rate ###")
+            for label in range(3):
+                denominator = np.where(self.cls_true_reliable == label)
+                numerator = np.where((self.cls_pred_reliable == label) & (self.cls_true_reliable == label))
+                if len(denominator[0]) == 0:
+                    if len(numerator[0]) == 0:
+                        precision = 0
+                    else:
+                        precision = np.inf
                 else:
-                    precision = np.inf
-            else:
-                precision = len(numerator[0])/len(denominator[0])
-            print("recall-rate for true {0} is : {1:.2f}% ({2} /{3} )"\
-            .format(self.objects[label], precision*100, len(numerator[0]), len(denominator[0])))
+                    precision = len(numerator[0])/len(denominator[0])
+                print("recall-rate for true {0} is : {1:.2f}% ({2} /{3} )"\
+                .format(self.objects[label], precision*100, len(numerator[0]), len(denominator[0])))
         return
 
 class cross_confusion_matrix_infos(confusion_matrix_infos):

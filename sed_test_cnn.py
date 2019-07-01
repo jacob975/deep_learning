@@ -63,9 +63,6 @@ def print_test_accuracy(show_confusion_matrix=False):
     # For all the images in the test-set,
     # calculate the predicted classes and whether they are correct.
     correct, cls_pred = predict_cls_test()
-    # save cls_pred and cls_true
-    save_cls_pred(images_name[:-4], directory, cls_pred)
-    save_cls_true(images_name[:-4], directory, data.test.cls)
     
     # Classification accuracy and the number of correct classifications.
     acc, num_correct = cls_accuracy(correct)
@@ -235,6 +232,8 @@ if __name__ == "__main__":
     print_test_accuracy(show_confusion_matrix=True)
     # save labels of prediction
     label_pred = predict_label(data.test.images, data.test.labels)
+    save_cls_pred(images_name[:-4], directory, cls_pred)
+    save_cls_true(images_name[:-4], directory, data.test.cls)
     save_label_pred(images_name[:-4], directory, label_pred)
     session.close()
     #-----------------------------------
