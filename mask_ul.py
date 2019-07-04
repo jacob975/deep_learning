@@ -34,14 +34,14 @@ def proper_error(error_list):
     # Sort the list
     error_array = np.sort(error_list)
     # Take the index of the 20% position.
-    index = int(len(error_array) * 0.01)
+    index = int(len(error_array) * 0.1)
     error = np.median(error_array[:index])
     return error
 
-# Take the flux at 20% latter part.
+# Take 1/100 of the weakest detectable flux 
 def proper_flux(flux_list):
     flux_array = np.sort(flux_list)
-    # Take the index of the 20% position.
+    # Take 1/100 of the weakest detectable flux 
     flux = flux_array[0] * 0.01
     return flux
 
@@ -81,7 +81,9 @@ if __name__ == "__main__":
         # Initialize
         pflux = 0.0
         perror = 0.0
-        # Get the mask
+        # Get the mask of 
+        #       1. all the U label detections, 
+        #       2. all the 0 detections
         mask = ul_table[:,i] == 'U'
         index_valid_flux = (ul_table[:,i] != 'U') & (ul_table[:,i] != 'R') & (data[:,i] != 0.0)
         # Find a proper value for upperlimit detections.
