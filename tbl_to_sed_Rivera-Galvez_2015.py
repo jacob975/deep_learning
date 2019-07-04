@@ -56,15 +56,34 @@ if __name__ == "__main__":
     IR4mag = np.array(np.transpose([inp_table[:,16], inp_table[:,17]]), dtype = float)
     MP1mag = np.array(np.transpose([inp_table[:,18], inp_table[:,19]]), dtype = float)
     #-----------------------------------
+    # Set the 1/100 of the smallest detectable flux and the corresponding error
+    proper_flux_error = np.array(
+                        [[  0.00149784692033, 0.00307373858059],  
+                         [  0.00227441747763, 0.00362321269368],  
+                         [  0.00225503537577, 0.00601552926042],  
+                         [  0.000373        , 0.0158          ],  
+                         [  0.000315        , 0.0119          ],  
+                         [  0.000107        , 0.0257          ],  
+                         [  0.000216        , 0.0257          ],  
+                         [  0.000898        , 0.02905         ]])  
+    #-----------------------------------
     # Convert mag to flux and artifical data
     Jflux = convert_lib.ensemble_mag_to_mjy(Jmag, 'J', SCAO_system)
+    Jflux[Jflux[:,0] == 0.0] = proper_flux_error[0,0]
+    Jflux[Jflux[:,1] == 0.0] = proper_flux_error[0,1]
     Hflux = convert_lib.ensemble_mag_to_mjy(Hmag, 'H', SCAO_system)
+    Hflux[Hflux[:,0] == 0.0] = proper_flux_error[1,0]
+    Hflux[Hflux[:,1] == 0.0] = proper_flux_error[1,1]
     Kflux = convert_lib.ensemble_mag_to_mjy(Kmag, 'K', SCAO_system)
+    Kflux[Kflux[:,0] == 0.0] = proper_flux_error[2,0]
+    Kflux[Kflux[:,1] == 0.0] = proper_flux_error[2,1]
     IR1flux = convert_lib.ensemble_mag_to_mjy(IR1mag, 'IR1', SCAO_system)
     IR2flux = convert_lib.ensemble_mag_to_mjy(IR2mag, 'IR2', SCAO_system)
     IR3flux = convert_lib.ensemble_mag_to_mjy(IR3mag, 'IR3', SCAO_system)
     IR4flux = convert_lib.ensemble_mag_to_mjy(IR4mag, 'IR4', SCAO_system)
     MP1flux = convert_lib.ensemble_mag_to_mjy(MP1mag, 'MP1', SCAO_system)
+    MP1flux[MP1flux[:,0] == 0.0] = proper_flux_error[7,0]
+    MP1flux[MP1flux[:,1] == 0.0] = proper_flux_error[7,1]
     flux_sed = np.array(np.transpose([  Jflux[:,0],
                                         Hflux[:,0],
                                         Kflux[:,0],
