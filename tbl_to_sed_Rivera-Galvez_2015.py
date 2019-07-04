@@ -40,7 +40,7 @@ if __name__ == "__main__":
     # Load argv
     if len(argv) != 2:
         print ("The number of arguments is wrong.")
-        print ("tbl_to_sed_Rivera-Galvez_2015.py[Rivera-Galvez 2015 table]")
+        print ("tbl_to_sed_Rivera-Galvez_2015.py [Rivera-Galvez 2015 table]")
         exit()
     inp_table_name = argv[1]
     #-----------------------------------
@@ -82,12 +82,13 @@ if __name__ == "__main__":
                                         IR4flux[:,1],
                                         MP1flux[:,1],
                                         ]))
-    print (flux_sed)
     # coordinate, Av, source type, and Q label.
     coord = np.transpose(np.array([inp_table[:,0], inp_table[:,1]]))
     fake_Av = np.ones((len(inp_table), 2))
     source_type = np.zeros((len(inp_table), 3))
     source_type[:,2] = 1
+    human_source_type = np.chararray(len(inp_table))
+    human_source_type[:] = 'YSO'
     fake_Q = np.chararray((len(inp_table), 8))
     fake_Q[:] = 'F' # fake
     #-----------------------------------
@@ -95,7 +96,8 @@ if __name__ == "__main__":
     np.savetxt('R-G_2015_sed.txt', flux_sed)
     np.savetxt('R-G_2015_coord.txt', coord, fmt = '%s')
     np.savetxt('R-G_2015_Av.txt', fake_Av)
-    np.savetxt('R-G_2015_Sp.txt', source_type)
+    np.savetxt('R-G_2015_label_pred.txt', source_type)
+    np.savetxt('R-G_2015_Sp.txt', human_source_type, fmt = '%s')
     np.savetxt('R-G_2015_Q.txt', fake_Q, fmt = '%s')
     #-----------------------------------
     # Measure time
