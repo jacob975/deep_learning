@@ -113,3 +113,17 @@ awk '$17~/Galc/ && $17!~/dust/ { print $1" "$3 }' catalog-SWIRE-v3.tbl > coord_o
 # 3. More convincing result.
 #
 # We might show the correlation of YSO on the Pearson’s correlation coefficient
+#
+###############################################
+# 20190715
+# Upper limit criteria for each band
+# In SCAO, c2d+SWIRE, all-observe, exul_4_7, dataset. 
+# band  flux             error
+# J     0.00149784692033 0.00249798704832
+# H     0.00227441747763 0.00314834524531
+# K     0.00225503537577 0.00538726232513
+# IR1   0.000373         0.00896
+# IR2   0.000315         0.00789
+# IR3   0.000107         0.0188
+# IR4   0.000216         0.0178
+# MP1   0.000898         0.0238
