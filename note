@@ -127,3 +127,15 @@ awk '$17~/Galc/ && $17!~/dust/ { print $1" "$3 }' catalog-SWIRE-v3.tbl > coord_o
 # IR3   0.000107         0.0188
 # IR4   0.000216         0.0178
 # MP1   0.000898         0.0238
+###############################################
+# 20190719
+# stellarity index -9 indicate saturation in SWIRE XMM-LSS region survey
+#
+# IRSA table titles
+# \catalog = 'Sample Catalog'
+# \ A sample table comment
+# |   ra      |    dec    |
+# |   double  |    double |
+# |   deg     |    deg    |
+# |   null    |    null   |
+#   165.466279  -34.704730 
