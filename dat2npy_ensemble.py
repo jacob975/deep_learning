@@ -98,7 +98,6 @@ if __name__ == "__main__":
         exit()
     option_file_name = argv[1]
     data_name_list = argv[2:]
-    
     mask_code, \
     number_of_lost, \
     do_normalization, \

@@ -5,6 +5,7 @@ Abstract:
 Usage:
     band_merge.py [error included] [table A] [table B] 
     error_included: Does error included in the input table?
+    Caution: !!!!!! distance is not taken into account !!!!!!!!!
 Output:
     1. The merged SEDs table
 Editor:
