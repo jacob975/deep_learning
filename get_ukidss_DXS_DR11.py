@@ -65,15 +65,21 @@ if __name__ == "__main__":
                                             Hflux[:,1],
                                             Kflux[:,1]
                                             ]))
-    coord_table = np.array(ukidss_table[:,1:3])
-    dist_table = np.array(ukidss_table[:,3])
+    coord_table = np.array(ukidss_table[:,8:10], dtype = str)
+    dist_table = np.array(ukidss_table[:,3], dtype = str)
+    saturation_table = np.array(ukidss_table[:,35], dtype = str)
     # Save the data
     np.savetxt( '{0}_sed.txt'.format(ukidss_table_name[:-4]), 
                 sed_table)
     np.savetxt( '{0}_coord.txt'.format(ukidss_table_name[:-4]), 
-                coord_table)
+                coord_table,
+                fmt = '%s')
     np.savetxt( '{0}_dist.txt'.format(ukidss_table_name[:-4]), 
-                dist_table)
+                dist_table,
+                fmt = '%s')
+    np.savetxt( '{0}_saturation.txt'.format(ukidss_table_name[:-4]),
+                saturation_table,
+                fmt = '%s')
     #-----------------------------------
     # Measure time
     elapsed_time = time.time() - start_time

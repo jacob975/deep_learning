@@ -93,13 +93,13 @@ if __name__ == "__main__":
                                             ]))
     #-----------------------------------
     # Save the data
-    np.savetxt('XMM-LSS_sed.txt', flux_sed, fmt = '%s')
-    np.savetxt('XMM-LSS_coord.txt', coord, fmt = '%s')
-    np.savetxt('XMM-LSS_Av.txt', fake_Av)
-    np.savetxt('XMM-LSS_label_pred.txt', source_type)
-    np.savetxt('XMM-LSS_Sp.txt', human_source_type, fmt = '%s')
-    np.savetxt('XMM-LSS_Q.txt', fake_Q, fmt = '%s')
-    np.savetxt('XMM-LSS_stell.txt', stellarity_index, fmt = '%s')
+    np.savetxt('XMM_LSS_sed.txt', flux_sed, fmt = '%s')
+    np.savetxt('XMM_LSS_coord.txt', coord, fmt = '%s')
+    np.savetxt('XMM_LSS_Av.txt', fake_Av)
+    np.savetxt('XMM_LSS_label_pred.txt', source_type)
+    np.savetxt('XMM_LSS_Sp.txt', human_source_type, fmt = '%s')
+    np.savetxt('XMM_LSS_Q.txt', fake_Q, fmt = '%s')
+    np.savetxt('XMM_LSS_stell.txt', stellarity_index, fmt = '%s')
     #-----------------------------------
     # Measure time
     elapsed_time = time.time() - start_time
