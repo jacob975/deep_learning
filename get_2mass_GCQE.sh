@@ -28,9 +28,9 @@ if [ "$#" -ne 1 ]; then
     echo "Usage: ${0##*/} [file name]"
     exit 1
 fi
-
+awk  '{print $2}' ${1} > ${1::-4}_dist.dat
 awk  '{print  $12" " $16" " $20" " \
-              $13" " $17" " $21}' ${1} > ${1::-4}_sed.dat
+              $13" " $17" " $21}' ${1} > ${1::-4}_mag_sed.dat
 awk  '{print $24}' ${1} > ${1::-4}_Q.dat
 awk  '{print $4" "$5 }' ${1} > ${1::-4}_coord.dat
 #awk -F "|" '{print FNR }' ${1} > wise_tracer.dat

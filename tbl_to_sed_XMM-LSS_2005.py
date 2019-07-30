@@ -44,6 +44,7 @@ if __name__ == "__main__":
         print ("tbl_to_sed_XMM-LSS_2005.py [XMM-LSS 2015 table]")
         exit()
     inp_table_name = argv[1]
+    ukidss_table_name = argv[2]
     #-----------------------------------
     # Load data from input table
     inp_table = np.loadtxt(inp_table_name, dtype = str)

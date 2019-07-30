@@ -24,6 +24,10 @@ update log
     but they haven't been tested.
 20180604 version alpha 3
     1. update the parameter of system.
+20190731 verision alpha 4
+    1. Add an ensemble convertor from 2mag to Umag.
+    2. Add an ensemble convertor from mjy to mag.
+    3. Add an ensemble convertor from mag to mjy.
 '''
 import numpy as np
 
@@ -171,8 +175,10 @@ def ensemble_mag_to_mjy(mags, band, system):
     err_j_mjy = []
     print("{1}, zeropoint: {0} Jy".format(system[band][2], band))
     for i in range(len(mags)):
-        # If no observation, put 0 as value
+        # If no observation, 0 or -infinty will be givne, put 0 as the value
         if mags[i,0] == 0 or mags[i,1] == 0:
+            mjy = err_mjy = 0.0
+        elif mags[i,0] < -100 or mags[i,0] < -100:
             mjy = err_mjy = 0.0
         # Convert
         else:
@@ -229,6 +235,47 @@ class TWOMASS_to_UKIDSS():
     def getKw_base_on_J2_K2(self):
         Kw = self.K2 - 0.010 * (self.J2 - self.K2)
         return Kw
+
+def ensemble_two2u(J2mag, H2mag, K2mag):
+    # Convert from 2MASSmag to UKIDSSmag
+    JUmag = []
+    HUmag = []
+    KUmag = []
+    for i in range(len(J2mag)):
+        # Initialzed
+        J2mag_u = None
+        H2mag_u = None
+        K2mag_u = None
+        # Selection
+        if J2mag[i,0] < -100 or J2mag[i,1] < -100:
+            J2mag_u = ufloat(0,0)
+        else:
+            J2mag_u = ufloat(J2mag[i,0], J2mag[i,1])
+        if H2mag[i,0] < -100 or H2mag[i,1] < -100:
+            H2mag_u = ufloat(0,0)
+        else:
+            H2mag_u = ufloat(H2mag[i,0], H2mag[i,1])
+        if K2mag[i,0] < -100 or K2mag[i,1] < -100:
+            K2mag_u = ufloat(0,0)
+        else:
+            K2mag_u = ufloat(K2mag[i,0], K2mag[i,1])
+        TwotoU = TWOMASS_to_UKIDSS(J2mag_u, H2mag_u, K2mag_u)
+        if (J2mag_u.n != 0.0) and (H2mag_u.n != 0.0):
+            JUmag_u = TwotoU.Jw
+            HUmag_u = TwotoU.Hw
+        else:
+            JUmag_u = ufloat(0.0, 0.0)
+            HUmag_u = ufloat(0.0, 0.0)
+        if (J2mag_u.n != 0.0) and (K2mag_u.n != 0.0):
+            KUmag_u = TwotoU.Kw
+        else:
+            KUmag_u = ufloat(0.0, 0.0)
+        # Append the result to list
+        JUmag.append(JUmag_u)
+        HUmag.append(HUmag_u)
+        KUmag.append(KUmag_u)
+    # Return a list which are formated in uncertainties nparray.
+    return JUmag, HUmag, KUmag
 
 #-----------------------------------------------------
 # This def is used to fill up empty error with median one.

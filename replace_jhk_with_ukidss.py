@@ -3,6 +3,7 @@
 Abstract:
     This is a program to take band JHK from ukidss catalog, 
     and replace the small signals in 2MASS with signals in UKIDSS in bands JHK.
+    Caution!!!!!! For DR10 Only !!!!!!!
 Usage:
     replace_jhk_with_ukidss.py [ukidss catalog file] [twomass catalog file] [target dat file]
 Output:
@@ -82,7 +83,7 @@ def mag_to_mjy_ufloat(bands, band, distances, system):
     # initialize variables
     mjy_array = []
     err_mjy_array = []
-    # convert
+    # Convert from mag to mjy
     for i in range(len(bands)):
         # if JHK is not found...
         if distances[i] == 0.0:
@@ -90,8 +91,12 @@ def mag_to_mjy_ufloat(bands, band, distances, system):
         # if the distance is larger than 1 beam size of irac...
         elif distances[i] > 0.6:
             mjy = err_mjy = 0.0
+        # If the source is not observed.
         elif bands[i].n == 0 or bands[i].s == 0:
             mjy = err_mjy = 0.0
+        elif bands[i].n < -100 or bands[i].s < -100:
+            mjy = err_mjy = 0.0
+        
         else:
             mjy, err_mjy = convert_lib.mag_to_mJy(system[band][2], bands[i].n, bands[i].s)
         mjy_array.append(mjy)
@@ -101,9 +106,9 @@ def mag_to_mjy_ufloat(bands, band, distances, system):
     return np.array(mjy_array), np.array(err_mjy_array)
 
 def wipe_out_non_physical_numbers(target_list):
-    # remove inf
+    # Remove inf
     target_list[target_list > 1e308] = 0 
-    # remove -inf
+    # Remove -inf
     target_list[target_list < -1e308] = 0 
 
 def SEDname2Qname(name_dat_file, keyword):
@@ -201,7 +206,7 @@ if __name__ == "__main__":
     twomass_err_k_mjy = None
     if name_twomass_catalog != 'skip':
         twomass_catalogs = np.loadtxt(name_twomass_catalog, skiprows = 79, dtype = np.str)
-        # Split table into J, H, and Ks bands.
+        # Obtain Mag data and split table into J, H, and Ks bands.
         twomass_bands_j = twomass_catalogs[:,11:13]
         twomass_bands_j[twomass_bands_j == 'null'] = '0.0'
         twomass_bands_j = np.array(twomass_bands_j, dtype = np.float64)
@@ -211,7 +216,7 @@ if __name__ == "__main__":
         twomass_bands_k = twomass_catalogs[:,19:21]
         twomass_bands_k[twomass_bands_k == 'null'] = '0.0'
         twomass_bands_k = np.array(twomass_bands_k, dtype = np.float64)
-        # Fill up empty error
+        # Fill up non-given error
         twomass_bands_ju = []
         twomass_bands_hu = []
         twomass_bands_ku = []
