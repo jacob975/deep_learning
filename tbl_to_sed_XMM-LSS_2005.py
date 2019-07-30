@@ -75,6 +75,8 @@ if __name__ == "__main__":
                                         IR4flux[:,1],
                                         MP1flux[:,1],
                                         ]))
+    flux_sed[flux_sed == 'null'] = '0.0'
+    flux_sed = np.array(flux_sed, dtype = float)/100
     print ('Arrange, done.')
     # coordinate, Av, source type, and Q label.
     coord = np.transpose(np.array([inp_table[:,2], inp_table[:,3]]))
@@ -93,7 +95,7 @@ if __name__ == "__main__":
                                             ]))
     #-----------------------------------
     # Save the data
-    np.savetxt('XMM_LSS_sed.txt', flux_sed, fmt = '%s')
+    np.savetxt('XMM_LSS_sed.txt', flux_sed)
     np.savetxt('XMM_LSS_coord.txt', coord, fmt = '%s')
     np.savetxt('XMM_LSS_Av.txt', fake_Av)
     np.savetxt('XMM_LSS_label_pred.txt', source_type)
