@@ -41,7 +41,7 @@ if __name__ == "__main__":
     filter_name = argv[3]
     #-----------------------------------
     # Load data
-    data = np.loadtxt(data_name)
+    data = np.loadtxt(data_name, dtype = str)
     _filter = np.loadtxt(filter_name, dtype = int)
     # Apply the filter
     result_data = data[:]
@@ -49,8 +49,8 @@ if __name__ == "__main__":
         result_data[_filter] = 0.0
     if option == "selector":
         result_data = result_data[_filter]
-    np.savetxt('{0}_backup{1}'.format(data_name[:-4], data_name[-4:]), data)
-    np.savetxt(data_name, result_data)
+    np.savetxt('{0}_backup{1}'.format(data_name[:-4], data_name[-4:]), data, fmt = '%s')
+    np.savetxt(data_name, result_data, fmt = '%s')
     #-----------------------------------
     # Measure time
     elapsed_time = time.time() - start_time
