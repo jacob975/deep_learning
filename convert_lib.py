@@ -148,12 +148,12 @@ def mJy_to_Jy(flux_density, err_flux_density):
 
 def mag_to_Jy(zeropoint, magnitude, err_magnitude):
     flux_density = zeropoint * np.power( 10.0, -0.4 * magnitude )
-    err_flux_density = np.divide(err_magnitude * np.log(10.0) * flux_density, 2.5)
+    err_flux_density = np.abs(np.divide(err_magnitude * np.log(10.0) * flux_density, 2.5))
     return flux_density, err_flux_density
 
 def Jy_to_mag(zeropoint, flux_density, err_flux_density):
     magnitude = -2.5 * ( np.log(flux_density) - np.log(zeropoint) )/ np.log(10.0)
-    err_magnitude = np.divide(-2.5 * err_flux_density, flux_density * np.log(10.0)) 
+    err_magnitude = np.abs(np.divide(-2.5 * err_flux_density, flux_density * np.log(10.0))) 
     return magnitude, err_magnitude
 
 def mag_to_mJy(zeropoint, magnitude, err_magnitude):
@@ -247,6 +247,7 @@ def ensemble_two2u(J2mag, H2mag, K2mag):
         H2mag_u = None
         K2mag_u = None
         # Selection
+        # ignore the detections with less -100.
         if J2mag[i,0] < -100 or J2mag[i,1] < -100:
             J2mag_u = ufloat(0,0)
         else:
@@ -276,6 +277,28 @@ def ensemble_two2u(J2mag, H2mag, K2mag):
         KUmag.append(KUmag_u)
     # Return a list which are formated in uncertainties nparray.
     return JUmag, HUmag, KUmag
+
+# this function is used to convert the unit from magnitude to mini Janskey
+# take j band as example
+def ensemble_mag_to_mjy_ufloat(bands, band, system):
+    # initialize variables
+    mjy_array = []
+    err_mjy_array = []
+    # Convert from mag to mjy
+    for i in range(len(bands)):
+        # If the source is not observed.
+        if bands[i].n == 0 or bands[i].s == 0:
+            mjy = err_mjy = 0.0
+        elif bands[i].n < -100 or bands[i].s < -100:
+            mjy = err_mjy = 0.0
+        
+        else:
+            mjy, err_mjy = mag_to_mJy(system[band][2], bands[i].n, bands[i].s)
+        mjy_array.append(mjy)
+        err_mjy_array.append(err_mjy)
+    mjy_array = np.nan_to_num(mjy_array)
+    err_mjy_array = np.nan_to_num(err_mjy_array)
+    return np.array(mjy_array), np.array(err_mjy_array)
 
 #-----------------------------------------------------
 # This def is used to fill up empty error with median one.

@@ -29,19 +29,17 @@ from sys import argv
 import time
 import numpy as np
 
-# Take the error at 20% latter part.
+# Take the error of the 1% last bright star.
 def proper_error(error_list):
     # Sort the list
     error_array = np.sort(error_list)
-    # Take the index of the 20% position.
     index = int(len(error_array) * 0.01)
     error = np.median(error_array[:index])
     return error
 
-# Take the flux at 20% latter part.
+# Take the flux of the last bright star.
 def proper_flux(flux_list):
     flux_array = np.sort(flux_list)
-    # Take the index of the 20% position.
     flux = flux_array[0] * 0.01
     return flux
 
@@ -74,10 +72,8 @@ if __name__ == "__main__":
     #------------------------------------------
     # Mask dataset with chosen mask
     for i in range(len(ul_table[0])):
-        '''
-        if i < 5:
+        if i == 1:
             continue
-        '''
         # Initialize
         pflux = 0.0
         perror = 0.0

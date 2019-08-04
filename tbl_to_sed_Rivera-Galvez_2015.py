@@ -47,14 +47,15 @@ if __name__ == "__main__":
     # Load data from input table
     SCAO_system = convert_lib.set_SCAO()
     inp_table = np.loadtxt(inp_table_name, dtype = str)
-    Jmag   = np.array(np.transpose([inp_table[:,4] , inp_table[:, 5]]), dtype = float)
-    Hmag   = np.array(np.transpose([inp_table[:,6] , inp_table[:, 7]]), dtype = float)
-    Kmag   = np.array(np.transpose([inp_table[:,8] , inp_table[:, 9]]), dtype = float)
-    IR1mag = np.array(np.transpose([inp_table[:,10], inp_table[:,11]]), dtype = float)
-    IR2mag = np.array(np.transpose([inp_table[:,12], inp_table[:,13]]), dtype = float)
-    IR3mag = np.array(np.transpose([inp_table[:,14], inp_table[:,15]]), dtype = float)
-    IR4mag = np.array(np.transpose([inp_table[:,16], inp_table[:,17]]), dtype = float)
-    MP1mag = np.array(np.transpose([inp_table[:,18], inp_table[:,19]]), dtype = float)
+    Jmag   = np.array(np.transpose([inp_table[:,3] , inp_table[:, 4]]), dtype = float)
+    Hmag   = np.array(np.transpose([inp_table[:,5] , inp_table[:, 6]]), dtype = float)
+    Kmag   = np.array(np.transpose([inp_table[:,7] , inp_table[:, 8]]), dtype = float)
+    IR1mag = np.array(np.transpose([inp_table[:,9] , inp_table[:,10]]), dtype = float)
+    IR2mag = np.array(np.transpose([inp_table[:,11], inp_table[:,12]]), dtype = float)
+    IR3mag = np.array(np.transpose([inp_table[:,13], inp_table[:,14]]), dtype = float)
+    IR4mag = np.array(np.transpose([inp_table[:,15], inp_table[:,16]]), dtype = float)
+    MP1mag = np.array(np.transpose([inp_table[:,17], inp_table[:,18]]), dtype = float)
+    '''
     #-----------------------------------
     # Set the 1/100 of the smallest detectable flux and the corresponding error
     proper_flux_error = np.array(
@@ -66,24 +67,17 @@ if __name__ == "__main__":
                          [  0.000107        , 0.0257          ],  
                          [  0.000216        , 0.0257          ],  
                          [  0.000898        , 0.02905         ]])  
+    '''
     #-----------------------------------
     # Convert mag to flux and artifical data
     Jflux = convert_lib.ensemble_mag_to_mjy(Jmag, 'J', SCAO_system)
-    Jflux[Jflux[:,0] == 0.0] = proper_flux_error[0,0]
-    Jflux[Jflux[:,1] == 0.0] = proper_flux_error[0,1]
     Hflux = convert_lib.ensemble_mag_to_mjy(Hmag, 'H', SCAO_system)
-    Hflux[Hflux[:,0] == 0.0] = proper_flux_error[1,0]
-    Hflux[Hflux[:,1] == 0.0] = proper_flux_error[1,1]
     Kflux = convert_lib.ensemble_mag_to_mjy(Kmag, 'K', SCAO_system)
-    Kflux[Kflux[:,0] == 0.0] = proper_flux_error[2,0]
-    Kflux[Kflux[:,1] == 0.0] = proper_flux_error[2,1]
     IR1flux = convert_lib.ensemble_mag_to_mjy(IR1mag, 'IR1', SCAO_system)
     IR2flux = convert_lib.ensemble_mag_to_mjy(IR2mag, 'IR2', SCAO_system)
     IR3flux = convert_lib.ensemble_mag_to_mjy(IR3mag, 'IR3', SCAO_system)
     IR4flux = convert_lib.ensemble_mag_to_mjy(IR4mag, 'IR4', SCAO_system)
     MP1flux = convert_lib.ensemble_mag_to_mjy(MP1mag, 'MP1', SCAO_system)
-    MP1flux[MP1flux[:,0] == 0.0] = proper_flux_error[7,0]
-    MP1flux[MP1flux[:,1] == 0.0] = proper_flux_error[7,1]
     flux_sed = np.array(np.transpose([  Jflux[:,0],
                                         Hflux[:,0],
                                         Kflux[:,0],
@@ -112,7 +106,7 @@ if __name__ == "__main__":
     fake_Q[:] = 'F' # fake
     #-----------------------------------
     # Save the data
-    np.savetxt('R-G_2015_sed.txt', flux_sed)
+    np.savetxt('R-G_2015_sed.txt', flux_sed, header = '# The JHK comes from Calar Alto Observatory.')
     np.savetxt('R-G_2015_coord.txt', coord, fmt = '%s')
     np.savetxt('R-G_2015_Av.txt', fake_Av)
     np.savetxt('R-G_2015_label_pred.txt', source_type)
