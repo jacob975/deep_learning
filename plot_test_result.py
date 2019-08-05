@@ -47,7 +47,7 @@ if __name__ == "__main__":
     #----------------------------------------
     # Load data
     print("Loading ...")
-    labels_pred = np.loadtxt("{0}_labels_pred.txt".format(main_name))
+    labels_pred = np.loadtxt("{0}_label_pred.txt".format(main_name))
     cls_pred    = np.argmax(labels_pred, axis = 1)
     cls_true    = np.loadtxt("{0}_cls_true.txt".format(main_name), dtype = int)
     data        = np.loadtxt("{0}_sed.txt".format(main_name))
