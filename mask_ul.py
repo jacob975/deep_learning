@@ -34,7 +34,7 @@ def proper_error(error_list):
     # Sort the list
     error_array = np.sort(error_list)
     # Take the index of the 10% position.
-    index = int(len(error_array) * 0.1)
+    index = int(len(error_array) * 0.01)
     error = np.median(error_array[:index])
     return error
 
