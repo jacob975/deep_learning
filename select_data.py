@@ -50,8 +50,12 @@ if __name__ == "__main__":
     result_data = data[:]
     if option == "filter":
         result_data[_filter] = 0.0
-    if option == "selector":
+    elif option == "selector":
         result_data = result_data[_filter]
+    else:
+        print ('Wrong arguments')
+        print ('Please check the usage.')
+        exit()
     np.savetxt('{0}_backup{1}'.format(data_name[:-4], data_name[-4:]), data, fmt = '%s')
     np.savetxt(data_name, result_data, fmt = '%s')
     #-----------------------------------
