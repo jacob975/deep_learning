@@ -63,14 +63,7 @@ if __name__ == "__main__":
     IR3err = IR3flux*0.047
     IR4flux = convert_lib.mag_to_mJy_noerr(SCAO_system['IR4'][2], IR4mag)
     IR4err = IR4flux*0.047
-    MP1flux = []
-    for mag in MP1mag:
-        if mag == 0:
-            MP1flux.append(0.0) 
-        else:
-            flux = convert_lib.mag_to_mJy_noerr(SCAO_system['MP1'][2], mag)
-            MP1flux.append(flux) 
-    MP1flux = np.array(MP1flux)
+    MP1flux = convert_lib.mag_to_mJy_noerr(SCAO_system['MP1'][2], MP1mag)
     MP1err = MP1flux*0.095
     flux_sed = np.array(np.transpose([  JUflux[:,0],
                                         HUflux[:,0],
