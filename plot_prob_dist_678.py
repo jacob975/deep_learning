@@ -28,7 +28,7 @@ import os
 import itertools
 from colour import Color
 from sed_test_cnn import bias_variable, weight_variable
-from convert_JHK_from_twomass_to_ukidss import mjy_to_mag
+from convert_lib import ensemble_mjy_to_mag
 import convert_lib
 
 # Assign RGB color to represent stars, galaxies, and YSOs.
@@ -57,7 +57,7 @@ def plot_prob(arti_mag, sgys_color, sort_order):
                     ys = arti_mag[np.where(arti_mag[:,0] == IR3[0]), 1], 
                     zs = arti_mag[np.where(arti_mag[:,0] == IR3[0]), 2], 
                     zdir='z', 
-                    s=100, 
+                    s=5, 
                     c = sgys_color[np.where(arti_mag[:,0] == IR3[0])],
                     depthshade=False)
         ax.set_title("Star/Galaxy/YSO probability")
@@ -67,20 +67,23 @@ def plot_prob(arti_mag, sgys_color, sort_order):
         ax.set_xlabel(sort_order[0])
         ax.set_ylabel(sort_order[1])
         ax.set_zlabel(sort_order[2])
-        plt.savefig('probability_distribution_along_{0}_{1}.png'.format(sort_order[0], 
-                                                                        i))
+        plt.savefig('probability_distribution_along_{0}_{1:03d}.png'
+                    .format(sort_order[0], 
+                    i))
+        if i%20 == 0:
+            plt.close()
         print ('number {0}, done.'.format(i))
     print ("IR4")
     # Print the color for each IR4 slice
     for i, IR4 in enumerate(IR4_arti_mag):
         fig = plt.figure(figsize = (8,8))
         ax = fig.add_subplot(111, projection='3d')
-        print (np.where(arti_mag[:,1] == IR4[0]))
+        #print (np.where(arti_mag[:,1] == IR4[0]))
         ax.scatter( xs = arti_mag[np.where(arti_mag[:,1] == IR4[0]), 0], 
                     ys = arti_mag[np.where(arti_mag[:,1] == IR4[0]), 1], 
                     zs = arti_mag[np.where(arti_mag[:,1] == IR4[0]), 2], 
                     zdir='z', 
-                    s=100, 
+                    s=5, 
                     c = sgys_color[np.where(arti_mag[:,1] == IR4[0])],
                     depthshade=False)
         ax.set_title("Star/Galaxy/YSO probability")
@@ -90,8 +93,11 @@ def plot_prob(arti_mag, sgys_color, sort_order):
         ax.set_xlabel(sort_order[0])
         ax.set_ylabel(sort_order[1])
         ax.set_zlabel(sort_order[2])
-        plt.savefig('probability_distribution_along_{0}_{1}.png'.format(sort_order[1], 
-                                                                        i))
+        plt.savefig('probability_distribution_along_{0}_{1:03d}.png'
+                    .format(sort_order[1], 
+                            i))
+        if i%20 == 0:
+            plt.close()
         print ('number {0}, done.'.format(i))
     print ('MP1')
     # Print the color for each MP1 slice
@@ -102,7 +108,7 @@ def plot_prob(arti_mag, sgys_color, sort_order):
                     ys = arti_mag[np.where(arti_mag[:,2] == MP1[0]), 1], 
                     zs = arti_mag[np.where(arti_mag[:,2] == MP1[0]), 2], 
                     zdir='z', 
-                    s=100, 
+                    s=5, 
                     c = sgys_color[np.where(arti_mag[:,2] == MP1[0])],
                     depthshade=False)
         ax.set_title("Star/Galaxy/YSO probability")
@@ -112,8 +118,11 @@ def plot_prob(arti_mag, sgys_color, sort_order):
         ax.set_xlabel(sort_order[0])
         ax.set_ylabel(sort_order[1])
         ax.set_zlabel(sort_order[2])
-        plt.savefig('probability_distribution_along_{0}_{1}.png'.format(sort_order[2], 
-                                                                        i))
+        plt.savefig('probability_distribution_along_{0}_{1:03d}.png'
+                    .format(sort_order[2], 
+                            i))
+        if i%20 == 0:
+            plt.close()
         print ('number {0}, done.'.format(i))
     return
 
@@ -132,19 +141,22 @@ if __name__ == "__main__":
     #-----------------------------------
     # Calculate the probability distribution of labels
     band_system = convert_lib.set_SCAO()
-    fake_error = np.ones(10)
-    IR3_arti_flux = np.transpose([  np.logspace(np.log10(0.000107), np.log10(5500.0), num=10),
+    fake_error = np.ones(100)
+    IR3_arti_flux = np.transpose([  np.logspace(np.log10(0.000107), np.log10(5500.0), num=100),
                                     fake_error
                                     ])
-    IR4_arti_flux = np.transpose([  np.logspace(np.log10(0.000216), np.log10(3830.0), num=10),
+    IR4_arti_flux = np.transpose([  np.logspace(np.log10(0.000216), np.log10(3830.0), num=100),
                                     fake_error
                                     ])
-    MP1_arti_flux = np.transpose([  np.logspace(np.log10(0.000898), np.log10(4370.0), num=10),
+    MP1_arti_flux = np.transpose([  np.logspace(np.log10(0.000898), np.log10(4370.0), num=100),
                                     fake_error
                                     ])
-    IR3_arti_mag = mjy_to_mag(IR3_arti_flux, 'IR3', band_system, )
-    IR4_arti_mag = mjy_to_mag(IR4_arti_flux, 'IR4', band_system, )
-    MP1_arti_mag = mjy_to_mag(MP1_arti_flux, 'MP1', band_system, )
+    print (IR3_arti_flux.shape)
+    print (IR4_arti_flux.shape)
+    print (MP1_arti_flux.shape)
+    IR3_arti_mag = ensemble_mjy_to_mag(IR3_arti_flux, 'IR3', band_system )
+    IR4_arti_mag = ensemble_mjy_to_mag(IR4_arti_flux, 'IR4', band_system )
+    MP1_arti_mag = ensemble_mjy_to_mag(MP1_arti_flux, 'MP1', band_system )
     arti_mag_678 = np.asarray(list(itertools.product(   IR3_arti_mag[:,0], 
                                                         IR4_arti_mag[:,0], 
                                                         MP1_arti_mag[:,0]
@@ -154,7 +166,6 @@ if __name__ == "__main__":
                                                         MP1_arti_flux[:,0]
                                                         )))
     arti_label_678 = np.zeros(arti_flux_678.shape)
-    print (arti_mag_678)
     #-----------------------------------
     # Load AI
     print ('Loading AI...')
