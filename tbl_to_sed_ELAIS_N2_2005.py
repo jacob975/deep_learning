@@ -1,15 +1,13 @@
 #!/usr/bin/python3
 '''
 Abstract:
-    This is a program for convert the SED data of source 
-    in ELAIS N2 region in IPAC Infrared Science Archive (IRSA) 
-    to AI model readable format. 
+    This is a program for convert the SED data of SWIRE ELAIS N2 survey (2005) to AI model readable format. 
 Usage:
     tbl_to_sed_ELAIS_N2_2005.py [ELAIS N2 2005 table]
 Output:
     1. The SED of sources in JHK, IRAC, and MIPS 
-    2. The fake coordinate of sources.
-    3. The source type of sources (YSO, of course)
+    2. The coordinate of sources.
+    3. The fake source type
     4. The fake Av
     5. The Quality label
 Editor:
@@ -20,10 +18,10 @@ Editor:
 #   This code is made in python3 #
 ##################################
 
-20190705
+20190719
 ####################################
 update log
-20190705 version alpha 1:
+20190719 version alpha 1:
     1. The code works.
 '''
 import time
@@ -42,40 +40,59 @@ if __name__ == "__main__":
     # Load argv
     if len(argv) != 2:
         print ("The number of arguments is wrong.")
-        print ("tbl_to_sed_ELAIS_N2_2005.py [ELAIS N2 2005 table]")
+        print ("tbl_to_sed_ELAIS_N2_2005.py [ELAIS_N2 2005 table]")
         exit()
     inp_table_name = argv[1]
     #-----------------------------------
     # Load data from input table
     inp_table = np.loadtxt(inp_table_name, dtype = str)
-    IR1flux = np.array(np.transpose([inp_table[:, 7], inp_table[:, 8]]))
-    IR2flux = np.array(np.transpose([inp_table[:,12], inp_table[:,13]]))
-    IR3flux = np.array(np.transpose([inp_table[:,17], inp_table[:,18]]))
-    IR4flux = np.array(np.transpose([inp_table[:,22], inp_table[:,23]]))
-    MP1flux = np.array(np.transpose([inp_table[:,27], inp_table[:,28]]))
+    inp_table[inp_table == '-99.00'] = 'null'
+    inp_table[inp_table == '-99.0'] = 'null'
+    #Jmag   = np.array(np.transpose([inp_table[:,4] , inp_table[:, 5]]), dtype = float)
+    #Hmag   = np.array(np.transpose([inp_table[:,6] , inp_table[:, 7]]), dtype = float)
+    #Kmag   = np.array(np.transpose([inp_table[:,8] , inp_table[:, 9]]), dtype = float)
+    IR1flux = np.array(np.transpose([inp_table[:, 2], inp_table[:, 3]])) 
+    IR2flux = np.array(np.transpose([inp_table[:, 4], inp_table[:, 5]])) 
+    IR3flux = np.array(np.transpose([inp_table[:, 6], inp_table[:, 7]])) 
+    IR4flux = np.array(np.transpose([inp_table[:, 8], inp_table[:, 9]])) 
+    MP1flux = np.array(np.transpose([inp_table[:,10], inp_table[:,11]])) 
+    print ('Loading, done.')
     flux_sed = np.array(np.transpose([  
+                                        #Jflux[:,0],
+                                        #Hflux[:,0],
+                                        #Kflux[:,0],
                                         IR1flux[:,0],
                                         IR2flux[:,0],
                                         IR3flux[:,0],
                                         IR4flux[:,0],
                                         MP1flux[:,0],
+                                        #Jflux[:,1],
+                                        #Hflux[:,1],
+                                        #Kflux[:,1],
                                         IR1flux[:,1],
                                         IR2flux[:,1],
                                         IR3flux[:,1],
                                         IR4flux[:,1],
                                         MP1flux[:,1],
                                         ]))
+    flux_sed[flux_sed == 'null'] = '0.0'
+    flux_sed = np.array(flux_sed, dtype = float)/1000
+    print ('Arrange, done.')
     # coordinate, Av, source type, and Q label.
-    coord = np.transpose(np.array([inp_table[:,2], inp_table[:,3]]))
-    fake_Av = np.zeros((len(inp_table), 2))
-    fake_Q = np.chararray((len(inp_table), 8))
-    fake_Q[:] = 'F' # fake
+    coord = np.transpose(np.array([inp_table[:,0], inp_table[:,1]]))
+    fake_Av = np.ones((len(inp_table), 2))
+    source_type = np.zeros((len(inp_table), 3))
+    source_type[:,0] = 1
+    fake_Q = np.chararray((len(inp_table), 5))
+    fake_Q[:] = 'A'
+    fake_Q = np.array(fake_Q, dtype= str)
     #-----------------------------------
     # Save the data
-    np.savetxt('ELAIS_N1_2005_sed.txt', flux_sed, fmt = '%s')
-    np.savetxt('ELAIS_N1_2005_coord.txt', coord, fmt = '%s')
-    np.savetxt('ELAIS_N1_2005_Av.txt', fake_Av)
-    np.savetxt('ELAIS_N1_2005_Q.txt', fake_Q, fmt = '%s')
+    np.savetxt('ELAIS_N2_sed.txt', flux_sed)
+    np.savetxt('ELAIS_N2_coord.txt', coord, fmt = '%s')
+    np.savetxt('ELAIS_N2_c2d2007_Sp.txt', source_type, header = '# fake source type')
+    np.savetxt('ELAIS_N2_Av.txt', fake_Av, header = '# fake Av')
+    np.savetxt('ELAIS_N2_Q.txt', fake_Q, fmt = '%s', header = '# fake quality label')
     #-----------------------------------
     # Measure time
     elapsed_time = time.time() - start_time

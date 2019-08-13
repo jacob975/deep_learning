@@ -3,7 +3,7 @@
 Abstract:
     This is a program for obtaining data from 2MASS table in GCQE format. 
 Usage:
-    get_twomass_GCQE.py [UKIDSS DXS table]
+    get_twomass_GCQE.py [2MASS GCQE table]
 Output:
     1. sed table
     2. coord table

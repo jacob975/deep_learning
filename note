@@ -143,3 +143,18 @@ awk '$17~/Galc/ && $17!~/dust/ { print $1" "$3 }' catalog-SWIRE-v3.tbl > coord_o
 # 20190729
 # The photometry method we used in UKIDSS is AperMag3,
 # which make a aperture with 2 arcsec radius on each source.
+#
+###############################################
+# 20190812
+# A null value in GCQE table could indicate:
+# Null values for fluxes and their un- certainties are denoted by “-99.00”. 
+# A null flux value does not necessarily mean a source has a flux below the 
+# SWIRE sensitivity limit in this band. There are three reasons a null 
+# value may exist: 
+#   (1) non-detection to the limits of source extraction 
+#   (2) failure of the detected source to meet the CSNR threshold criterion 
+#   (3) lack of coverage in this band. 
+# 
+# The third criterion should not apply to null IRAC flux values since we 
+# have attempted to limit the IRAC-24μm-Optical Catalog to the full IRAC 
+# coverage area, but we do not guarantee this to be the case.
