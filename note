@@ -145,7 +145,7 @@ awk '$17~/Galc/ && $17!~/dust/ { print $1" "$3 }' catalog-SWIRE-v3.tbl > coord_o
 # which make a aperture with 2 arcsec radius on each source.
 #
 ###############################################
-# 20190812
+# 20190813
 # A null value in GCQE table could indicate:
 # Null values for fluxes and their un- certainties are denoted by “-99.00”. 
 # A null flux value does not necessarily mean a source has a flux below the 
@@ -158,3 +158,10 @@ awk '$17~/Galc/ && $17!~/dust/ { print $1" "$3 }' catalog-SWIRE-v3.tbl > coord_o
 # The third criterion should not apply to null IRAC flux values since we 
 # have attempted to limit the IRAC-24μm-Optical Catalog to the full IRAC 
 # coverage area, but we do not guarantee this to be the case.
+#
+# Caution!!!!!!!!!!!!!!!!
+# Don't use the GLIMPSE survey later than GLIMPSE 3D since they are belonged
+# the Spitzer Warm Mission, which operated without band 3 and 4.
+#
+# Usefull: GLIMPSE I, GLIMPSE II, GLIMPSE 3D
+# Useless: GLIMPSE 360, Deep GLIMPSE, GLIMPSE Proper, APOGLIMPSE, SMOG, and Cygnus-X

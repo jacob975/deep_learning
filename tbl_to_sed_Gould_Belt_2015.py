@@ -2,16 +2,16 @@
 '''
 Abstract:
     This is a program for convert the SED data of source 
-    in Taurus region in IPAC Infrared Science Archive (IRSA) 
+    in Gould belt region in IPAC Infrared Science Archive (IRSA) 
     to AI model readable format. 
 Usage:
-    tbl_to_sed_Taurus_2008.py [Taurus 2008 table]
+    tbl_to_sed_Gould_belt_2015.py [Gould belt 2015 table]
 Output:
     1. The SED of sources in JHK, IRAC, and MIPS 
     2. The fake coordinate of sources.
-    3. The source type of sources (YSO, of course)
-    4. The fake Av
-    5. The Quality label
+    3. The fake Av
+    4. The Quality label
+    5. Source types
 Editor:
     Jacob975
 
@@ -20,14 +20,11 @@ Editor:
 #   This code is made in python3 #
 ##################################
 
-20190705
+20190814
 ####################################
 update log
-20190705 version alpha 1:
+20190814 version alpha 1:
     1. The code works.
-20190801 version alpha 2:
-    1. convert uJy to mJy
-    2. convert 2MASSflux to UKIDSSflux
 '''
 import time
 import numpy as np
@@ -45,27 +42,21 @@ if __name__ == "__main__":
     # Load argv
     if len(argv) != 2:
         print ("The number of arguments is wrong.")
-        print ("tbl_to_sed_Taurus_2008.py [Taurus 2008 table]")
+        print ("tbl_to_sed_Gould_belt_2015.py [Gould belt 2015 table]")
         exit()
     inp_table_name = argv[1]
     #-----------------------------------
     # Load data from input table
-    # -9 means no data available.
-    # 0 means trying to measure but fail.
-    # More details described in https://irsa.ipac.caltech.edu/data/SPITZER/Taurus/gator_docs/taurus_Oct2008_2.1_colDescriptions.html#i3_05px_flx
-    # I choose detection with 5px, which seems containing the most detections.
     print ('Load data from input table')
     inp_table = np.loadtxt(inp_table_name, dtype = str)
-    inp_table[inp_table == '-9.000000'] = '0.0'
-    inp_table[inp_table == '-999000.0'] = '0.0'
-    J2flux  = np.array(np.transpose([inp_table[:, 3], inp_table[:, 4]]), dtype = float)/1000 
-    H2flux  = np.array(np.transpose([inp_table[:, 5], inp_table[:, 6]]), dtype = float)/1000 
-    K2flux  = np.array(np.transpose([inp_table[:, 7], inp_table[:, 8]]), dtype = float)/1000 
-    IR1flux = np.array(np.transpose([inp_table[:,11], inp_table[:,12]]), dtype = float)/1000 
-    IR2flux = np.array(np.transpose([inp_table[:,17], inp_table[:,18]]), dtype = float)/1000 
-    IR3flux = np.array(np.transpose([inp_table[:,23], inp_table[:,24]]), dtype = float)/1000 
-    IR4flux = np.array(np.transpose([inp_table[:,29], inp_table[:,30]]), dtype = float)/1000 
-    MP1flux = np.array(np.transpose([inp_table[:,33], inp_table[:,34]]), dtype = float)/1000 
+    J2flux  = np.array(np.transpose([inp_table[:, 33], inp_table[:, 34]]), dtype = float)
+    H2flux  = np.array(np.transpose([inp_table[:, 54], inp_table[:, 55]]), dtype = float)
+    K2flux  = np.array(np.transpose([inp_table[:, 75], inp_table[:, 76]]), dtype = float)
+    IR1flux = np.array(np.transpose([inp_table[:, 96], inp_table[:, 97]]), dtype = float)
+    IR2flux = np.array(np.transpose([inp_table[:,117], inp_table[:,118]]), dtype = float)
+    IR3flux = np.array(np.transpose([inp_table[:,138], inp_table[:,139]]), dtype = float)
+    IR4flux = np.array(np.transpose([inp_table[:,159], inp_table[:,160]]), dtype = float)
+    MP1flux = np.array(np.transpose([inp_table[:,180], inp_table[:,181]]), dtype = float)
     #-----------------------------------
     # Convert 2MASSflux to UKIDSSflux
     print ('Convert 2MASSflux to UKIDSSflux')
@@ -106,26 +97,35 @@ if __name__ == "__main__":
                                         MP1flux[:,1],
                                         ]))
     # coordinate, Av, source type, and Q label.
-    coord = np.transpose(np.array([inp_table[:,1], inp_table[:,2]]))
+    coord = np.transpose(np.array([inp_table[:,0], inp_table[:,2]]))
     fake_Av = np.ones((len(inp_table), 2))
-    fake_Q = np.chararray((len(inp_table), 8))
-    fake_Q[:] = 'F' # fake
-    fake_Q = np.array(fake_Q, dtype = str)
+    # Quality flag
+    J2_Q  = np.array(inp_table[:, 37])
+    H2_Q  = np.array(inp_table[:, 58])
+    K2_Q  = np.array(inp_table[:, 79])
+    IR1_Q = np.array(inp_table[:,100])
+    IR2_Q = np.array(inp_table[:,121])
+    IR3_Q = np.array(inp_table[:,142])
+    IR4_Q = np.array(inp_table[:,163])
+    MP1_Q = np.array(inp_table[:,184])
+    real_Q = np.array(np.transpose([J2_Q,
+                                    H2_Q,
+                                    K2_Q,
+                                    IR1_Q,
+                                    IR2_Q,
+                                    IR3_Q,
+                                    IR4_Q,
+                                    MP1_Q,
+                                    ]))
+    source_types = np.array(inp_table[:, 16])
     #-----------------------------------
     # Save the data
     print ('Save the data')
-    np.savetxt( 'Taurus_2008_sed.txt', 
-                flux_sed)
-    np.savetxt( 'Taurus_2008_coord.txt', 
-                coord, 
-                fmt = '%s')
-    np.savetxt( 'Taurus_2008_Av.txt', 
-                fake_Av, 
-                header = '# fake')
-    np.savetxt( 'Taurus_2008_Q.txt', 
-                fake_Q, 
-                fmt = '%s', 
-                header = '# fake')
+    np.savetxt( '{0}_sed.txt'.format(inp_table_name[:-4]), flux_sed)
+    np.savetxt( '{0}_coord.txt'.format(inp_table_name[:-4]), coord, fmt = '%s')
+    np.savetxt( '{0}_Av.txt'.format(inp_table_name[:-4]), fake_Av, header = '# fake')
+    np.savetxt( '{0}_Q.txt'.format(inp_table_name[:-4]), real_Q, fmt = '%s')
+    np.savetxt( '{0}_Sp.txt'.format(inp_table_name[:-4]), source_types, fmt = '%s')
     #-----------------------------------
     # Measure time
     elapsed_time = time.time() - start_time
