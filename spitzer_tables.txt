@@ -1,0 +1,32 @@
+Name                    Used    Note
+SEIP                    no      It makes photometry on compact sources only on all Spitzer images.
+IRS Enhanced Products   no      It doesn't cover full IRAC
+Spitzer Abell 1763      yes     It is galaxy cluster
+c2d                     yes     We train our model with c2d data.
+CLASH                   no      No MIPS 1 data
+CSI 2264                yes     Which is a active star forming region
+Cygnus-X                yes     Which is a active star forming region
+DUSTiNGS                no      It provide IRAC 1 and IRAC 2 only
+FEPS Photometry Catalog yes     The photometry on evolving planetary systems.
+GALCEN                  no      No MIPS 1 data
+GLIMPSE                 yes     GLIMPSE I, GLIMPSE II, and GLIMPSE 3D only, the other are observed in warm spitzer program, which is not good.
+GOODS                   no      No IRAC data
+MIPS Local Galaxies     no      No IRAC data
+MIPSGAL                 yes     The follow up project of GLIMPSE
+S4G                     no      No IR3, IR4, and MP1 data
+SAFIRES                 no      No IRAC data
+SAGE                    yes     NOT FINISH YET
+SAGE-SMC                yes     NOT FINISH YET
+SAGE-Spec               no      It is a spectrum catalog
+SASS                    no      It contains only IR1 and MIPS 1 data
+SDWFS                   no      No MIPS 1 data
+South Ecliptic Pole     no      No IRAC data
+SERVS                   no      No IR3, IR4, and MP1 data
+SHELA                   no      No IR3, IR4, and MP1 data
+SIMPLE                  no      No MIPS 1 data
+SMUVS                   no      No IR3, IR4, and MP1 data
+SpIES                   no      No IR3, IR4, and MP1 data
+SpUDS                   no      No MP1 data
+Spitzer-SPT Deep Field  no      No IR3, IR4, and MP1 data
+SWIRE                   yes     Including CDFS, ELAIS N1, ELAIS N2, ELAIS S1, Lockman, XMM-LSS regions
+YSOVAR                  yes     Including GGD, IRAS 20050+2720, L1688, and NGC1333 regions
