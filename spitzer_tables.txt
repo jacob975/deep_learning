@@ -1,3 +1,6 @@
+I browse the spitzer catalogues, and determine whether we should use it or not.
+
+
 Name                    Used    Note
 SEIP                    no      It makes photometry on compact sources only on all Spitzer images.
 IRS Enhanced Products   no      It doesn't cover full IRAC
