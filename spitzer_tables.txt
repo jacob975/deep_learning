@@ -1,8 +1,8 @@
 I browse the spitzer catalogues, and determine whether we should use it or not.
-
+https://irsa.ipac.caltech.edu/cgi-bin/Gator/nph-scan?submit=Select&projshort=SPITZER
 
 Name                    Used    Note
-SEIP                    no      It makes photometry on compact sources only on all Spitzer images.
+SEIP                    yes     It makes photometry on compact sources only on all Spitzer images.
 IRS Enhanced Products   no      It doesn't cover full IRAC
 Spitzer Abell 1763      yes     It is galaxy cluster
 c2d                     yes     We train our model with c2d data.
