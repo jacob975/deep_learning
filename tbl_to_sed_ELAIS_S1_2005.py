@@ -84,7 +84,7 @@ if __name__ == "__main__":
     source_type = np.zeros((len(inp_table), 3))
     source_type[:,0] = 1
     fake_Q = np.chararray((len(inp_table), 5))
-    fake_Q[:] = 'A'
+    fake_Q[:] = '--'
     fake_Q = np.array(fake_Q, dtype= str)
     #-----------------------------------
     # Save the data
