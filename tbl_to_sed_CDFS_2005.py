@@ -85,12 +85,15 @@ if __name__ == "__main__":
     fake_Q = np.chararray((len(inp_table), 5))
     fake_Q[:] = '--'
     fake_Q = np.array(fake_Q)
+    source_type = np.zeros((len(inp_table), 3))
+    source_type[:,0] = 1
     #-----------------------------------
     # Save the data
-    np.savetxt('CDFS_2005_sed.txt', flux_sed)
+    np.savetxt('CDFS_2005_spitzer_sed.txt', flux_sed)
     np.savetxt('CDFS_2005_coord.txt', coord, fmt = '%s')
     np.savetxt('CDFS_2005_Av.txt', fake_Av, header = '# fake Av')
     np.savetxt('CDFS_2005_Q.txt', fake_Q, fmt = '%s', header = '# fake quality')
+    np.savetxt('CDFS_2005_c2d2007_Sp.txt', source_type, header = 'fake source type')
     #-----------------------------------
     # Measure time
     elapsed_time = time.time() - start_time
