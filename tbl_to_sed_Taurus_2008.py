@@ -108,6 +108,8 @@ if __name__ == "__main__":
     # coordinate, Av, source type, and Q label.
     coord = np.transpose(np.array([inp_table[:,1], inp_table[:,2]]))
     fake_Av = np.ones((len(inp_table), 2))
+    source_type = np.zeros((len(inp_table), 3))
+    source_type[:,0] = 1
     fake_Q = np.chararray((len(inp_table), 8))
     fake_Q[:] = 'F' # fake
     fake_Q = np.array(fake_Q, dtype = str)
@@ -125,6 +127,9 @@ if __name__ == "__main__":
     np.savetxt( 'Taurus_2008_Q.txt', 
                 fake_Q, 
                 fmt = '%s', 
+                header = '# fake')
+    np.savetxt( 'Taurus_2008_c2d2007_Sp.txt',
+                source_type,
                 header = '# fake')
     #-----------------------------------
     # Measure time
