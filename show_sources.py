@@ -49,12 +49,15 @@ if __name__ == "__main__":
     image_name = argv[2]
     #-----------------------------------
     # Load data
+    
+    hdu = pyfits.open(image_name)
+    
     world_coord = None
     pixel_coord = None
     if coord_table_name != 'skip':
         world_coord = np.loadtxt(coord_table_name)
-    image = pyfits.getdata(image_name) 
-    header = pyfits.getheader(image_name)
+    image = hdu[1].data 
+    header = hdu[1].header 
     #-----------------------------------
     # Convert WCS coord to pixel coord
     w = wcs.WCS(header)

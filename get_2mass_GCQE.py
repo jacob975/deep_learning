@@ -55,14 +55,21 @@ if __name__ == "__main__":
     # Take the magnitude.
     # And also replace 'null' with -999
     J2mag = np.array(twomass_table[:, 11:13], dtype = str)
-    J2mag[J2mag == 'null'] = '-999'
+    J2mag[J2mag == 'null'] = '0.0'
     J2mag = np.array(J2mag, dtype = float)
     H2mag = np.array(twomass_table[:, 15:17], dtype = str)
-    H2mag[H2mag == 'null'] = '-999'
+    H2mag[H2mag == 'null'] = '0.0'
     H2mag = np.array(H2mag, dtype = float)
     K2mag = np.array(twomass_table[:, 19:21], dtype = str)
-    K2mag[K2mag == 'null'] = '-999'
+    K2mag[K2mag == 'null'] = '0.0'
     K2mag = np.array(K2mag, dtype = float)
+    mag_table = np.array(np.transpose([
+                                        J2mag[:,0],
+                                        H2mag[:,0],
+                                        K2mag[:,0],
+                                        J2mag[:,1],
+                                        H2mag[:,1],
+                                        K2mag[:,1]]))
     # Load UKIDSS bands system
     ukidss_system = convert_lib.set_ukirt()
     # Convert from 2MASSmag to UKIDSSmag
@@ -97,6 +104,8 @@ if __name__ == "__main__":
     print ('Finished!')
     # Save the data
     print ('Saving results')
+    np.savetxt( '{0}_mag.txt'.format(twomass_table_name[:-4]),
+                mag_table, fmt = '%s')
     np.savetxt( '{0}_sed.txt'.format(twomass_table_name[:-4]), 
                 sed_table)
     np.savetxt( '{0}_coord.txt'.format(twomass_table_name[:-4]), 
