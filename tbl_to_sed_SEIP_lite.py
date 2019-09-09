@@ -64,9 +64,10 @@ if __name__ == "__main__":
     # Load data(XX_f_ap1) from input table
     print ('Load data from input table')
     inp_table = np.loadtxt(inp_table_name, dtype = str, comments = ['|', '\\'])
-    J2flux  = np.array(np.transpose([inp_table[:,114], inp_table[:,115]]))
-    H2flux  = np.array(np.transpose([inp_table[:,116], inp_table[:,117]]))
-    K2flux  = np.array(np.transpose([inp_table[:,118], inp_table[:,119]]))
+    
+    J2flux  = np.array(np.transpose([inp_table[:,113], inp_table[:,114]]))
+    H2flux  = np.array(np.transpose([inp_table[:,115], inp_table[:,116]]))
+    K2flux  = np.array(np.transpose([inp_table[:,117], inp_table[:,118]]))
     IR1flux = np.array(np.transpose([inp_table[:, 25], inp_table[:, 26]]))
     IR2flux = np.array(np.transpose([inp_table[:, 35], inp_table[:, 36]]))
     IR3flux = np.array(np.transpose([inp_table[:, 45], inp_table[:, 46]]))
