@@ -24,6 +24,29 @@ import time
 import numpy as np
 from sys import argv
 
+def get_saturation_flag(sed_array, e_sed_array):
+    # Default quality 
+    quality_array = np.chararray(len(sed_array))
+    quality_array[:] = 'A'
+    quality_array[(sed_array <= 0.0 ) | (e_sed_array <= 0.0)] = 'U'
+    
+    '''
+    # Saturation quality
+    for i, flag in enumerate(flag_array):
+        if flag == 'null':
+            continue
+        SE_flag = int(flag[2:])
+        bin_SED_flag =  bin(SE_flag)
+        if len(bin_SED_flag) < 3:
+            continue
+        elif bin_SED_flag[-3] == '1':
+            quality_array[i] = 'S'
+            continue
+    '''
+    # Convert from char to string
+    quality_array = np.array(quality_array, dtype = str)
+    return quality_array
+
 #--------------------------------------------
 # Main code
 if __name__ == "__main__":
@@ -40,6 +63,26 @@ if __name__ == "__main__":
     #-----------------------------------
     # Load data
     sed_table = np.loadtxt(sed_table_name)
+    '''
+    Jsat   = get_saturation_flag(sed_table[:,0], sed_table[:,8])
+    Hsat   = get_saturation_flag(sed_table[:,1], sed_table[:,9])
+    Ksat   = get_saturation_flag(sed_table[:,2], sed_table[:,10])
+    IR1sat = get_saturation_flag(sed_table[:,3], sed_table[:,11])
+    IR2sat = get_saturation_flag(sed_table[:,4], sed_table[:,12])
+    IR3sat = get_saturation_flag(sed_table[:,5], sed_table[:,13])
+    IR4sat = get_saturation_flag(sed_table[:,6], sed_table[:,14])
+    MP1sat = get_saturation_flag(sed_table[:,7], sed_table[:,15])
+    fake_Q_table_2 = np.array(np.transpose([
+                                        Jsat,  
+                                        Hsat,  
+                                        Ksat,  
+                                        IR1sat,
+                                        IR2sat,
+                                        IR3sat,
+                                        IR4sat,
+                                        MP1sat,
+                                        ]))
+    '''
     fake_Q_table = np.empty((len(sed_table), 8), dtype = str)
     fake_Q_table[:] = 'A'
     index_zero = sed_table[:,:8] <= 0.0

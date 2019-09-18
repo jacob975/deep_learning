@@ -24,6 +24,30 @@ update log
 20190719 version alpha 1:
     1. The code works.
 '''
+
+def get_saturation_flag(flag_array, sed_array, e_sed_array):
+    # Default quality 
+    quality_array = np.chararray(len(flag_array))
+    quality_array[:] = 'A'
+    quality_array[(sed_array <= 0.0 ) | (e_sed_array <= 0.0)] = 'U'
+    
+    '''
+    # Saturation quality
+    for i, flag in enumerate(flag_array):
+        if flag == 'null':
+            continue
+        SE_flag = int(flag[2:])
+        bin_SED_flag =  bin(SE_flag)
+        if len(bin_SED_flag) < 3:
+            continue
+        elif bin_SED_flag[-3] == '1':
+            quality_array[i] = 'S'
+            continue
+    '''
+    # Convert from char to string
+    quality_array = np.array(quality_array, dtype = str)
+    return quality_array
+
 import time
 import numpy as np
 from sys import argv
@@ -51,11 +75,11 @@ if __name__ == "__main__":
     #Jmag   = np.array(np.transpose([inp_table[:,4] , inp_table[:, 5]]), dtype = float)
     #Hmag   = np.array(np.transpose([inp_table[:,6] , inp_table[:, 7]]), dtype = float)
     #Kmag   = np.array(np.transpose([inp_table[:,8] , inp_table[:, 9]]), dtype = float)
-    IR1flux = np.array(np.transpose([inp_table[:, 2], inp_table[:, 3]])) 
-    IR2flux = np.array(np.transpose([inp_table[:, 4], inp_table[:, 5]])) 
-    IR3flux = np.array(np.transpose([inp_table[:, 6], inp_table[:, 7]])) 
-    IR4flux = np.array(np.transpose([inp_table[:, 8], inp_table[:, 9]])) 
-    MP1flux = np.array(np.transpose([inp_table[:,10], inp_table[:,11]])) 
+    IR1flux = np.array(np.transpose([inp_table[:, 9], inp_table[:,10]])) 
+    IR2flux = np.array(np.transpose([inp_table[:,16], inp_table[:,17]])) 
+    IR3flux = np.array(np.transpose([inp_table[:,23], inp_table[:,24]])) 
+    IR4flux = np.array(np.transpose([inp_table[:,30], inp_table[:,31]])) 
+    MP1flux = np.array(np.transpose([inp_table[:,37], inp_table[:,38]])) 
     print ('Loading, done.')
     flux_sed = np.array(np.transpose([  
                                         #Jflux[:,0],
@@ -78,21 +102,39 @@ if __name__ == "__main__":
     flux_sed[flux_sed == 'null'] = '0.0'
     flux_sed = np.array(flux_sed, dtype = float)/1000
     print ('Arrange, done.')
-    # coordinate, Av, source type, and Q label.
-    coord = np.transpose(np.array([inp_table[:,0], inp_table[:,1]]))
+    # coordinate, Av, and Q label.
+    coord = np.transpose(np.array([inp_table[:,2], inp_table[:,3]]))
     fake_Av = np.ones((len(inp_table), 2))
-    source_type = np.zeros((len(inp_table), 3))
-    source_type[:,0] = 1
-    fake_Q = np.chararray((len(inp_table), 5))
-    fake_Q[:] = '--'
-    fake_Q = np.array(fake_Q, dtype= str)
+    IR1flag = np.array(inp_table[:,12])
+    IR2flag = np.array(inp_table[:,19])
+    IR3flag = np.array(inp_table[:,26])
+    IR4flag = np.array(inp_table[:,33])
+    MP1flag = np.array(inp_table[:,40])
+    IR1sat = get_saturation_flag(IR1flag, flux_sed[:,0], flux_sed[:,5]) 
+    IR2sat = get_saturation_flag(IR2flag, flux_sed[:,1], flux_sed[:,6]) 
+    IR3sat = get_saturation_flag(IR3flag, flux_sed[:,2], flux_sed[:,7]) 
+    IR4sat = get_saturation_flag(IR4flag, flux_sed[:,3], flux_sed[:,8]) 
+    MP1sat = get_saturation_flag(MP1flag, flux_sed[:,4], flux_sed[:,9]) 
+    flags = np.array(np.transpose([
+                                    IR1flag,
+                                    IR2flag,
+                                    IR3flag,
+                                    IR4flag,
+                                    MP1flag,
+                                    ]))
+    sat_index = np.array(np.transpose([
+                                        IR1sat,
+                                        IR2sat,
+                                        IR3sat,
+                                        IR4sat,
+                                        MP1sat
+                                    ]))
     #-----------------------------------
     # Save the data
-    np.savetxt('ELAIS_S1_sed.txt', flux_sed)
+    np.savetxt('ELAIS_S1_Spitzer_sed.txt', flux_sed)
     np.savetxt('ELAIS_S1_coord.txt', coord, fmt = '%s')
-    np.savetxt('ELAIS_S1_c2d2007_Sp.txt', source_type, header = '# fake source type')
     np.savetxt('ELAIS_S1_Av.txt', fake_Av, header = '# fake Av')
-    np.savetxt('ELAIS_S1_Q.txt', fake_Q, fmt = '%s', header = '# fake quality label')
+    np.savetxt('ELAIS_S1_Spitzer_Q.txt', sat_index, fmt = '%s')
     #-----------------------------------
     # Measure time
     elapsed_time = time.time() - start_time

@@ -31,6 +31,27 @@ from sys import argv
 import sys
 import convert_lib
 np.set_printoptions(threshold=sys.maxsize)
+
+def get_saturation_flag(flag_array):
+    # Default quality 
+    quality_array = np.chararray(len(flag_array))
+    quality_array[:] = 'A'
+    # Saturation quality
+    for i, flag in enumerate(flag_array):
+        if flag == 'null':
+            quality_array[i] = 'X'
+            continue 
+        SE_flag = int(flag[2:])
+        bin_SED_flag =  bin(SE_flag)
+        if len(bin_SED_flag) < 3:
+            continue
+        elif bin_SED_flag[-3] == '1':
+            quality_array[i] = 'S'
+            continue
+    # Convert from char to string
+    quality_array = np.array(quality_array, dtype = str)
+    return quality_array
+
 #--------------------------------------------
 # Main code
 if __name__ == "__main__":
@@ -82,26 +103,38 @@ if __name__ == "__main__":
     # coordinate, Av, source type, and Q label.
     coord = np.transpose(np.array([inp_table[:,2], inp_table[:,3]]))
     fake_Av = np.ones((len(inp_table), 2))
-    source_type = np.zeros((len(inp_table), 3))
-    source_type[:,0] = 1
-    fake_Q = np.chararray((len(inp_table), 5))
-    fake_Q[:] = '--'
-    fake_Q = np.array(fake_Q)
-    # Stellarity index
-    stellarity_index = np.transpose(np.array([  inp_table[:, 9],
-                                                inp_table[:,14],
-                                                inp_table[:,19],
-                                                inp_table[:,24],
-                                                inp_table[:,31],
-                                            ]))
+    # Flag and saturation index
+    IR1flag = np.array(inp_table[:,10])
+    IR2flag = np.array(inp_table[:,15])
+    IR3flag = np.array(inp_table[:,20])
+    IR4flag = np.array(inp_table[:,25])
+    MP1flag = np.array(inp_table[:,32])
+    IR1sat = get_saturation_flag(IR1flag) 
+    IR2sat = get_saturation_flag(IR2flag) 
+    IR3sat = get_saturation_flag(IR3flag) 
+    IR4sat = get_saturation_flag(IR4flag) 
+    MP1sat = get_saturation_flag(MP1flag) 
+    flags = np.array(np.transpose([
+                                    IR1flag,
+                                    IR2flag,
+                                    IR3flag,
+                                    IR4flag,
+                                    MP1flag,
+                                    ]))
+    sat_index = np.array(np.transpose([
+                                        IR1sat,
+                                        IR2sat,
+                                        IR3sat,
+                                        IR4sat,
+                                        MP1sat
+                                    ]))
+    
     #-----------------------------------
     # Save the data
     np.savetxt('XMM_LSS_sed.txt', flux_sed)
     np.savetxt('XMM_LSS_coord.txt', coord, fmt = '%s')
-    np.savetxt('XMM_LSS_c2d2007_Sp.txt', source_type, header = '# fake source type')
     np.savetxt('XMM_LSS_Av.txt', fake_Av, header = '# fake Av')
-    np.savetxt('XMM_LSS_Q.txt', fake_Q, fmt = '%s', header = '# fake quality')
-    np.savetxt('XMM_LSS_stell.txt', stellarity_index, fmt = '%s')
+    np.savetxt('XMM_LSS_Q.txt', sat_index, fmt = '%s')
     #-----------------------------------
     # Measure time
     elapsed_time = time.time() - start_time
