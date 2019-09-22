@@ -26,12 +26,12 @@ update log
     1. The code works.
 '''
 
-def get_quality_flag(flux, upper, ftype):
+def get_quality_flag(flux, e_flux, upper, ftype):
     num_row = len(flux)
     Q = np.chararray(num_row)
     Q[:] = 'X'
     Q[upper != 'null'] = 'U'
-    Q[flux != 'null']  = 'A'
+    Q[(flux != 'null') & (e_flux != 'null')]  = 'A'
     Q = np.array(Q, dtype = str)
     if len(ftype) == 0:
         pass
@@ -88,14 +88,14 @@ if __name__ == "__main__":
     IR4type = np.array(inp_table[:,24])
     
     fake_upper = np.zeros(len(inp_table))
-    J2Q  = get_quality_flag( J2flux[:,0], fake_upper, []) 
-    H2Q  = get_quality_flag( H2flux[:,0], fake_upper, []) 
-    K2Q  = get_quality_flag( K2flux[:,0], fake_upper, []) 
-    IR1Q = get_quality_flag(IR1flux[:,0], IR1upper[:,0], IR1type) 
-    IR2Q = get_quality_flag(IR2flux[:,0], IR2upper[:,0], IR2type) 
-    IR3Q = get_quality_flag(IR3flux[:,0], IR3upper[:,0], IR3type) 
-    IR4Q = get_quality_flag(IR4flux[:,0], IR4upper[:,0], IR4type) 
-    MP1Q = get_quality_flag(MP1flux[:,0], MP1upper[:,0], []) 
+    J2Q  = get_quality_flag( J2flux[:,0],  J2flux[:,1], fake_upper, []) 
+    H2Q  = get_quality_flag( H2flux[:,0],  H2flux[:,1], fake_upper, []) 
+    K2Q  = get_quality_flag( K2flux[:,0],  K2flux[:,1], fake_upper, []) 
+    IR1Q = get_quality_flag(IR1flux[:,0], IR1flux[:,1], IR1upper[:,0], IR1type) 
+    IR2Q = get_quality_flag(IR2flux[:,0], IR2flux[:,1], IR2upper[:,0], IR2type) 
+    IR3Q = get_quality_flag(IR3flux[:,0], IR3flux[:,1], IR3upper[:,0], IR3type) 
+    IR4Q = get_quality_flag(IR4flux[:,0], IR4flux[:,1], IR4upper[:,0], IR4type) 
+    MP1Q = get_quality_flag(MP1flux[:,0], MP1flux[:,1], MP1upper[:,0], []) 
     quality_label = np.array(np.transpose([
                                             J2Q,
                                             H2Q,
@@ -113,23 +113,24 @@ if __name__ == "__main__":
     IR4flux[IR4flux == 'null'] = IR4upper[IR4flux == 'null']
     MP1flux[MP1flux == 'null'] = MP1upper[MP1flux == 'null']
     # Replace 'null' with '0.0'
-    J2flux[  J2flux == 'null'] = '0.0' 
-    H2flux[  H2flux == 'null'] = '0.0' 
-    K2flux[  K2flux == 'null'] = '0.0' 
+    J2flux[  J2flux  == 'null'] = '0.0' 
+    H2flux[  H2flux  == 'null'] = '0.0' 
+    K2flux[  K2flux  == 'null'] = '0.0' 
     IR1flux[ IR1flux == 'null'] = '0.0' 
     IR2flux[ IR2flux == 'null'] = '0.0' 
     IR3flux[ IR3flux == 'null'] = '0.0' 
     IR4flux[ IR4flux == 'null'] = '0.0' 
     MP1flux[ MP1flux == 'null'] = '0.0' 
     # Convert datatype from string to float
-    J2flux  = np.array(J2flux , dtype = float)/1000.0 
-    H2flux  = np.array(H2flux , dtype = float)/1000.0 
-    K2flux  = np.array(K2flux , dtype = float)/1000.0 
+    J2flux  = convert_lib.fill_up_flux_error(np.array(J2flux , dtype = float)/1000.0) 
+    H2flux  = convert_lib.fill_up_flux_error(np.array(H2flux , dtype = float)/1000.0)
+    K2flux  = convert_lib.fill_up_flux_error(np.array(K2flux , dtype = float)/1000.0)
     IR1flux = np.array(IR1flux, dtype = float)/1000.0 
     IR2flux = np.array(IR2flux, dtype = float)/1000.0 
     IR3flux = np.array(IR3flux, dtype = float)/1000.0 
     IR4flux = np.array(IR4flux, dtype = float)/1000.0 
     MP1flux = np.array(MP1flux, dtype = float)/1000.0 
+    
     #-----------------------------------
     # Convert 2MASSflux to UKIDSSflux
     print ('Convert 2MASSflux to UKIDSSflux')

@@ -319,3 +319,23 @@ def fill_up_error(bands):
                                     & (bands_with_error[:,0] > bands[index, 0] - 0.115), 1]
         bands[index, 1] = np.median(candidates)
     return bands
+
+def fill_up_flux_error(bands):
+    # Make sure data format
+    bands = np.array(bands, dtype = float)
+    # load data
+    flux_with_error =  bands[(bands[:,1] != 0.0), 0]
+    bands_with_error = bands[(bands[:,1] != 0.0)]
+    # find the upper bond of flux with error
+    flux_with_error = np.sort(flux_with_error)
+    flux_upper_bond = flux_with_error[-1]
+    # if flux over upper bond of flux with error, abandom that data.
+    # if flux is below the upper bond of flux with error, replace error with median
+    bands[(bands[:,1] == 0) & (bands[:,0] != 0.0) & (bands[:,0] > flux_upper_bond), 0] = 0.0
+    index_of_bands_below_upper_bond_without_error = np.where( (bands[:,1] == 0.0) \
+                                                            & (bands[:,0] != 0.0))
+    for index in index_of_bands_below_upper_bond_without_error[0]:
+        candidates = bands_with_error[(bands_with_error[:,0] < bands[index, 0]*1.115) \
+                                    & (bands_with_error[:,0] > bands[index, 0]*0.885), 1]
+        bands[index, 1] = np.median(candidates)
+    return bands

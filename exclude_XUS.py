@@ -51,7 +51,9 @@ if __name__ == "__main__":
     data_name = argv[2]
     #-----------------------------------
     # Load data
+    print ("Loading quality flags...")
     ul_table = np.loadtxt(ul_table_name, dtype = str)
+    print ("Loading data...")
     data = np.loadtxt(data_name, dtype = str)
     #------------------------------------------
     # Find the line with upper limits
@@ -79,6 +81,26 @@ if __name__ == "__main__":
                             ]
     # Exclude 'U' in IRAC and 2MASS
     print ("Exclude 'U' from data")
+    '''
+    data_woX_woU = data_woX[  
+                            (ul_table_woX[:,0] != 'U') &\
+                            (ul_table_woX[:,1] != 'U') &\
+                            (ul_table_woX[:,2] != 'U') &\
+                            (ul_table_woX[:,3] != 'U') &\
+                            (ul_table_woX[:,4] != 'U') &\
+                            (ul_table_woX[:,5] != 'U') &\
+                            (ul_table_woX[:,6] != 'U')
+                            ]
+    ul_table_woX_woU = ul_table_woX[                    
+                            (ul_table_woX[:,0] != 'U') &\
+                            (ul_table_woX[:,1] != 'U') &\
+                            (ul_table_woX[:,2] != 'U') &\
+                            (ul_table_woX[:,3] != 'U') &\
+                            (ul_table_woX[:,4] != 'U') &\
+                            (ul_table_woX[:,5] != 'U') &\
+                            (ul_table_woX[:,6] != 'U')
+                            ]
+    '''
     data_woX_woU = data_woX[  
                             ~((ul_table_woX[:,0] == 'U') & (ul_table_woX[:,1] == 'U') & (ul_table_woX[:,2] == 'U')) &\
                             (ul_table_woX[:,3] != 'U') &\
