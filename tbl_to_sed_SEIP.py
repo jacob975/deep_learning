@@ -31,7 +31,8 @@ def get_quality_flag(flux, e_flux, upper, ftype):
     Q = np.chararray(num_row)
     Q[:] = 'X'
     Q[upper != 'null'] = 'U'
-    Q[(flux != 'null') & (e_flux != 'null')]  = 'A'
+    #Q[(flux != 'null') & (e_flux != 'null')]  = 'A'
+    Q[flux != 'null'] = 'A'
     Q = np.array(Q, dtype = str)
     if len(ftype) == 0:
         pass

@@ -17,7 +17,7 @@ Example:
 
     Then, do this cmd.
     $ dat2npy.py
-    the option file will give to you
+    the option file will be given in present working directory.
     $ dat2npy.py [option files] Toy1.dat Toy2.dat Toy3.dat
 
 Editor:
@@ -201,7 +201,7 @@ if __name__ == "__main__":
         if do_extinction == 'yes': extinction = extinction[~nan_filter]
         if do_HL2013 == 'yes': HL2013 = HL2013[~nan_filter]
         # no observation filter
-        # i is the tolarence of loss in a single datum
+        # "i" is the tolarence of the number of loss in a single datum
         for i in range(data_width):
             data_n_z, _filter= no_observation_filter_eq_0(data_n, i, data_width)
             tracer_outp = np.where(_filter == 1.0)
