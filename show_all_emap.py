@@ -16,12 +16,10 @@ Usage:
     SER_120asec_Av.fits
 Editor:
     Jacob975
-
 ##################################
 #   Python3                      #
 #   This code is made in python3 #
 ##################################
-
 20181012
 ####################################
 update log
