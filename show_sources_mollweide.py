@@ -66,11 +66,12 @@ if __name__ == "__main__":
     # Plot the sources
     world_coords = np.loadtxt(coord_table_name, dtype = float)
     gala_coords = equatorial2galactic(world_coords)
-    hp.projplot(gala_coords[:,0], gala_coords[:,1], \
-                lonlat = True, \
-                #c = color_list[index], \
-                #label = region_name_list[index]
-                )
+    hp.projscatter( gala_coords[:,0], gala_coords[:,1], \
+                    lonlat = True, \
+                    s=1, \
+                    #c = color_list[index], \
+                    #label = region_name_list[index]
+                  )
     fig.savefig('{0}.png'.format(image_name[:-5]), dpi = 300)
     #-----------------------------------
     # Measure time
