@@ -62,6 +62,7 @@ if __name__ == "__main__":
     # Load data
     ul_table = np.loadtxt(ul_table_name, dtype = str)
     data = np.loadtxt(data_name, dtype = np.float64)
+    prev_data = data
     # With or without error
     no_error = False
     with_error = False
@@ -95,6 +96,7 @@ if __name__ == "__main__":
         print (bands[i], pflux, perror)
     # Save masked data set
     np.savetxt(data_name, data)
+    np.savetxt("{0}_backup.txt".format(data_name[:-4]), prev_data)
     #-----------------------------------
     # measure time
     elapsed_time = time.time() - start_time
