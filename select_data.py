@@ -3,7 +3,7 @@
 Abstract:
     This is a program to select data with filter. 
 Usage:
-    select_data.py [options] [data] [filter]
+    select_data.py [options] [filter] [data]
     
     options could be: selector, filter
 Output:
@@ -36,12 +36,12 @@ if __name__ == "__main__":
     # Load argv
     if len(argv) != 4:
         print ("Error! The number of arguments is wrong.")
-        print ("Usage: select_data.py [options] [data] [filter]")
+        print ("Usage: select_data.py [options] [filter] [data]")
         print ("Available options: selector, filter")
         exit()
     option = argv[1]
-    data_name = argv[2]
-    filter_name = argv[3]
+    filter_name = argv[2]
+    data_name = argv[3]
     #-----------------------------------
     # Load data
     data = np.loadtxt(data_name, dtype = object)
