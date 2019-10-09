@@ -52,7 +52,7 @@ if __name__ == "__main__":
     image_name = argv[2]
     #-----------------------------------
     # Plot and show
-    fig = plt.figure(figsize = (8,6))
+    fig = plt.figure(figsize = (16,12))
     sub_fig = plt.subplot(111, projection="mollweide")
     # Plot background
     m = hp.read_map(image_name)
@@ -72,7 +72,7 @@ if __name__ == "__main__":
                     #c = color_list[index], \
                     #label = region_name_list[index]
                   )
-    fig.savefig('{0}.png'.format(image_name[:-5]), dpi = 300)
+    fig.savefig('{0}.png'.format(coord_table_name[:-5]), dpi = 300)
     #-----------------------------------
     # Measure time
     elapsed_time = time.time() - start_time
