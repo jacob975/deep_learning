@@ -17,6 +17,8 @@ Editor and Practicer:
 update log
 20180730 version alpha 1:
     1. The code works
+20191016 version alpha 2:
+    1. Assign star as blue, YSO as red.
 '''
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
@@ -33,7 +35,11 @@ import convert_lib
 
 # Assign RGB color to represent stars, galaxies, and YSOs.
 def assign_color(color_code):
-    sgys_color = [Color(rgb = tuple(color_code[i])).hex_l for i in range(len(color_code))] 
+    bgr_color_code = np.transpose([ color_code[:,2], 
+                                    color_code[:,1], 
+                                    color_code[:,0]
+                                    ])
+    sgys_color = [Color(rgb = tuple(bgr_color_code[i])).hex_l for i in range(len(bgr_color_code))] 
     sgys_color = np.asarray(sgys_color)
     return sgys_color 
 
