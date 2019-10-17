@@ -67,9 +67,9 @@ def plot_prob(arti_mag, sgys_color, sort_order):
                     c = sgys_color[np.where(arti_mag[:,0] == IR3[0])],
                     depthshade=False)
         ax.set_title("Star/Galaxy/YSO probability")
-        ax.set_xlim(np.amax(IR3_arti_mag[:,0]), np.amin(IR3_arti_mag[:,0]))
-        ax.set_ylim(np.amax(IR4_arti_mag[:,0]), np.amin(IR4_arti_mag[:,0]))
-        ax.set_zlim(np.amax(MP1_arti_mag[:,0]), np.amin(MP1_arti_mag[:,0]))
+        ax.set_xlim(np.amin(IR3_arti_mag[:,0]), np.amax(IR3_arti_mag[:,0]))
+        ax.set_ylim(np.amin(IR4_arti_mag[:,0]), np.amax(IR4_arti_mag[:,0]))
+        ax.set_zlim(np.amin(MP1_arti_mag[:,0]), np.amax(MP1_arti_mag[:,0]))
         ax.set_xlabel("{0} (log(mJy))".format(sort_order[0]))
         ax.set_ylabel("{0} (log(mJy))".format(sort_order[1]))
         ax.set_zlabel("{0} (log(mJy))".format(sort_order[2]))
@@ -93,9 +93,9 @@ def plot_prob(arti_mag, sgys_color, sort_order):
                     c = sgys_color[np.where(arti_mag[:,1] == IR4[0])],
                     depthshade=False)
         ax.set_title("Star/Galaxy/YSO probability")
-        ax.set_xlim(np.amax(IR3_arti_mag[:,0]), np.amin(IR3_arti_mag[:,0]))
-        ax.set_ylim(np.amax(IR4_arti_mag[:,0]), np.amin(IR4_arti_mag[:,0]))
-        ax.set_zlim(np.amax(MP1_arti_mag[:,0]), np.amin(MP1_arti_mag[:,0]))
+        ax.set_xlim(np.amin(IR3_arti_mag[:,0]), np.amax(IR3_arti_mag[:,0]))
+        ax.set_ylim(np.amin(IR4_arti_mag[:,0]), np.amax(IR4_arti_mag[:,0]))
+        ax.set_zlim(np.amin(MP1_arti_mag[:,0]), np.amax(MP1_arti_mag[:,0]))
         ax.set_xlabel("{0} (log(mJy))".format(sort_order[0]))
         ax.set_ylabel("{0} (log(mJy))".format(sort_order[1]))
         ax.set_zlabel("{0} (log(mJy))".format(sort_order[2]))
@@ -118,9 +118,9 @@ def plot_prob(arti_mag, sgys_color, sort_order):
                     c = sgys_color[np.where(arti_mag[:,2] == MP1[0])],
                     depthshade=False)
         ax.set_title("Star/Galaxy/YSO probability")
-        ax.set_xlim(np.amax(IR3_arti_mag[:,0]), np.amin(IR3_arti_mag[:,0]))
-        ax.set_ylim(np.amax(IR4_arti_mag[:,0]), np.amin(IR4_arti_mag[:,0]))
-        ax.set_zlim(np.amax(MP1_arti_mag[:,0]), np.amin(MP1_arti_mag[:,0]))
+        ax.set_xlim(np.amin(IR3_arti_mag[:,0]), np.amax(IR3_arti_mag[:,0]))
+        ax.set_ylim(np.amin(IR4_arti_mag[:,0]), np.amax(IR4_arti_mag[:,0]))
+        ax.set_zlim(np.amin(MP1_arti_mag[:,0]), np.amax(MP1_arti_mag[:,0]))
         ax.set_xlabel("{0} (log(mJy))".format(sort_order[0]))
         ax.set_ylabel("{0} (log(mJy))".format(sort_order[1]))
         ax.set_zlabel("{0} (log(mJy))".format(sort_order[2]))
@@ -148,13 +148,22 @@ if __name__ == "__main__":
     # Calculate the probability distribution of labels
     band_system = convert_lib.set_SCAO()
     fake_error = np.ones(100)
-    IR3_arti_flux = np.transpose([  np.logspace(np.log10(0.000107), np.log10(5500.0), num=100),
+    #IR3_arti_flux = np.transpose([  np.logspace(np.log10(0.000107), np.log10(5500.0), num=100),
+    #                                fake_error
+    #                                ])
+    #IR4_arti_flux = np.transpose([  np.logspace(np.log10(0.000216), np.log10(3830.0), num=100),
+    #                                fake_error
+    #                                ])
+    #MP1_arti_flux = np.transpose([  np.logspace(np.log10(0.000898), np.log10(4370.0), num=100),
+    #                                fake_error
+    #                                ])
+    IR3_arti_flux = np.transpose([  np.logspace(np.log10(0.000107), np.log10(1000.0), num=100),
                                     fake_error
                                     ])
-    IR4_arti_flux = np.transpose([  np.logspace(np.log10(0.000216), np.log10(3830.0), num=100),
+    IR4_arti_flux = np.transpose([  np.logspace(np.log10(0.000216), np.log10(1000.0), num=100),
                                     fake_error
                                     ])
-    MP1_arti_flux = np.transpose([  np.logspace(np.log10(0.000898), np.log10(4370.0), num=100),
+    MP1_arti_flux = np.transpose([  np.logspace(np.log10(0.000898), np.log10(1000.0), num=100),
                                     fake_error
                                     ])
     print (IR3_arti_flux.shape)
