@@ -26,6 +26,7 @@ update log
 import numpy as np
 import time
 from sys import argv
+import os
 
 #--------------------------------------------
 # Main code
@@ -44,20 +45,22 @@ if __name__ == "__main__":
     data_name = argv[3]
     #-----------------------------------
     # Load data
+    print ('Loading data...')
     data = np.loadtxt(data_name, dtype = object)
     _filter = np.loadtxt(filter_name, dtype = int)
     # Apply the filter
-    result_data = data[:]
+    print ('Calculating...')
     if option == "filter":
-        result_data[_filter] = 0.0
+        data[_filter] = 0.0
     elif option == "selector":
-        result_data = result_data[_filter]
+        data = data[_filter]
     else:
         print ('Wrong arguments')
         print ('Please check the usage.')
         exit()
-    np.savetxt('{0}_backup{1}'.format(data_name[:-4], data_name[-4:]), data, fmt = '%s')
-    np.savetxt(data_name, result_data, fmt = '%s')
+    print ('Saving...')
+    os.system('mv {0}{1} {0}_backup{1}'.format(data_name[:-4], data_name[-4:]))
+    np.savetxt(data_name, data, fmt = '%s')
     #-----------------------------------
     # Measure time
     elapsed_time = time.time() - start_time
