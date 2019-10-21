@@ -1,11 +1,9 @@
 #!/usr/bin/python3
 '''
 Abstract:
-    This is a program to select data with filter. 
+    This is a program to select data with filter, and then save to a destination file. 
 Usage:
-    select_data.py [options] [margin of index] [filter] [data]
-    
-    options could be: selector, filter
+    select_data.py [margin of index] [filter] [data] [destination]
 Output:
     1. The processed table
     2. The backup which is the original table.
@@ -37,33 +35,34 @@ if __name__ == "__main__":
     # Load argv
     if len(argv) != 5:
         print ("Error! The number of arguments is wrong.")
-        print ("Usage: select_data.py [options] [margin of index] [filter] [data]")
-        print ("Available options: selector, filter")
+        print ("Usage: select_data.py [margin of index] [filter] [data] [destination]")
         exit()
-    option = argv[1]
-    margin = int(argv[2])
-    filter_name = argv[3]
-    data_name = argv[4]
+    margin = int(argv[1])
+    filter_name = argv[2]
+    data_name = argv[3]
+    dest_name = argv[4]
     #-----------------------------------
     # Load data
     print ('Loading data...')
     data = np.loadtxt(data_name, dtype = str)
     _filter = np.loadtxt(filter_name, dtype = int)
+    num_filter = len(_filter)
+    try: 
+        dest = np.loadtxt(dest_name, dtype = str)
+    except:
+        dest = np.ones( (num_filter, len(data[0])), 
+                        dtype = str
+                        )
+        
     # Apply the filter
+    index = np.arange(num_filter)
     _filter = _filter - margin
-    _filter = _filter[(_filter < len(data)) & (_filter >= 0)]
+    _filter_compact = _filter[(_filter < len(data)) & (_filter >= 0)]
+    index_compact   = index[(_filter < len(data)) & (_filter >= 0)]
     print ('Calculating...')
-    if option == "filter":
-        data[_filter] = 0.0
-    elif option == "selector":
-        data = data[_filter]
-    else:
-        print ('Wrong arguments')
-        print ('Please check the usage.')
-        exit()
+    dest[index_compact] = data[_filter_compact]
     print ('Saving...')
-    os.system('mv {0} {0}.bkup'.format(data_name))
-    np.savetxt(data_name, data, fmt = '%s')
+    np.savetxt(dest_name, dest, fmt = '%s')
     #-----------------------------------
     # Measure time
     elapsed_time = time.time() - start_time
