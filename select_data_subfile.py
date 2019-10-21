@@ -3,7 +3,7 @@
 Abstract:
     This is a program to select data with filter. 
 Usage:
-    select_data.py [options] [filter] [data]
+    select_data.py [options] [margin of index] [filter] [data]
     
     options could be: selector, filter
 Output:
@@ -35,20 +35,23 @@ if __name__ == "__main__":
     start_time = time.time()
     #-----------------------------------
     # Load argv
-    if len(argv) != 4:
+    if len(argv) != 5:
         print ("Error! The number of arguments is wrong.")
-        print ("Usage: select_data.py [options] [filter] [data]")
+        print ("Usage: select_data.py [options] [margin of index] [filter] [data]")
         print ("Available options: selector, filter")
         exit()
     option = argv[1]
-    filter_name = argv[2]
-    data_name = argv[3]
+    margin = int(argv[2])
+    filter_name = argv[3]
+    data_name = argv[4]
     #-----------------------------------
     # Load data
     print ('Loading data...')
     data = np.loadtxt(data_name, dtype = str)
     _filter = np.loadtxt(filter_name, dtype = int)
     # Apply the filter
+    _filter = _filter - margin
+    _filter = _filter[(_filter < len(data)) & (_filter >= 0)]
     print ('Calculating...')
     if option == "filter":
         data[_filter] = 0.0
@@ -59,7 +62,7 @@ if __name__ == "__main__":
         print ('Please check the usage.')
         exit()
     print ('Saving...')
-    os.system('mv {0}{1} {0}_backup{1}'.format(data_name[:-4], data_name[-4:]))
+    os.system('mv {0} {0}.bkup'.format(data_name))
     np.savetxt(data_name, data, fmt = '%s')
     #-----------------------------------
     # Measure time
