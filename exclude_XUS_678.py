@@ -91,21 +91,21 @@ if __name__ == "__main__":
     data_woX_woU = data_woX[  
     #                        ~((Q_table_woX[:,0] == 'U') & (Q_table_woX[:,1] == 'U') & (Q_table_woX[:,2] == 'U')) &\
     #                        (Q_table_woX[:,3] != 'U') &\
-                            (Q_table_woX[:,4] != 'U') &\
+    #                        (Q_table_woX[:,4] != 'U') &\
                             (Q_table_woX[:,5] != 'U') &\
                             (Q_table_woX[:,6] != 'U')
                             ]
     Q_table_woX_woU = Q_table_woX[                    
     #                        ~((Q_table_woX[:,0] == 'U') & (Q_table_woX[:,1] == 'U') & (Q_table_woX[:,2] == 'U')) &\
     #                        (Q_table_woX[:,3] != 'U') &\
-                            (Q_table_woX[:,4] != 'U') &\
+    #                        (Q_table_woX[:,4] != 'U') &\
                             (Q_table_woX[:,5] != 'U') &\
                             (Q_table_woX[:,6] != 'U')
                             ]
     index_woX_woU = index_woX[                    
     #                        ~((Q_table_woX[:,0] == 'U') & (Q_table_woX[:,1] == 'U') & (Q_table_woX[:,2] == 'U')) &\
     #                        (Q_table_woX[:,3] != 'U') &\
-                            (Q_table_woX[:,4] != 'U') &\
+    #                        (Q_table_woX[:,4] != 'U') &\
                             (Q_table_woX[:,5] != 'U') &\
                             (Q_table_woX[:,6] != 'U')
                             ]
