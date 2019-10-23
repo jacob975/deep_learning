@@ -384,3 +384,15 @@ class cross_confusion_matrix_infos(confusion_matrix_infos):
         self.cls_pred_reliable = self.cls_pred[self.reliable]
         return 
 
+class confusion_matrix_infos_reliable(confusion_matrix_infos_lite):
+    objects = ['star', 'galaxy', 'yso']
+    # Give the lower limit of highest probability to select sources. 
+    def __init__(self, label_true, label_pred, ll):
+        max_prob_true = np.amax(label_true, axis = 1)
+        max_prob_pred = np.amax(label_pred, axis = 1)
+        reliable_index = np.where((max_prob_true >= ll) & (max_prob_pred >= ll))[0]
+        self.label_true = label_true[reliable_index]
+        self.label_pred = label_pred[reliable_index] 
+        self.cls_true = np.argmax(self.label_true, axis= 1)
+        self.cls_pred = np.argmax(self.label_pred, axis= 1)
+        return

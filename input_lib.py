@@ -132,3 +132,21 @@ class option_dat2npy():
         self.opts = np.loadtxt(file_name, dtype = str)
         self.opts = list(self.opts)
         return self.opts
+
+class option_cm_reliable():
+    def __init__(self):
+        self.opts = None
+    def create(self):
+        s = [   
+                '# How many true labels are given?',
+                '3',
+                '# How many pred label are given?',
+                '4',
+                '# The lower limit for the highest probability.',
+                '0.8',
+            ]
+        np.savetxt('option_cm_reliable.txt', s, fmt = '%s')
+    def load(self, file_name):
+        self.opts = np.loadtxt(file_name, dtype = str)
+        self.opts = list(self.opts)
+        return self.opts

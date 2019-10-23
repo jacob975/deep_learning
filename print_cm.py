@@ -3,7 +3,7 @@
 Abstract:
     This is a program to show the basic result of AI testing.
 Usage:
-    print_confusion_matrix.py [cls true table] [cls pred table]
+    print_cm.py [label true table] [label pred table]
 Editor:
     Jacob975
 
@@ -17,6 +17,8 @@ Editor:
 update log
 20190307 version alpha 1:
     1. The code works
+20191023 version alpha 2:
+    2. rename by "print_cm.py"
 '''
 import numpy as np
 import time
@@ -31,20 +33,22 @@ if __name__ == "__main__":
     # measure times
     start_time = time.time()
     #----------------------------------------
-    # Initialize variables and constants
-    cls_pred = None
-    cls_true = None
-    #----------------------------------------
     # Load argv
     if len(argv) != 3:
-        print ("Error!\nUsage: print_confusion_matrix.py [cls true table] [cls pred table]")
+        print ("Error!\nUsage: print_cm.py [label true table] [label pred table]")
         exit()
-    cls_true_name = argv[1]
-    cls_pred_name = argv[2]
-    cls_true = np.loadtxt(cls_true_name)
-    cls_true = np.argmax(cls_true, axis=1)
-    cls_pred = np.loadtxt(cls_pred_name)
-    cls_pred = np.argmax(cls_pred, axis=1)
+    true_name = argv[1]
+    pred_name = argv[2]
+    # Load data
+    true = np.loadtxt(true_name)
+    pred = np.loadtxt(pred_name)
+    # Make cls for each labels.
+    num_true = input("How many true labels given? ({0})\n".format(true_name))
+    num_true = int(num_true)
+    cls_true = np.argmax(true[:,:num_true], axis=1)
+    num_pred = input("How many pred labels given? ({0})\n".format(pred_name))
+    num_pred = int(num_pred)
+    cls_pred = np.argmax(pred[:,:num_pred], axis=1)
     #-----------------------------------
     # print the properties of sources
     infos = confusion_matrix_infos(cls_true, cls_pred)

@@ -49,7 +49,7 @@ if __name__ == "__main__":
     inp_table = np.loadtxt(inp_table_name, dtype = str)
     # coordinate
     coord = np.transpose(np.array([inp_table[:,1], inp_table[:,2]]))
-    # Star, galaxy, YSO, evolve star
+    # Star, galaxy, YSO, and evolve star
     # 4 pred. then 4 errors
     L_pred = np.transpose(np.array([
                                     inp_table[:, 7], 
