@@ -74,8 +74,10 @@ if __name__ == "__main__":
     #-----------------------------------
     # Save the data
     print ('Save the data')
-    np.savetxt( '{0}_Lpred.txt'.format(inp_table_name[:-4]), L_pred, fmt = '%s')
-    np.savetxt( '{0}_Spred.txt'.format(inp_table_name[:-4]), S_pred, fmt = '%s')
+    np.savetxt( '{0}_Lpred.txt'.format(inp_table_name[:-4]), L_pred, fmt = '%s',
+                header = '# star  galaxy  ysos    evolved e_s     e_g     e_y     e_e')
+    np.savetxt( '{0}_Spred.txt'.format(inp_table_name[:-4]), S_pred, fmt = '%s',
+                header = '# star  galaxy  ysos    evolved e_s     e_g     e_y     e_e')
     np.savetxt( '{0}_coord.txt'.format(inp_table_name[:-4]), coord, fmt = '%s')
     #-----------------------------------
     # Measure time

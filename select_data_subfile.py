@@ -48,12 +48,10 @@ if __name__ == "__main__":
     _filter = np.loadtxt(filter_name, dtype = int)
     num_filter = len(_filter)
     try: 
-        dest = np.loadtxt(dest_name, dtype = str)
+        dest = np.loadtxt(  dest_name, dtype = object)
     except:
-        dest = np.ones( (num_filter, len(data[0])), 
-                        dtype = str
-                        )
-        
+        dest = np.ones( (num_filter, len(data[0])), dtype = object)
+    print (dest.dtype) 
     # Apply the filter
     index = np.arange(num_filter)
     _filter = _filter - margin

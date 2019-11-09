@@ -3,7 +3,7 @@
 Abstract:
     This is a program for show regions on all sky map. 
 Usage:
-    show_sources_mollweide.py [coord table] [fits files]
+    show_sources_mollweide.py [fits files]
     
 Editor:
     Jacob975
@@ -35,6 +35,15 @@ def equatorial2galactic(coords):
     gala_coords = np.transpose(np.array([gala_l, gala_b]))
     return gala_coords
 
+def plot_procedure(given_coords, given_color):
+    gala_coords = equatorial2galactic(given_coords)
+    hp.projscatter( gala_coords[:,0], gala_coords[:,1], \
+                    lonlat = True, \
+                    s=1, \
+                    c = given_color, \
+                  )
+    
+
 #--------------------------------------------
 # Main code
 if __name__ == "__main__":
@@ -43,19 +52,19 @@ if __name__ == "__main__":
     start_time = time.time()
     #-----------------------------------
     # Load arguments
-    if len(argv) != 3:
+    if len(argv) != 2:
         print ("The number of arguments is wrong.")
-        print ("Usage: show_sources_mollweide.py [coord table] [fits file]")
+        print ("Usage: show_sources_mollweide.py [fits file]")
         print ("Hint: This program suits planck archive image only.")
         exit(1)
-    coord_table_name = argv[1]
-    image_name = argv[2]
+    image_name = argv[1]
     #-----------------------------------
-    # Plot and show
+    # Load images
+    m = hp.read_map(image_name)
+    # Setup the image scales. 
     fig = plt.figure(figsize = (16,12))
     sub_fig = plt.subplot(111, projection="mollweide")
     # Plot background
-    m = hp.read_map(image_name)
     hp.mollview(m, fig = 1, cmap = 'Greys', norm = 'log', cbar = False, \
                 title = '', \
                 #title = 'Locations of our datasets in the whole sky map', \
@@ -64,15 +73,19 @@ if __name__ == "__main__":
     hp.graticule()
     plt.grid(True)
     # Plot the sources
-    world_coords = np.loadtxt(coord_table_name, dtype = float)
-    gala_coords = equatorial2galactic(world_coords)
-    hp.projscatter( gala_coords[:,0], gala_coords[:,1], \
-                    lonlat = True, \
-                    s=1, \
-                    #c = color_list[index], \
-                    #label = region_name_list[index]
-                  )
-    fig.savefig('{0}.png'.format(coord_table_name[:-5]), dpi = 300)
+    while True:
+        coord_table_name = input("Name of coordinate table:")
+        color = input("The color of sources:")
+        coords = np.loadtxt(coord_table_name, dtype = float)
+        plot_procedure(coords, color)
+        status = input("Continue? (y/n):")
+        if status == 'y':
+            continue
+        elif status == 'n':
+            break
+        else:
+            print ("Unrecongnized symbles, continue.")
+    fig.savefig('shown_sources.png', dpi = 300)
     #-----------------------------------
     # Measure time
     elapsed_time = time.time() - start_time
