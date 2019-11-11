@@ -48,6 +48,7 @@ if __name__ == "__main__":
     ll = float(ll)
     true_name = argv[2]
     pred_name = argv[3]
+    print ("#------------ Start -------------")
     print ("true label: {0} with {1} labels".format(true_name, num_true))
     print ("pred label: {0} with {1} labels".format(pred_name, num_pred))
     print ("lower limit for the highest probability: {0}".format(ll))

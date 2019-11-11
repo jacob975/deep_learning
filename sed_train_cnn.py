@@ -41,7 +41,7 @@ import numpy as np
 from sklearn.metrics import confusion_matrix
 import time
 from sys import argv
-from save_lib import save_arrangement, save_cls_pred, save_cls_true, save_coords
+from save_lib import save_arrangement, save_coords
 import astro_mnist
 import math
 import os
@@ -189,6 +189,7 @@ def optimize_GT_score(num_iterations):
             val_gala_recall = np.sum((val_true == 1) & (val_pred == 1)) / np.sum(val_true == 1)
             val_ysos_recall = np.sum((val_true == 2) & (val_pred == 2)) / np.sum(val_true == 2)
             val_ysos_precision = np.sum((val_true == 2) & (val_pred == 2)) / np.sum(val_pred == 2)
+            val_es_recall = np.sum((val_true == 3) & (val_pred == 3)) / np.sum(val_true == 3)
             # Save the acc and loss of each iter
             validation_list.append([total_iterations, acc_validation, loss_validation])
             # Determind a score for validating the AI.
@@ -198,13 +199,15 @@ def optimize_GT_score(num_iterations):
                         val_star_recall + \
                         0.01 * val_gala_recall + \
                         0.1 * val_ysos_recall + \
-                        0.1 * val_ysos_precision
+                        0.1 * val_ysos_precision + \
+                        val_es_recall
             elif validation_func == "GT_score_newn":
                 score = acc_train + \
                         val_star_recall + \
                         0.01 * val_gala_recall + \
                         0.01 * val_ysos_recall + \
-                        0.01 * val_ysos_precision
+                        0.01 * val_ysos_precision + \
+                        val_es_recall
             # If validation accuracy is an improvement over best-known.
             if score > best_score:
                 # Update the best-known validation accuracy.
@@ -372,7 +375,17 @@ if __name__ == "__main__":
         stu.create()
         exit(1)
     option_file_name = argv[1]
+    global images_name
+    images_name = argv[2]
+    labels_name = argv[3]
+    coords_name = argv[4]
+    time_stamp = argv[5]
     imply_mask, consider_error, batch_format, iterations_upperlimit, validation_func = stu.load(option_file_name)
+    print ('#----------------------------------')
+    print ('Input parameters:')
+    print ('sed_name = {0}'.format(images_name))
+    print ('label name = {0}'.format(labels_name))
+    print ('coords_name = {0}'.format(labels_name))
     print ('imply mask: {0}'.format(imply_mask))
     print ('consider error: {0}'.format(consider_error))
     print ('batch format: {0}'.format(batch_format))
@@ -386,11 +399,6 @@ if __name__ == "__main__":
     else:
         print ("Wrong batch_format option")
         exit()
-    global images_name
-    images_name = argv[2]
-    labels_name = argv[3]
-    coords_name = argv[4]
-    time_stamp = argv[5]
     #------------------------------------
     # Load Data
     # We should play a mask on image
@@ -432,7 +440,7 @@ if __name__ == "__main__":
     #-----------------------------------
     # Construct an AI
     x = tf.placeholder(tf.float32, [None, width_of_data * img_maj], name = 'x')
-    y_true = tf.placeholder(tf.float32, [None, 3], name = 'y_true')
+    y_true = tf.placeholder(tf.float32, [None, num_label], name = 'y_true')
     y_true_cls = tf.argmax(y_true, axis=1)
     x_image = tf.reshape(x, [-1, image_shape[0], image_shape[1], 1])
     # First layer( First kernal)
