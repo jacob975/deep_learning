@@ -41,7 +41,8 @@ import numpy as np
 from sklearn.metrics import confusion_matrix
 import time
 from sys import argv
-from save_lib import save_arrangement, save_coords
+from save_lib import save_arrangement_ext as save_arrangement
+from save_lib import save_coords_ext as save_coords
 import astro_mnist
 import math
 import os
@@ -410,10 +411,10 @@ if __name__ == "__main__":
     print("- Validation-set:\t{}".format(len(data.validation.labels)))
     #-----------------------------------
     # save arrangement and coords
-    failure = save_arrangement(images_name[:-4], time_stamp, data, tracer)
+    failure = save_arrangement(time_stamp, data, tracer)
     if not failure:
         print ("tracers and data are saved.")
-    failure = save_coords(images_name[:-4], time_stamp, coords)
+    failure = save_coords(time_stamp, coords)
     if not failure:
         print ("coords are saved.")
     #-----------------------------------
@@ -494,7 +495,7 @@ if __name__ == "__main__":
     validation_list = []
     improved_validation_list = []
     saver = tf.train.Saver()
-    save_dir = '{0}/checkpoint_AI_64_8_{1}'.format(time_stamp, images_name[:-4])
+    save_dir = '{0}/checkpoint'.format(time_stamp)
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
     save_path = os.path.join(save_dir, 'best_validation')
