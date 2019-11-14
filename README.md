@@ -1,5 +1,6 @@
 # Purpose
 Classify the identities of sources in c2d legacy catalog using SED data and our trained-AI.
+Recently, I try to make it more simple.
 
 # Preparation
 The module you need
