@@ -41,8 +41,8 @@ import numpy as np
 from sklearn.metrics import confusion_matrix
 import time
 from sys import argv
-from save_lib import save_arrangement_ext as save_arrangement
-from save_lib import save_coords_ext as save_coords
+from save_lib import save_arrangement
+from save_lib import save_coords
 import astro_mnist
 import math
 import os

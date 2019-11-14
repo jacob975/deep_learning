@@ -13,10 +13,10 @@
 # 20180529 version alpha 3
 # Using main name to replace the keywords, and the fucntions become more flexible.
 # check arguments
-if [ "$#" -ne 3 ]; then
+if [ "$#" -ne 4 ]; then
     echo "Illegal number of parameters"
-    echo "Usage: ${0##*/} [DIR where AI saved] [main name of AI] [main name of dataset]"
-    echo "Example: ${0##*/} . spitzer spitzer"
+    echo "Usage: ${0##*/} [DIR where AI saved] [sed name] [label name] [coord name]"
+    echo "Example: ${0##*/} . sed.txt label.txt coord.txt"
     exit 1
 fi
 # Initialize the format of your datasets.
@@ -25,8 +25,9 @@ vim option_test.txt
 
 # Initialize variables
 AI_POOL=${1}
-main_name_model=${2}
-main_name_set=${3}
+sed_name=${2}
+label_name=${3}
+coord_name=${4}
 
 echo "AI saved directory going to test:"
 for each in ${AI_POOL}/20*/;
@@ -39,12 +40,12 @@ do
     echo "AI under test: ${AI_NAME}"
 
     # create a directory to save result of testing
-    mkdir -p "AI_${AI_NAME}_test_on_${main_name_set}"
+    mkdir -p "AI_${AI_NAME}_test_on_testset"
     sed_test_cnn.py option_test.txt \
-                    ${main_name_set}_sed.txt ${main_name_set}_c2d2007_Sp.txt ${main_name_set}_coord.txt \
-                    "AI_${AI_NAME}_test_on_${main_name_set}"\
-                    "${each}checkpoint_AI_64_8_${main_name_model}_sed" \
-                    > "AI_${AI_NAME}_test_on_${main_name_set}/result_of_AI_test"
+                    ${sed_name} ${label_name} ${coord_name} \
+                    "AI_${AI_NAME}_test_on_testset"\
+                    "${each}checkpoint" \
+                    > "AI_${AI_NAME}_test_on_testset/result_of_AI_test"
 
 done
 exit 0

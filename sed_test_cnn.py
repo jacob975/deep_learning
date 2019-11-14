@@ -106,7 +106,7 @@ def predict_label(images, labels):
     # Number of images.
     num_images = len(images)
     # initialize
-    label_pred = np.zeros(num_images*3).reshape((num_images, 3))
+    label_pred = np.zeros(num_images*num_label).reshape((num_images, num_label))
     feed_dict = {x: images[:,pick_band_array[0]], y_true: labels[:]}
     # process 
     label_pred = session.run(y_pred, feed_dict=feed_dict)
@@ -150,6 +150,15 @@ if __name__ == "__main__":
     coords_name = argv[4]
     directory = argv[5]
     AI_saved_dir = argv[6]
+    print ('#----------------------------------')
+    print ('Input parameters:')
+    print ('sed_name = {0}'.format(images_name))
+    print ('label name = {0}'.format(labels_name))
+    print ('coords_name = {0}'.format(labels_name))
+    print ('The model from "{0}"'.format(AI_saved_dir))
+    print ('The predictions saved in "{0}"'.format(directory))
+    print ('imply mask = {0}'.format(imply_mask))
+    print ('consider error = {0}'.format(consider_error))
     #-------------------------------------
     # Load Data
     data, \
@@ -166,10 +175,10 @@ if __name__ == "__main__":
     print("- Validation-set:\t{}".format(len(data.validation.labels)))
     data.test.cls = np.argmax(data.test.labels, axis=1)
     # save arrangement and coords
-    failure = save_arrangement(images_name[:-4], directory, data, tracer)
+    failure = save_arrangement(directory, data, tracer)
     if not failure:
         print ("tracer and data is saved.")
-    failure = save_coords(images_name[:-4], directory, coords)
+    failure = save_coords(directory, coords)
     if not failure:
         print ("coords are saved.")
     #-----------------------------------
@@ -196,7 +205,7 @@ if __name__ == "__main__":
     #-----------------------------------
     # Construct an AI
     x = tf.placeholder(tf.float32, [None, width_of_data * img_maj], name = 'x')
-    y_true = tf.placeholder(tf.float32, [None, 3], name = 'y_true')
+    y_true = tf.placeholder(tf.float32, [None, num_label], name = 'y_true')
     y_true_cls = tf.argmax(y_true, axis=1)
     x_image = tf.reshape(x, [-1, image_shape[0], image_shape[1], 1])
     # First layer( First kernal)
@@ -241,9 +250,9 @@ if __name__ == "__main__":
     label_pred = predict_label(data.test.images, data.test.labels)
     cls_pred = np.argmax(label_pred, axis = 1)
     # save cls_pred and cls_true
-    save_cls_pred(images_name[:-4], directory, cls_pred)
-    save_cls_true(images_name[:-4], directory, data.test.cls)
-    save_label_pred(images_name[:-4], directory, label_pred)
+    save_cls_pred(directory, cls_pred)
+    save_cls_true(directory, data.test.cls)
+    save_label_pred(directory, label_pred)
     session.close()
     #-----------------------------------
     # measuring time

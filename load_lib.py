@@ -40,15 +40,13 @@ from tensorflow.python.framework import dtypes
 from astro_mnist import DataSet, shuffled_tracer
 
 # This is used to load data, label, and shuffle tracer
-def load_arrangement(main_name, 
-                    directory, 
+def load_arrangement(directory, 
                     reshape=False,
                     dtype=dtypes.float32,
                     seed=None,
                     VERBOSE = 0
                     ):
     # directory is where you save AI
-    # main_name is the main part to of the filename
     # data contains data set and label
     # tracer is just tracer
     # initialize variables
@@ -67,21 +65,21 @@ def load_arrangement(main_name,
         return 1, None
     # if directory is not null, load data, labels and tracers
     try:
-        train_tracer    = np.loadtxt("{0}/training_tracer_{1}_sed.txt".format(directory, main_name))
-        train_data      = np.loadtxt("{0}/training_set_{1}_sed.txt".format(directory, main_name))
-        train_labels    = np.loadtxt("{0}/training_label_{1}_sed.txt".format(directory, main_name))
+        train_tracer    = np.loadtxt("{0}/training_tracer.txt".format(directory))
+        train_data      = np.loadtxt("{0}/training_set.txt".format(directory))
+        train_labels    = np.loadtxt("{0}/training_label.txt".format(directory))
     except:
         if VERBOSE != 0:print("In train dataset, data or label or tracer aren't completed")
     try:
-        valid_tracer    = np.loadtxt("{0}/validation_tracer_{1}_sed.txt".format(directory, main_name))
-        valid_data      = np.loadtxt("{0}/validation_set_{1}_sed.txt".format(directory, main_name))
-        valid_labels    = np.loadtxt("{0}/validation_labels_{1}_sed.txt".format(directory, main_name))
+        valid_tracer    = np.loadtxt("{0}/validation_tracer.txt".format(directory))
+        valid_data      = np.loadtxt("{0}/validation_set.txt".format(directory))
+        valid_labels    = np.loadtxt("{0}/validation_labels.txt".format(directory))
     except:
         if VERBOSE != 0:print("In validation dataset, data or label or tracer aren't completed")
     try:
-        test_tracer     = np.loadtxt("{0}/test_tracer_{1}_sed.txt".format(directory, main_name))
-        test_data       = np.loadtxt("{0}/test_set_{1}_sed.txt".format(directory, main_name))
-        test_labels     = np.loadtxt("{0}/test_labels_{1}_sed.txt".format(directory, main_name))
+        test_tracer     = np.loadtxt("{0}/test_tracer.txt".format(directory))
+        test_data       = np.loadtxt("{0}/test_set.txt".format(directory))
+        test_labels     = np.loadtxt("{0}/test_labels.txt".format(directory))
     except:
         if VERBOSE != 0:print("In test dataset, data or label or tracer aren't completed")
     options = dict(dtype=dtype, reshape=reshape, seed=seed)
@@ -101,55 +99,52 @@ def load_table_tracer():
     return 0, table_tracer
 
 # This is used to loading the index of pred label
-def load_cls_pred(main_name, directory):
+def load_cls_pred(directory):
     # directory is used to create a uniq folder
-    # main_name is used to denote filename
     # cls_pred is the index of predicted labels
     try:
-        cls_pred = np.loadtxt("{0}/test_cls_pred_{1}_sed.txt".format(directory, main_name))
+        cls_pred = np.loadtxt("{0}/test_cls_pred.txt".format(directory))
     except:
         print("test_cls_pred not found")
         return 1, None
     return 0, cls_pred
 
 # This is used to loading pred label
-def load_labels_pred(main_name, directory):
+def load_labels_pred(directory):
     # directory is used to create a uniq folder
-    # main_name is used to denote filename
     # cls_pred is predicted label
     try:
-        labels_pred = np.loadtxt("{0}/test_labels_pred_{1}_sed.txt".format(directory, main_name))
+        labels_pred = np.loadtxt("{0}/test_labels_pred.txt".format(directory))
     except:
         print("test_labels_pred not found")
         return 1, None
     return 0, labels_pred
 
 # This is used to loading the index of true lable
-def load_cls_true(main_name, directory):
+def load_cls_true(directory):
     # directory is used to create a uniq folder
-    # main_name is used to denote filename
     # cls_pred is the index of true labels
     try:
-        cls_true = np.loadtxt("{0}/test_cls_true_{1}_sed.txt".format(directory, main_name))
+        cls_true = np.loadtxt("{0}/test_cls_true.txt".format(directory))
     except:
         print ("test_cls_true not found")
         return 1, None
     return 0, cls_true
 
 # This is the func to load coordinates of corresponding sources.
-def load_coords(main_name, directory):
+def load_coords(directory):
     try:
-        train_coords = np.loadtxt("{0}/train_coords_{1}_sed.txt".format(directory, main_name))
+        train_coords = np.loadtxt("{0}/train_coords.txt".format(directory))
     except:
         print ("train coords not found")
         train_coords = None
     try:
-        validation_coords = np.loadtxt("{0}/validation_coords_{1}_sed.txt".format(directory, main_name))
+        validation_coords = np.loadtxt("{0}/validation_coords.txt".format(directory))
     except:
         print ("validation coords not found")
         validation_coords = None
     try:
-        test_coords = np.loadtxt("{0}/test_coords_{1}_sed.txt".format(directory, main_name))
+        test_coords = np.loadtxt("{0}/test_coords.txt".format(directory))
     except:
         print ("test coords not found")
         test_coords = None
