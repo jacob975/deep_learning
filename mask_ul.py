@@ -73,8 +73,10 @@ if __name__ == "__main__":
     #------------------------------------------
     # Mask dataset with chosen mask
     for i in range(len(ul_table[0])):
+        '''
         if i == 1:
             continue
+        '''
         # Initialize
         pflux = 0.0
         perror = 0.0
