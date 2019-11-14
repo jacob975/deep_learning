@@ -3,7 +3,7 @@
 Abstract:
     This is a program to show the basic result of AI testing.
 Usage:
-    plot_test_result.py [main_name of test set]
+    plot_test_result_HOPS.py [main_name of test set]
 Editor:
     Jacob975
 
@@ -41,12 +41,13 @@ if __name__ == "__main__":
     #----------------------------------------
     # Load argv
     if len(argv) != 2:
-        print ("Error!\nUsage: plot_test_result.py [main_name for test set]")
+        print ("Error!\nUsage: plot_test_result_HOPS.py [main_name for test set]")
         exit()
     main_name = argv[1]
     #----------------------------------------
     # Load data
     print("Loading ...")
+    src_name    = np.loadtxt("{0}_srcname.txt".format(main_name), dtype = int)
     labels_pred = np.loadtxt("{0}_label_pred.txt".format(main_name))
     cls_pred    = np.argmax(labels_pred, axis = 1)
     cls_true    = np.loadtxt("{0}_cls_true.txt".format(main_name), dtype = int)
@@ -72,7 +73,8 @@ if __name__ == "__main__":
     for i, source in enumerate(data):
         fig, ax = plt.subplots(figsize = (8,6))
         #ax.set_aspect(0.4)
-        ax.set_title("Actual: {0}, Predicted: {1}\nRA: {2:.4f}, DEC: {3:.4f}".format( 
+        ax.set_title("HOPS{0:03d}\nActual: {1}, Predicted: {2}\nRA: {3:.4f}, DEC: {4:.4f}".format( 
+                        src_name[i],
                         source_type[cls_true[i]], 
                         source_type[cls_pred[i]], 
                         coord[i,0], 
@@ -114,7 +116,8 @@ if __name__ == "__main__":
         ax.set_xticks(wavelength, minor = False)
         ax.set_xticklabels(wavelength)
         ax.legend(loc =1)
-        fig.savefig("Source_{0:.4f}_{1:.4f}.png".format(
+        fig.savefig("HOPS{0:03d}_{1:.4f}_{2:.4f}.png".format(
+                        src_name[i],
                         coord[i,0], 
                         coord[i,1]))
         if i%20 == 0:
