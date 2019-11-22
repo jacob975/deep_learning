@@ -3,10 +3,10 @@ Classify the identities of sources in c2d legacy catalog using SED data and our 
 
 # Preparation
 The module you need
-1. tensorflow
-2. sklearn
-3. tkinter
-4. IPython
+1. tensorflow 1.5.0\
+2. sklearn\
+3. tkinter\
+4. python3\
 
 # How to train our AI?
 1. Getting SED data of sources in c2d legacy catalog, and also corresponding data from 2MASS or UKIDSS catalog.
@@ -86,3 +86,9 @@ Please follow the step 7, step 8.
 16. ```print_test_result.py [keyword of dataset]```
   + This program is used to print the confusion matrixes, recall-rate, and precision, ... several statistial result.
   + ```[Keyword of dataset]``` should be ```MaxLoss[number]``` of testing SED data.
+
+# Hints
+1. Remote to non-master branches\
+`git checkout origin/<branch> -b <branch>`\
+2. Patch a <file> from <branch>\
+`git checkout -p <branch> <file>` \
