@@ -88,7 +88,7 @@ Please follow the step 7, step 8.
   + ```[Keyword of dataset]``` should be ```MaxLoss[number]``` of testing SED data.
 
 # Hints
-1. Remote to non-master branches\
+1. Remote to a non-master `<branch>` in `<origin>`\
 `git checkout origin/<branch> -b <branch>`\
-2. Patch a <file> from <branch>\
+2. Patch a `<file>` from `<branch>`\
 `git checkout -p <branch> <file>` \
