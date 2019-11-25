@@ -137,7 +137,6 @@ if __name__ == "__main__":
     #-----------------------------------
     # Load arguments
     stu = option_test()
-    print(len(argv))
     if len(argv) != 7:
         print ("The number of arguments is wrong.")
         print ("Usage: sed_test_cnn.py [option_file] [source] [id] [coord] [where to save] [AI]")
@@ -152,6 +151,7 @@ if __name__ == "__main__":
     AI_saved_dir = argv[6]
     #-------------------------------------
     # Load Data
+
     data, tracer, coords = astro_mnist.read_data_sets(images_name, labels_name, coords_name, train_weight = 0, validation_weight = 0, test_weight = 1)
     print("Size of:")
     print("- Training-set:\t\t{}".format(len(data.train.labels)))
@@ -186,6 +186,15 @@ if __name__ == "__main__":
     num_kernal_2 = 64
     num_conn_neural = 100
     num_label = len(data.test.labels[0])
+    print ('img_maj:            {0}'.format(img_maj))
+    print ('width_of_data:      {0}'.format(width_of_data))
+    print ('pick_band_array:\n  {0}'.format(pick_band_array))
+    print ('image_shape:\n      {0}'.format(image_shape))
+    print ('kernal_shape:\n     {0}'.format(kernal_shape))
+    print ('num_kernal_1:       {0}'.format(num_kernal_1))
+    print ('num_kernal_2:       {0}'.format(num_kernal_2))
+    print ('num_conn_neural:    {0}'.format(num_conn_neural))
+    print ('num_label:          {0}'.format(num_label))
     #-----------------------------------
     # Construct an AI
     x = tf.placeholder(tf.float32, [None, width_of_data * img_maj], name = 'x')

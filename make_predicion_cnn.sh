@@ -53,6 +53,10 @@ do
                         "AI_${AI_NAME}_test_on_${keyword_set}"\
                         "${each}checkpoint_AI_64_8_source_sed_${keyword_AI}" \
                         > "AI_${AI_NAME}_test_on_${keyword_set}/result_of_AI_test"
+        echo            option_test.txt \
+                        source_sed_${keyword_set}.txt source_id_${keyword_set}.txt source_coord_${keyword_set}.txt\
+                        "AI_${AI_NAME}_test_on_${keyword_set}"\
+                        "${each}checkpoint_AI_64_8_source_sed_${keyword_AI}"
     fi
 done
 exit 0
