@@ -20,9 +20,7 @@ update log
 '''
 import numpy as np
 import time
-from load_lib import confusion_matrix_infos
 from sys import argv
-from glob import glob
 import os
 from matplotlib import pyplot as plt
 

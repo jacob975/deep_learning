@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 '''
 Abstract:
-    This is a program for replacing the items in table A with items in table B using specified Bindex. 
+    This is a program for replacing each item in table A with items in table B using specified index of B table. 
 Usage:
     replace_A_by_B_using_Bindex.py [table A] [table B] [table Bindex]
 Output:
@@ -51,6 +51,7 @@ if __name__ == "__main__":
         table_A = np.loadtxt(table_A_name, dtype = object, delimiter = '|')
     # Replace the items in table A with items in table B
     for i, index in enumerate(Bindex):
+        
         if index == -1:
             continue
         else:

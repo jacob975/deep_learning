@@ -179,6 +179,7 @@ if __name__ == "__main__":
     num_label = 3 
     #-----------------------------------
     # Construct an AI
+    tf.reset_default_graph()
     x = tf.placeholder(tf.float32, [None, width_of_data * img_maj], name = 'x')
     y_true = tf.placeholder(tf.float32, [None, 3], name = 'y_true')
     y_true_cls = tf.argmax(y_true, axis=1)

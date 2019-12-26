@@ -439,6 +439,7 @@ if __name__ == "__main__":
     num_label = len(data.train.labels[0])
     #-----------------------------------
     # Construct an AI
+    tf.reset_default_graph()
     x = tf.placeholder(tf.float32, [None, width_of_data * img_maj], name = 'x')
     y_true = tf.placeholder(tf.float32, [None, num_label], name = 'y_true')
     y_true_cls = tf.argmax(y_true, axis=1)

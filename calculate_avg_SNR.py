@@ -41,6 +41,7 @@ if __name__ == "__main__":
     #-----------------------------------
     # Load data
     sed_table = np.loadtxt(sed_table_name)
+    print ("table name: {0}".format(sed_table_name))
     # Calculate the signal noise ratio
     for i in range(8):
         flux = sed_table[:,i]
@@ -50,7 +51,8 @@ if __name__ == "__main__":
         print ('Average SNR = {0}'.format(SNR_mean))
         n, bins, patches = plt.hist(SNR_array, 50, facecolor='g', alpha=0.75)
         # Show the histogram
-        plt.show()
+        plt.savefig("{0}_band{1}.png".format(sed_table_name[:-4], i))
+        plt.close()
     #-----------------------------------
     # Measure time
     elapsed_time = time.time() - start_time

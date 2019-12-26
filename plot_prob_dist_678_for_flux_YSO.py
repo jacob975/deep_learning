@@ -21,6 +21,7 @@ update log
     1. Assign star as blue, YSO as red.
 '''
 import matplotlib.pyplot as plt
+from matplotlib import cm
 from mpl_toolkits.mplot3d import Axes3D
 import tensorflow as tf
 import numpy as np
@@ -33,16 +34,7 @@ from sed_test_cnn import bias_variable, weight_variable
 from convert_lib import ensemble_mjy_to_mag
 import convert_lib
 
-# Assign RGB color to represent stars, galaxies, and YSOs.
-def assign_color(color_code):
-    bgr_color_code = np.transpose([ color_code[:,2], 
-                                    color_code[:,1], 
-                                    color_code[:,0]
-                                    ])
-    sgys_color = [Color(rgb = tuple(bgr_color_code[i])).hex_l for i in range(len(bgr_color_code))] 
-    sgys_color = np.asarray(sgys_color)
-    return sgys_color 
-
+# Assign RGB color to represent MP 1 magnitude. 
 def predict_label(images, labels):
     # Number of images.
     num_images = len(images)
@@ -53,124 +45,36 @@ def predict_label(images, labels):
     label_pred = session.run(y_pred, feed_dict=feed_dict)
     return label_pred
 
-def plot_prob(arti_mag, sgys_color, sort_order):
-    # Print the color for each IR3 slice
-    print ("IR3")
-    for i, IR3 in enumerate(IR3_arti_mag):
-        if i%10 != 0:
-            continue
-        if i%20 == 0:
-            plt.close()
-        fig = plt.figure(
-            figsize = (8,8)
-            )
-        ax = fig.add_subplot(111, projection='3d')
-        ax.scatter( 
-            xs = arti_mag[np.where(arti_mag[:,0] == IR3[0]), 0], 
-            ys = arti_mag[np.where(arti_mag[:,0] == IR3[0]), 1], 
-            zs = arti_mag[np.where(arti_mag[:,0] == IR3[0]), 2], 
-            zdir='z', 
-            s=20, 
-            c = sgys_color[np.where(arti_mag[:,0] == IR3[0])],
-            depthshade=False)
-        plt.tick_params(
-            top='off', 
-            bottom='off', 
-            left='off', 
-            right='off', 
-            labelleft='off', 
-            labelbottom='off',
-            )
-        ax.set_xlim(np.amin(IR3_arti_mag[:,0]), np.amax(IR3_arti_mag[:,0]))
-        ax.set_ylim(np.amin(IR4_arti_mag[:,0]), np.amax(IR4_arti_mag[:,0]))
-        ax.set_zlim(np.amin(MP1_arti_mag[:,0]), np.amax(MP1_arti_mag[:,0]))
-        #ax.set_xlabel("{0} (log(mJy))".format(sort_order[0]))
-        #ax.set_ylabel("{0} (log(mJy))".format(sort_order[1]))
-        #ax.set_zlabel("{0} (log(mJy))".format(sort_order[2]))
-        plt.savefig(
-            'probability_distribution_along_{0}_{1:03d}.png'.format(sort_order[0], i),
-            dpi = 300,
-            )
-        print ('number {0}, done.'.format(i))
-    print ("IR4")
-    # Print the color for each IR4 slice
-    for i, IR4 in enumerate(IR4_arti_mag):
-        if i%10 != 0:
-            continue
-        if i%20 == 0:
-            plt.close()
-        fig = plt.figure(
-            figsize = (8,8)
-            )
-        ax = fig.add_subplot(111, projection='3d')
-        #print (np.where(arti_mag[:,1] == IR4[0]))
-        ax.scatter( 
-            xs = arti_mag[np.where(arti_mag[:,1] == IR4[0]), 0], 
-            ys = arti_mag[np.where(arti_mag[:,1] == IR4[0]), 1], 
-            zs = arti_mag[np.where(arti_mag[:,1] == IR4[0]), 2], 
-            zdir='z', 
-            s=20, 
-            c = sgys_color[np.where(arti_mag[:,1] == IR4[0])],
-            depthshade=False)
-        plt.tick_params(
-            top='off', 
-            bottom='off', 
-            left='off', 
-            right='off', 
-            labelleft='off', 
-            labelbottom='off',
-            )
-        ax.set_xlim(np.amin(IR3_arti_mag[:,0]), np.amax(IR3_arti_mag[:,0]))
-        ax.set_ylim(np.amin(IR4_arti_mag[:,0]), np.amax(IR4_arti_mag[:,0]))
-        ax.set_zlim(np.amin(MP1_arti_mag[:,0]), np.amax(MP1_arti_mag[:,0]))
-        #ax.set_xlabel("{0} (log(mJy))".format(sort_order[0]))
-        #ax.set_ylabel("{0} (log(mJy))".format(sort_order[1]))
-        #ax.set_zlabel("{0} (log(mJy))".format(sort_order[2]))
-        plt.savefig(
-            'probability_distribution_along_{0}_{1:03d}.png'.format(sort_order[1], i), 
-            dpi = 300,
-            )
-        print ('number {0}, done.'.format(i))
-    print ('MP1')
+def plot_prob(arti_mag, sort_order):
     # Print the color for each MP1 slice
-    for i, MP1 in enumerate(MP1_arti_mag):
-        if i%10 != 0:
-            continue
-        if i%20 == 0:
-            plt.close()
-        fig = plt.figure(
-            figsize = (8,8)
-            )
-        ax = fig.add_subplot(111, projection='3d')
-        divider = make_axes_locatable(ax)
-        ax_cb = divider.new_horizontal(size="5%", pad=0.05)
-        ax.scatter( 
-            xs = arti_mag[np.where(arti_mag[:,2] == MP1[0]), 0], 
-            ys = arti_mag[np.where(arti_mag[:,2] == MP1[0]), 1], 
-            zs = arti_mag[np.where(arti_mag[:,2] == MP1[0]), 2], 
-            zdir='z', 
-            s=20, 
-            c = sgys_color[np.where(arti_mag[:,2] == MP1[0])],
-            depthshade=False)
-        plt.tick_params(
-            top='off', 
-            bottom='off', 
-            left='off', 
-            right='off', 
-            labelleft='off', 
-            labelbottom='off',
-            )
-        ax.set_xlim(np.amin(IR3_arti_mag[:,0]), np.amax(IR3_arti_mag[:,0]))
-        ax.set_ylim(np.amin(IR4_arti_mag[:,0]), np.amax(IR4_arti_mag[:,0]))
-        ax.set_zlim(np.amin(MP1_arti_mag[:,0]), np.amax(MP1_arti_mag[:,0]))
-        #ax.set_xlabel("{0} (log(mJy))".format(sort_order[0]))
-        #ax.set_ylabel("{0} (log(mJy))".format(sort_order[1]))
-        #ax.set_zlabel("{0} (log(mJy))".format(sort_order[2]))
-        plt.savefig(
-            'probability_distribution_along_{0}_{1:03d}.png'.format(sort_order[2], i), 
-            dpi = 300,
-            )
-        print ('number {0}, done.'.format(i))
+    fig = plt.figure(
+        figsize = (8,8)
+        )
+    ax = fig.add_subplot(111, projection='3d')
+    ax.plot_trisurf(
+        arti_mag[:, 0], 
+        arti_mag[:, 1], 
+        arti_mag[:, 2], 
+        cmap='jet',
+        edgecolor='none'
+        )
+    ax.set_xlim(np.amin(IR3_arti_mag[:,0]), np.amax(IR3_arti_mag[:,0]))
+    ax.set_ylim(np.amin(IR4_arti_mag[:,0]), np.amax(IR4_arti_mag[:,0]))
+    ax.set_zlim(np.amin(MP1_arti_mag[:,0]), np.amax(MP1_arti_mag[:,0]))
+    ax.set_xlabel(
+        "{0} (log(mJy))".format(sort_order[0]),
+        fontsize=16)
+    ax.set_ylabel(
+        "{0} (log(mJy))".format(sort_order[1]),
+        fontsize=16)
+    ax.set_zlabel(
+        "{0} (log(mJy))".format(sort_order[2]),
+        fontsize=16)
+    #plt.show()
+    plt.savefig(
+        'probability_distribution_for_YSO.png',
+        dpi = 300,
+        )
     return
 
 #--------------------------------------------
@@ -268,13 +172,15 @@ if __name__ == "__main__":
     #-----------------------------------
     # Make a prediction
     label_pred_678 = predict_label(arti_flux_678, arti_label_678)
+    cls_pred_678 = np.argmax(label_pred_678, axis = 1)
     #-----------------------------------
     # Shows the degenerate data and pred_labels to band IRAC3, IRAC4, and MIPS1
     sort_order_678 = ['IRAC3', 'IRAC4', 'MIPS1']
-    print ('Assign the color')
-    sgys_color_678 = assign_color(label_pred_678)
+    # Plot YSO only
+    index_YSO = np.where(cls_pred_678 == 2)
+    arti_mag_678_YSO = arti_mag_678[index_YSO]
     print ('Plot the 3D map')
-    plot_prob(arti_mag_678, sgys_color_678, sort_order_678)
+    plot_prob(arti_mag_678_YSO, sort_order_678)
     #-----------------------------------
     # Close session
     session.close()
