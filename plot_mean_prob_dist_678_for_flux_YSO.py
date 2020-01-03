@@ -3,7 +3,7 @@
 Abstract:
     This is a program for ploting probability distribution of labels. 
 Usage:
-    plot_prob_dist.py [AI dir]
+    plot_prob_dist.py [AI dir list]
 Editor and Practicer:
     Jacob975
 
@@ -33,8 +33,16 @@ from colour import Color
 from sed_test_cnn import bias_variable, weight_variable
 from convert_lib import ensemble_mjy_to_mag
 import convert_lib
+from scipy.interpolate import RegularGridInterpolator
 
 # Assign RGB color to represent MP 1 magnitude. 
+
+def rebin3d(arr, new_shape):
+    shape = (new_shape[0], arr.shape[0] // new_shape[0],
+             new_shape[1], arr.shape[1] // new_shape[1],
+             new_shape[2], arr.shape[2] // new_shape[2],
+    )
+    return arr.reshape(shape).mean(-1).mean(3).mean(1)
 
 def plot_prob(arti_mag, sort_order):
     # Print the color for each MP1 slice
@@ -42,13 +50,19 @@ def plot_prob(arti_mag, sort_order):
         figsize = (8,8)
         )
     ax = fig.add_subplot(111, projection='3d')
+    #ax.scatter(
+    #    arti_mag[:, 0], 
+    #    arti_mag[:, 1], 
+    #    arti_mag[:, 2], 
+    #    s = 1,
+    #)
     ax.plot_trisurf(
         arti_mag[:, 0], 
         arti_mag[:, 1], 
         arti_mag[:, 2], 
         cmap='jet',
         edgecolor='none'
-        )
+    )
     ax.set_xlim(np.amin(IR3_arti_mag[:,0]), np.amax(IR3_arti_mag[:,0]))
     ax.set_ylim(np.amin(IR4_arti_mag[:,0]), np.amax(IR4_arti_mag[:,0]))
     ax.set_zlim(np.amin(MP1_arti_mag[:,0]), np.amax(MP1_arti_mag[:,0]))
@@ -146,24 +160,39 @@ if __name__ == "__main__":
     #-----------------------------------
     # Load argv
     if len(argv) != 2:
-        print ("Error! Usage: plot_prob_distribution.py [AI dir]")
+        print ("Error! Usage: plot_prob_distribution.py [AI dir list]")
         exit(1)
-    AI_saved_dir = argv[1]
+    AI_saved_dir_list_name = argv[1]
+    # Load data
+    AI_saved_dir_list = np.loadtxt(
+        AI_saved_dir_list_name, 
+        dtype = str,
+        delimiter = '\n')
     #-----------------------------------
     # Initialize
-    num_ticks = 100
+    #reduced_num_ticks = 50
+    num_ticks = 400
     # Calculate the probability distribution of labels
     band_system = convert_lib.set_SCAO()
     fake_error = np.ones(num_ticks)
-    IR3_arti_flux = np.transpose([  np.logspace(np.log10(0.000107), np.log10(1000.0), num=num_ticks),
-                                    fake_error
-                                    ])
-    IR4_arti_flux = np.transpose([  np.logspace(np.log10(0.000216), np.log10(1000.0), num=num_ticks),
-                                    fake_error
-                                    ])
-    MP1_arti_flux = np.transpose([  np.logspace(np.log10(0.000898), np.log10(1000.0), num=num_ticks),
-                                    fake_error
-                                    ])
+    IR3_arti_flux = np.transpose(
+        [   np.logspace(
+                np.log10(0.000107), 
+                np.log10(100.0), 
+                num=num_ticks),
+            fake_error])
+    IR4_arti_flux = np.transpose(
+        [   np.logspace(
+                np.log10(0.000216), 
+                np.log10(320.0), 
+                num=num_ticks),
+            fake_error])
+    MP1_arti_flux = np.transpose(
+        [   np.logspace(
+                np.log10(0.000898), 
+                np.log10(1000.0), 
+                num=num_ticks),
+            fake_error])
     IR3_arti_mag = np.log10(IR3_arti_flux)
     IR4_arti_mag = np.log10(IR4_arti_flux)
     MP1_arti_mag = np.log10(MP1_arti_flux)
@@ -177,14 +206,22 @@ if __name__ == "__main__":
                                                         )))
     arti_label_678 = np.zeros(arti_flux_678.shape)
     #-----------------------------------
-    # Make a prediction
-    label_pred_678 = scao_model_iv(AI_saved_dir, arti_flux_678, arti_label_678)
-    cls_pred_678 = np.argmax(label_pred_678, axis = 1)
+    # Make predictions using each run
+    sum_label_pred_678 = np.zeros(arti_flux_678.shape)
+    for AI_saved_dir in AI_saved_dir_list:
+        label_pred_678 = scao_model_iv(AI_saved_dir, arti_flux_678, arti_label_678)
+        sum_label_pred_678 += label_pred_678
+    mean_label_pred_678 = np.divide(sum_label_pred_678, len(AI_saved_dir_list))
+    #-----------------------------------
+    # Quantize the probability
+    mean_label_pred_678[mean_label_pred_678 >= 0.5] = 1.0
+    mean_label_pred_678[mean_label_pred_678 < 0.5]  = 0.0
+    mean_cls_pred_678 = np.argmax(mean_label_pred_678, axis = 1)
     #-----------------------------------
     # Shows the degenerate data and pred_labels to band IRAC3, IRAC4, and MIPS1
     sort_order_678 = ['IRAC3', 'IRAC4', 'MIPS1']
     # Plot YSO only
-    index_YSO = np.where(cls_pred_678 == 2)
+    index_YSO = np.where(mean_cls_pred_678 == 2)
     arti_mag_678_YSO = arti_mag_678[index_YSO]
     print ('Plot the 3D map')
     plot_prob(arti_mag_678_YSO, sort_order_678)

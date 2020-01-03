@@ -3,7 +3,7 @@
 Abstract:
     This is a program for ploting probability distribution of labels. 
 Usage:
-    plot_prob_dist.py [AI dir]
+    plot_prob_dist.py [AI dir list]
 Editor and Practicer:
     Jacob975
 
@@ -61,7 +61,7 @@ def plot_prob(arti_mag, sgys_color, sort_order):
             ys = arti_mag[np.where(arti_mag[:,0] == IR3[0]), 1], 
             zs = arti_mag[np.where(arti_mag[:,0] == IR3[0]), 2], 
             zdir='z', 
-            s=20, 
+            s=2, 
             c = sgys_color[np.where(arti_mag[:,0] == IR3[0])],
             depthshade=False)
         plt.tick_params(
@@ -100,7 +100,7 @@ def plot_prob(arti_mag, sgys_color, sort_order):
             ys = arti_mag[np.where(arti_mag[:,1] == IR4[0]), 1], 
             zs = arti_mag[np.where(arti_mag[:,1] == IR4[0]), 2], 
             zdir='z', 
-            s=20, 
+            s=2, 
             c = sgys_color[np.where(arti_mag[:,1] == IR4[0])],
             depthshade=False)
         plt.tick_params(
@@ -140,7 +140,7 @@ def plot_prob(arti_mag, sgys_color, sort_order):
             ys = arti_mag[np.where(arti_mag[:,2] == MP1[0]), 1], 
             zs = arti_mag[np.where(arti_mag[:,2] == MP1[0]), 2], 
             zdir='z', 
-            s=20, 
+            s=2, 
             c = sgys_color[np.where(arti_mag[:,2] == MP1[0])],
             depthshade=False)
         plt.tick_params(
@@ -240,19 +240,21 @@ if __name__ == "__main__":
     #-----------------------------------
     # Load argv
     if len(argv) != 2:
-        print ("Error! Usage: plot_prob_distribution.py [AI dir]")
+        print ("Error! Usage: plot_prob_distribution.py [AI dir list]")
         exit(1)
-    AI_saved_dir = argv[1]
+    AI_saved_dir_list_name = argv[1]
+    # Load data
+    AI_saved_dir_list = np.loadtxt(AI_saved_dir_list_name, dtype = str, delimiter = '\n')
     #-----------------------------------
     # Initialize
     num_ticks = 100
     # Calculate the probability distribution of labels
     band_system = convert_lib.set_SCAO()
     fake_error = np.ones(num_ticks)
-    IR3_arti_flux = np.transpose([  np.logspace(np.log10(0.000107), np.log10(1000.0), num=num_ticks),
+    IR3_arti_flux = np.transpose([  np.logspace(np.log10(0.000107), np.log10(100.0), num=num_ticks),
                                     fake_error
                                     ])
-    IR4_arti_flux = np.transpose([  np.logspace(np.log10(0.000216), np.log10(1000.0), num=num_ticks),
+    IR4_arti_flux = np.transpose([  np.logspace(np.log10(0.000216), np.log10(320.0), num=num_ticks),
                                     fake_error
                                     ])
     MP1_arti_flux = np.transpose([  np.logspace(np.log10(0.000898), np.log10(1000.0), num=num_ticks),
@@ -270,12 +272,22 @@ if __name__ == "__main__":
                                                         MP1_arti_flux[:,0]
                                                         )))
     arti_label_678 = np.zeros(arti_flux_678.shape)
-    label_pred_678 = scao_model_iv(AI_saved_dir, arti_flux_678, arti_label_678)
+    #-----------------------------------
+    # Make predictions using each run
+    sum_label_pred_678 = np.zeros(arti_flux_678.shape)
+    for AI_saved_dir in AI_saved_dir_list:
+        label_pred_678 = scao_model_iv(AI_saved_dir, arti_flux_678, arti_label_678)
+        sum_label_pred_678 += label_pred_678
+    mean_label_pred_678 = np.divide(sum_label_pred_678, len(AI_saved_dir_list))
+    #-----------------------------------
+    # Quantize the number 
+    mean_label_pred_678[mean_label_pred_678 >= 0.5] = 1.0
+    mean_label_pred_678[mean_label_pred_678 < 0.5] = 0.0
     #-----------------------------------
     # Shows the degenerate data and pred_labels to band IRAC3, IRAC4, and MIPS1
     sort_order_678 = ['IRAC3', 'IRAC4', 'MIPS1']
     print ('Assign the color')
-    sgys_color_678 = assign_color(label_pred_678)
+    sgys_color_678 = assign_color(mean_label_pred_678)
     print ('Plot the 3D map')
     plot_prob(arti_mag_678, sgys_color_678, sort_order_678)
     #-----------------------------------
