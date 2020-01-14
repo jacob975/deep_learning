@@ -64,12 +64,15 @@ def plot_prob(arti_mag, sort_order, yso_67):
         else:
             arti_mag_8[i] = np.amin(arti_mag[match,2])
     z = np.transpose(np.reshape(arti_mag_8, (num_ticks, num_ticks)))
+    levels = np.linspace(-1.6, 4.0, 8)
     cs = ax.contourf(
         IR3_arti_mag[:,0], 
         IR4_arti_mag[:,0], 
         z, 
+        levels = levels,
         cmap=cm.PuBu_r)
-    cbar = fig.colorbar(cs) 
+    plt.colorbar(cs)
+    # Set labels
     ax.set_xlabel(
         "{0} (log(mJy))".format(sort_order[0]),
         fontsize=16)

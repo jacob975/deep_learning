@@ -3,7 +3,7 @@
 Abstract:
     This is a program for ploting probability distribution of labels. 
 Usage:
-    plot_prob_dist.py [AI dir list]
+    plot_prob_distribution.py [AI dir list] [yso sed list]
 Editor and Practicer:
     Jacob975
 
@@ -45,43 +45,44 @@ def rebin3d(arr, new_shape):
     return arr.reshape(shape).mean(-1).mean(3).mean(1)
 
 def plot_prob(arti_mag, sort_order, yso_678):
-    # Print the color for each MP1 slice
-    fig = plt.figure(
-        figsize = (8,8)
-        )
-    ax = fig.add_subplot(111, projection='3d')
-    ax.plot_trisurf(
-        arti_mag[:, 0], 
-        arti_mag[:, 1], 
-        arti_mag[:, 2], 
-        cmap='jet',
-        edgecolor='none',
-        zorder = 2,
-    )
-    ax.scatter(
-        np.log10(yso_678[:, 0]), 
-        np.log10(yso_678[:, 1]), 
-        np.log10(yso_678[:, 2]), 
-        c = 'r', s = 2,
-        zorder = 1,
-    )
-    ax.set_xlim(np.amin(IR3_arti_mag[:,0]), np.amax(IR3_arti_mag[:,0]))
-    ax.set_ylim(np.amin(IR4_arti_mag[:,0]), np.amax(IR4_arti_mag[:,0]))
-    ax.set_zlim(np.amin(MP1_arti_mag[:,0]), np.amax(MP1_arti_mag[:,0]))
+    # Find the IR3-IR4 YSO 50% surface
+    arti_mag_67 = np.asarray(list(itertools.product(IR3_arti_mag[:,0], IR4_arti_mag[:,0])))
+    arti_mag_8 = np.zeros(len(arti_mag_67))
+    for i, s in enumerate(arti_mag_67):
+        if (i%1000 == 0):
+            print (i)
+        # Denote the row matching the given IR3, IR4 fluxes.
+        match = np.where(
+            (arti_mag[:,0] == s[0]) &\
+            (arti_mag[:,1] == s[1]))[0]
+        # Assign the minimum value
+        # Skip if no YSOs are found.
+        if len(match) == 0:
+            arti_mag_8[i] == 0
+        else:
+            arti_mag_8[i] = np.amin(arti_mag[match,2])
+    # Pick sources on the diagnal line on IR3-IR4 surface
+    index = np.where(arti_mag_67[:,0] == arti_mag_67[:,1])
+    IR3_mag = arti_mag_67[index, 0].flatten()
+    MP1_mag = arti_mag_8[index]
+    # Plot the IR3 vs. MP1 on a line chart
+    fig, ax = plt.subplots(
+        figsize = (8,6))
+    ax.plot(IR3_mag, MP1_mag, '-', label = '50% YSO bound')
+    # Plot real yso on this line chart.
+    yso_6 = np.log10(yso_678[:,0])
+    yso_8 = np.log10(yso_678[:,2])
+    ax.scatter(yso_6, yso_8, c='r', label = 'real yso')
+    # Set labels
     ax.set_xlabel(
-        "{0} (log(mJy))".format(sort_order[0]),
+        "{0}={1} (log(mJy))".format(sort_order[0], sort_order[1]),
         fontsize=16)
     ax.set_ylabel(
-        "{0} (log(mJy))".format(sort_order[1]),
-        fontsize=16)
-    ax.set_zlabel(
         "{0} (log(mJy))".format(sort_order[2]),
-        fontsize=16)
+        fontsize=16) 
+    plt.legend()
     #plt.show()
-    plt.savefig(
-        'probability_distribution_for_YSO.png',
-        dpi = 300,
-        )
+    plt.savefig('IR34_vs_MP1_for_YSO.png', dpi = 300)
     return
 
 # This is a function for classifying sources using Model IV.
@@ -176,16 +177,16 @@ if __name__ == "__main__":
     #-----------------------------------
     # Initialize
     #reduced_num_ticks = 50
-    num_ticks = 200
+    num_ticks = 100
     # Calculate the probability distribution of labels
     band_system = convert_lib.set_SCAO()
     fake_error = np.ones(num_ticks)
-    IR3_arti_flux = np.transpose(
-        [   np.logspace(
-                np.log10(0.000107), 
-                np.log10(10000.0), 
-                num=num_ticks),
-            fake_error])
+    # IR3_arti_flux = np.transpose(
+    #     [   np.logspace(
+    #             np.log10(0.000107), 
+    #             np.log10(10000.0), 
+    #             num=num_ticks),
+    #         fake_error])
     IR4_arti_flux = np.transpose(
         [   np.logspace(
                 np.log10(0.000216), 
@@ -198,6 +199,7 @@ if __name__ == "__main__":
                 np.log10(10000.0), 
                 num=num_ticks),
             fake_error])
+    IR3_arti_flux = IR4_arti_flux
     IR3_arti_mag = np.log10(IR3_arti_flux)
     IR4_arti_mag = np.log10(IR4_arti_flux)
     MP1_arti_mag = np.log10(MP1_arti_flux)
@@ -217,10 +219,6 @@ if __name__ == "__main__":
         label_pred_678 = scao_model_iv(AI_saved_dir, arti_flux_678, arti_label_678)
         sum_label_pred_678 += label_pred_678
     mean_label_pred_678 = np.divide(sum_label_pred_678, len(AI_saved_dir_list))
-    #-----------------------------------
-    # Quantize the probability
-    mean_label_pred_678[mean_label_pred_678 >= 0.5] = 1.0
-    mean_label_pred_678[mean_label_pred_678 < 0.5]  = 0.0
     mean_cls_pred_678 = np.argmax(mean_label_pred_678, axis = 1)
     #-----------------------------------
     # Shows the degenerate data and pred_labels to band IRAC3, IRAC4, and MIPS1
@@ -228,7 +226,7 @@ if __name__ == "__main__":
     # Plot YSO only
     index_YSO = np.where(mean_cls_pred_678 == 2)
     arti_mag_678_YSO = arti_mag_678[index_YSO]
-    print ('Plot the 3D map')
+    print ('Plot IR3=IR4 vs. MP1 line chart')
     plot_prob(arti_mag_678_YSO, sort_order_678, yso_678)
     #-----------------------------------
     # measuring time
