@@ -3,7 +3,7 @@
 Abstract:
     This is a program for ploting probability distribution of labels. 
 Usage:
-    plot_prob_distribution.py [AI dir list] [yso sed list]
+    plot_prob_distribution.py [AI dir list] [star sed list] [gala sed list] [yso sed list]
 Editor and Practicer:
     Jacob975
 
@@ -44,7 +44,7 @@ def rebin3d(arr, new_shape):
     )
     return arr.reshape(shape).mean(-1).mean(3).mean(1)
 
-def plot_prob(arti_mag, sort_order, yso_67):
+def plot_prob(arti_mag, sort_order, star_67, gala_67, yso_67):
     # Print YSO lower bond
     fig, ax = plt.subplots(
         figsize = (8,6))
@@ -64,7 +64,7 @@ def plot_prob(arti_mag, sort_order, yso_67):
         else:
             arti_mag_8[i] = np.amin(arti_mag[match,2])
     z = np.transpose(np.reshape(arti_mag_8, (num_ticks, num_ticks)))
-    levels = np.linspace(-1.6, 4.0, 8)
+    levels = np.linspace(-1.0, 4.0, 10)
     cs = ax.contourf(
         IR3_arti_mag[:,0], 
         IR4_arti_mag[:,0], 
@@ -72,20 +72,39 @@ def plot_prob(arti_mag, sort_order, yso_67):
         levels = levels,
         cmap=cm.PuBu_r)
     plt.colorbar(cs)
+    # Plot real sources
+    ax.scatter(
+        np.log10(star_67[:,0]),
+        np.log10(star_67[:,1]),
+        s = 1, c = 'b')
+    ax.scatter(
+        np.log10(gala_67[:,0]),
+        np.log10(gala_67[:,1]),
+        s = 1, c = 'g')
+    ax.scatter(
+        np.log10(yso_67[:,0]),
+        np.log10(yso_67[:,1]),
+        s = 1, c = 'r')
+    # Plot line ratios
+    ratios = np.array([0.2, 0.5, 1, 2])
+    log_ratios = np.log(ratios)
+    for i, r in enumerate(log_ratios):
+        ax.plot(
+            [-3, 4], 
+            [-3-r, 4-r], 
+            label = 'IR3/IR4 flux ratio = {0}'.format(ratios[i]))
     # Set labels
+    ax.set_xlim([-3, 4])
+    ax.set_ylim([-3, 4])
     ax.set_xlabel(
         "{0} (log(mJy))".format(sort_order[0]),
         fontsize=16)
     ax.set_ylabel(
         "{0} (log(mJy))".format(sort_order[1]),
         fontsize=16)
-    ax.scatter(
-        np.log10(yso_67[:,0]),
-        np.log10(yso_67[:,1]),
-        s = 1, c = 'r')
-
+    plt.legend()
     plt.savefig(
-        '2d_contour_probability_for_YSO.png',
+        '2d_contour_probability_for_all_sources.png',
         dpi = 300,
         )
     return
@@ -167,16 +186,22 @@ if __name__ == "__main__":
     start_time = time.time()    
     #-----------------------------------
     # Load argv
-    if len(argv) != 3:
-        print ("Error! Usage: plot_prob_distribution.py [AI dir list] [yso sed list]")
+    if len(argv) != 5:
+        print ("Error! Usage: plot_prob_distribution.py [AI dir list] [star sed list] [gala sed list] [yso sed list]")
         exit(1)
     AI_saved_dir_list_name = argv[1]
-    yso_list_name = argv[2]
+    star_list_name = argv[2]
+    gala_list_name = argv[3]
+    yso_list_name = argv[4]
     # Load data
     AI_saved_dir_list = np.loadtxt(
         AI_saved_dir_list_name, 
         dtype = str,
         delimiter = '\n')
+    star_sed_list = np.loadtxt(star_list_name)
+    star_67 = star_sed_list[:,5:7]
+    gala_sed_list = np.loadtxt(gala_list_name)
+    gala_67 = gala_sed_list[:,5:7]
     yso_sed_list = np.loadtxt(yso_list_name)
     yso_67 = yso_sed_list[:,5:7]
     #-----------------------------------
@@ -188,22 +213,12 @@ if __name__ == "__main__":
     fake_error = np.ones(num_ticks)
     IR3_arti_flux = np.transpose(
         [   np.logspace(
-                np.log10(0.000107), 
+                np.log10(0.001), 
                 np.log10(10000.0), 
                 num=num_ticks),
             fake_error])
-    IR4_arti_flux = np.transpose(
-        [   np.logspace(
-                np.log10(0.000216), 
-                np.log10(10000.0), 
-                num=num_ticks),
-            fake_error])
-    MP1_arti_flux = np.transpose(
-        [   np.logspace(
-                np.log10(0.000898), 
-                np.log10(10000.0), 
-                num=num_ticks),
-            fake_error])
+    IR4_arti_flux = IR3_arti_flux[:]
+    MP1_arti_flux = IR3_arti_flux[:] 
     IR3_arti_mag = np.log10(IR3_arti_flux)
     IR4_arti_mag = np.log10(IR4_arti_flux)
     MP1_arti_mag = np.log10(MP1_arti_flux)
@@ -231,7 +246,7 @@ if __name__ == "__main__":
     index_YSO = np.where(mean_cls_pred_678 == 2)
     arti_mag_678_YSO = arti_mag_678[index_YSO]
     print ('Plot the 2D map')
-    plot_prob(arti_mag_678_YSO, sort_order_678, yso_67)
+    plot_prob(arti_mag_678_YSO, sort_order_678, star_67, gala_67, yso_67)
     #-----------------------------------
     # measuring time
     elapsed_time = time.time() - start_time

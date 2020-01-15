@@ -22,64 +22,82 @@ update log
 '''
 import matplotlib.pyplot as plt
 from matplotlib import cm
+from mpl_toolkits.mplot3d import Axes3D
 import tensorflow as tf
 import numpy as np
 import time
 from sys import argv
 import os
 import itertools
+from colour import Color
 from sed_test_cnn import bias_variable, weight_variable
+from convert_lib import ensemble_mjy_to_mag
 import convert_lib
+from scipy.interpolate import RegularGridInterpolator
 
-def lower_bound(arti_mag_78, arti_flux_78, ratio, AI_saved_dir_list):
-    IR3_arti_flux = np.reshape(arti_flux_78[:,0] * ratio, (-1, 1))
-    IR3_arti_mag = np.log10(IR3_arti_flux)
-    arti_mag_678 = np.hstack((IR3_arti_mag, arti_mag_78))
-    arti_flux_678 = np.hstack((IR3_arti_flux, arti_flux_78))
-    arti_label_678 = np.zeros(arti_flux_678.shape)
-    #-----------------------------------
-    # Make predictions using each run
-    sum_label_pred_678 = np.zeros(arti_flux_678.shape)
-    for AI_saved_dir in AI_saved_dir_list:
-        label_pred_678 = scao_model_iv(AI_saved_dir, arti_flux_678, arti_label_678)
-        sum_label_pred_678 += label_pred_678
-    mean_label_pred_678 = np.divide(sum_label_pred_678, len(AI_saved_dir_list))
-    mean_cls_pred_678 = np.argmax(mean_label_pred_678, axis = 1)
-    #-----------------------------------
-    # Take the YSO region only
-    index_YSO = np.where(mean_cls_pred_678 == 2)
-    arti_mag_678_YSO = arti_mag_678[index_YSO]
-    # Find the IR3-IR4 YSO 50% surface
-    yso_lb_MP1 = np.zeros(len(IR4_arti_mag))
-    for i, s in enumerate(IR4_arti_mag[:,0]):
+# Assign RGB color to represent MP 1 magnitude. 
+
+def rebin3d(arr, new_shape):
+    shape = (new_shape[0], arr.shape[0] // new_shape[0],
+             new_shape[1], arr.shape[1] // new_shape[1],
+             new_shape[2], arr.shape[2] // new_shape[2],
+    )
+    return arr.reshape(shape).mean(-1).mean(3).mean(1)
+
+def plot_prob(arti_mag, sort_order, yso_67):
+    # Print YSO lower bond
+    fig, ax = plt.subplots(
+        figsize = (8,6))
+    arti_mag_67 = np.asarray(list(itertools.product(IR3_arti_mag[:,0], IR4_arti_mag[:,0])))
+    arti_mag_8 = np.zeros(len(arti_mag_67))
+    for i, s in enumerate(arti_mag_67):
+        if (i%1000 == 0):
+            print (i)
         # Denote the row matching the given IR3, IR4 fluxes.
-        match = np.where((arti_mag_678_YSO[:,1] == s))[0]
-        # Assign the minimum value to not found case.
+        match = np.where(
+            (arti_mag[:,0] == s[0]) &\
+            (arti_mag[:,1] == s[1]))[0]
+        # Assign the minimum value
         # Skip if no YSOs are found.
         if len(match) == 0:
-            yso_lb_MP1[i] == 0
+            arti_mag_8[i] == 0
         else:
-            yso_lb_MP1[i] = np.amin(arti_mag_678_YSO[match,2])
-    # Pick sources on the diagnal line on IR3-IR4 surface
-    yso_lb_IR3_flux = IR4_arti_flux[:,0] * ratio 
-    yso_lb_IR3 = np.log10(yso_lb_IR3_flux) 
-    return yso_lb_IR3, yso_lb_MP1 
-
-def plot_line(ax, IR3_mag, MP1_mag, ratio):
-    ax.plot(IR3_mag, MP1_mag, '-', label = 'IR3/IR4 flux ratio = {0}'.format(ratio))
-    return
-
-def plot_source(ax, star_678, gala_678, yso_678):
-    # Plot real yso on this line chart.
-    star_6 = np.log10(star_678[:,0])
-    star_8 = np.log10(star_678[:,2])
-    ax.scatter(star_6, star_8, c='b', s=2, label = 'real star')
-    gala_6 = np.log10(gala_678[:,0])
-    gala_8 = np.log10(gala_678[:,2])
-    ax.scatter(gala_6, gala_8, c='g', s=2, label = 'real gala')
-    yso_6 = np.log10(yso_678[:,0])
-    yso_8 = np.log10(yso_678[:,2])
-    ax.scatter(yso_6, yso_8, c='r', s=2, label = 'real yso')
+            arti_mag_8[i] = np.amin(arti_mag[match,2])
+    z = np.transpose(np.reshape(arti_mag_8, (num_ticks, num_ticks)))
+    levels = np.linspace(-1.0, 4.0, 10)
+    cs = ax.contourf(
+        IR3_arti_mag[:,0], 
+        IR4_arti_mag[:,0], 
+        z, 
+        levels = levels,
+        cmap=cm.PuBu_r)
+    plt.colorbar(cs)
+    # Plot line ratios
+    ratios = np.array([0.2, 0.5, 1, 2])
+    log_ratios = np.log(ratios)
+    for i, r in enumerate(log_ratios):
+        ax.plot(
+            [-3, 4], 
+            [-3-r, 4-r], 
+            label = 'ratio = {0}'.format(ratios[i]))
+    # Set labels
+    ax.set_xlim([-3, 4])
+    ax.set_ylim([-3, 4])
+    ax.set_xlabel(
+        "{0} (log(mJy))".format(sort_order[0]),
+        fontsize=16)
+    ax.set_ylabel(
+        "{0} (log(mJy))".format(sort_order[1]),
+        fontsize=16)
+    ax.scatter(
+        np.log10(yso_67[:,0]),
+        np.log10(yso_67[:,1]),
+        s = 1, c = 'r')
+    plt.legend()
+    plt.savefig(
+        '2d_contour_probability_for_YSO.png',
+        dpi = 300,
+        )
     return
 
 # This is a function for classifying sources using Model IV.
@@ -159,70 +177,61 @@ if __name__ == "__main__":
     start_time = time.time()    
     #-----------------------------------
     # Load argv
-    if len(argv) != 5:
-        print ("Error! Usage: plot_prob_distribution.py [AI dir list] [star sed list] [gala sed list] [yso sed list]")
+    if len(argv) != 3:
+        print ("Error! Usage: plot_prob_distribution.py [AI dir list] [yso sed list]")
         exit(1)
     AI_saved_dir_list_name = argv[1]
-    star_list_name = argv[2]
-    gala_list_name = argv[3]
-    yso_list_name = argv[4]
+    yso_list_name = argv[2]
     # Load data
-    print ('Loading data')
     AI_saved_dir_list = np.loadtxt(
         AI_saved_dir_list_name, 
         dtype = str,
         delimiter = '\n')
-    star_sed_list = np.loadtxt(star_list_name)
-    star_678 = star_sed_list[:,5:]
-    gala_sed_list = np.loadtxt(gala_list_name)
-    gala_678 = gala_sed_list[:,5:]
     yso_sed_list = np.loadtxt(yso_list_name)
-    yso_678 = yso_sed_list[:,5:]
+    yso_67 = yso_sed_list[:,5:7]
     #-----------------------------------
     # Initialize
-    num_ticks = 400
+    #reduced_num_ticks = 50
+    num_ticks = 100
     # Calculate the probability distribution of labels
     band_system = convert_lib.set_SCAO()
     fake_error = np.ones(num_ticks)
-    IR4_arti_flux = np.transpose(
+    IR3_arti_flux = np.transpose(
         [   np.logspace(
                 np.log10(0.001), 
                 np.log10(10000.0), 
                 num=num_ticks),
             fake_error])
-    MP1_arti_flux = IR4_arti_flux[:]
-    # Define IR3/IR4 = ratio
-    #ratios = [0.2, 0.5, 1.0, 2]
-    ratios = [1.0]
+    IR4_arti_flux = IR3_arti_flux[:]
+    MP1_arti_flux = IR3_arti_flux[:] 
+    IR3_arti_mag = np.log10(IR3_arti_flux)
     IR4_arti_mag = np.log10(IR4_arti_flux)
     MP1_arti_mag = np.log10(MP1_arti_flux)
-    arti_mag_78 = np.asarray(list(itertools.product(   
-        IR4_arti_mag[:,0], 
-        MP1_arti_mag[:,0])))
-    arti_flux_78 = np.asarray(list(itertools.product(  
-        IR4_arti_flux[:,0], 
-        MP1_arti_flux[:,0])))
-    #---------------------------------------
-    # Plot the IR3 vs. MP1 on a line chart
-    fig, ax = plt.subplots(
-        figsize = (8,6))
-    #-----------------------------------------
-    # Find the YSO lower bond
-    for r in ratios:
-        yso_lb_IR3, yso_lb_MP1 = lower_bound(arti_mag_78, arti_flux_78, r, AI_saved_dir_list)
-        plot_line(ax, yso_lb_IR3, yso_lb_MP1, r)
-    plot_source(ax, star_678, gala_678, yso_678)
-    # Set labels
-    sort_order = ['IRAC 3', 'IRAC 4', 'MIPS 1']
-    ax.set_ylim([-1, 4])
-    ax.set_xlabel(
-        "{0} (log(mJy))".format(sort_order[0]),
-        fontsize=16)
-    ax.set_ylabel(
-        "{0} (log(mJy))".format(sort_order[2]),
-        fontsize=16) 
-    plt.legend()
-    plt.savefig('IR34_vs_MP1_for_all_sources.png', dpi = 300)
+    arti_mag_678 = np.asarray(list(itertools.product(   IR3_arti_mag[:,0], 
+                                                        IR4_arti_mag[:,0], 
+                                                        MP1_arti_mag[:,0]
+                                                        )))
+    arti_flux_678 = np.asarray(list(itertools.product(  IR3_arti_flux[:,0], 
+                                                        IR4_arti_flux[:,0], 
+                                                        MP1_arti_flux[:,0]
+                                                        )))
+    arti_label_678 = np.zeros(arti_flux_678.shape)
+    #-----------------------------------
+    # Make predictions using each run
+    sum_label_pred_678 = np.zeros(arti_flux_678.shape)
+    for AI_saved_dir in AI_saved_dir_list:
+        label_pred_678 = scao_model_iv(AI_saved_dir, arti_flux_678, arti_label_678)
+        sum_label_pred_678 += label_pred_678
+    mean_label_pred_678 = np.divide(sum_label_pred_678, len(AI_saved_dir_list))
+    mean_cls_pred_678 = np.argmax(mean_label_pred_678, axis = 1)
+    #-----------------------------------
+    # Shows the degenerate data and pred_labels to band IRAC3, IRAC4, and MIPS1
+    sort_order_678 = ['IRAC3', 'IRAC4', 'MIPS1']
+    # Plot YSO only
+    index_YSO = np.where(mean_cls_pred_678 == 2)
+    arti_mag_678_YSO = arti_mag_678[index_YSO]
+    print ('Plot the 2D map')
+    plot_prob(arti_mag_678_YSO, sort_order_678, yso_67)
     #-----------------------------------
     # measuring time
     elapsed_time = time.time() - start_time
