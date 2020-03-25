@@ -45,7 +45,8 @@ if __name__ == "__main__":
     #----------------------------------------
     # Ploting
     print ("ploting ... ")
-    source_type = ['galaxy', 'star', 'YSO']
+    source_type = ['star', 'galaxy', 'YSO']
+    colors = ['b', 'g', 'r']
     wavelength = [  1.235, 
                     1.662, 
                     2.159, 
@@ -74,6 +75,7 @@ if __name__ == "__main__":
             label = r"%s at (%.7f, %.7f)" % (source_type[i], coord[i][0], coord[i][1]),
             fmt='--o',
             capsize=8,
+            c = colors[i],
         )
     ax.legend()
     fig.savefig( "SEDs.png".format(coord[i,0], coord[i,1]))
