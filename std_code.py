@@ -9,12 +9,10 @@ Output:
     2. coordinates of un-matched sources
 Editor:
     Jacob975
-
 ##################################
 #   Python3                      #
 #   This code is made in python3 #
 ##################################
-
 20180104
 ####################################
 update log
