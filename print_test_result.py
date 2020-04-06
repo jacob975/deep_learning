@@ -8,12 +8,10 @@ Example:
     print_test_result.py MaxLoss15
 Editor:
     Jacob975
-
 ##################################
 #   Python3                      #
 #   This code is made in python3 #
 ##################################
-
 20180430
 ####################################
 update log
@@ -138,7 +136,9 @@ if __name__ == "__main__":
     infos.print_accuracy()
     infos.print_precision()
     infos.print_recall_rate()
+    cls_pred = np.argmax(infos.labels_pred, axis = 1)
     np.savetxt("{0}_label_pred.txt".format(main_name), infos.labels_pred)
+    np.savetxt("{0}_cls_pred.txt".format(main_name), cls_pred)
     #----------------------------------------
     # measuring time
     elapsed_time = time.time() - start_time
