@@ -138,7 +138,9 @@ if __name__ == "__main__":
     infos.print_accuracy()
     infos.print_precision()
     infos.print_recall_rate()
+    cls_pred = np.argmax(infos.labels_pred, axis = 1)
     np.savetxt("label_pred.txt", infos.labels_pred)
+    np.savetxt("cls_pred.txt", cls_pred)
     #----------------------------------------
     # measuring time
     elapsed_time = time.time() - start_time
