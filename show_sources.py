@@ -32,6 +32,19 @@ import numpy as np
 from astropy.io import fits as pyfits
 from astropy import wcs
 from astropy.coordinates import *
+from astropy.coordinates import SkyCoord
+from astropy import units as u
+
+def coord_np2sky(alpha, delta, frame):
+    if frame == 'icrs':
+        coord = SkyCoord(float(alpha), float(delta), frame = 'icrs', unit = 'deg')
+    elif frame == 'galactic':
+        coord = SkyCoord(float(alpha), float(delta), frame = 'galactic', unit = 'deg')
+    else:
+        print("The given frame is not available.")
+        print("Please use 'icrs' or 'galactic'.")
+        exit()
+    return coord
 
 #--------------------------------------------
 # Main code
@@ -49,25 +62,28 @@ if __name__ == "__main__":
     image_name = argv[2]
     #-----------------------------------
     # Load data
-    world_coord = None
-    pixel_coord = None
-    if coord_table_name != 'skip':
-        world_coord = np.loadtxt(coord_table_name)
+    world_coord = np.loadtxt(coord_table_name)
     image = pyfits.getdata(image_name) 
-    header = pyfits.getheader(image_name)
+    hdu = pyfits.open(image_name)
+    #header = hdu[0].header
+    header = hdu[1].header
+    print(header)
     #-----------------------------------
     # Convert WCS coord to pixel coord
     w = wcs.WCS(header)
-    if coord_table_name != 'skip':
-        pixel_coord = w.wcs_world2pix(world_coord, 1)
     # Plot and show
     fig = plt.figure(figsize = (8, 8))
-    plt.subplot(111, projection = w)
+    ax = plt.subplot(111, projection = w)
     plt.title("Source on {0}".format(image_name))
     plt_image = plt.imshow(image)
     plt.colorbar()
-    if coord_table_name != 'skip':
-        plt.scatter(pixel_coord[:,0], pixel_coord[:,1], s= 2, c= 'r' )
+    plt.scatter(
+        world_coord[:,0], 
+        world_coord[:,1], 
+        s= 2, 
+        c= 'r',
+        transform=ax.get_transform('icrs')
+    )
     plt.savefig('{0}.png'.format(image_name[:-5]))
     #-----------------------------------
     # Measure time
