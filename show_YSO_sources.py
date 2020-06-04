@@ -3,14 +3,17 @@
 Abstract:
     This is a program for show sources on image. 
 Usage:
-    show_sources.py [coord table] [fits image file]
+    show_YSO_sources.py [coord table] [cls_pred table] [fits image file]
 
-    coord table is a txt file with the following form.
+    1. coord table is a txt file with the following form.
         [[RA, DEC], 
          [RA, DEC],
          ...
         ]
-    fits image file is an image file with WCS
+    2. cls_pred table is a text file containing a list of cls index.
+    ex.
+    [ 0, 0, 1, 0, 2, 0, ...,]
+    3. fits image file is an image file with WCS
 Editor:
     Jacob975
 
@@ -36,17 +39,6 @@ from astropy.coordinates import *
 from astropy.coordinates import SkyCoord
 from astropy import units as u
 
-def coord_np2sky(alpha, delta, frame):
-    if frame == 'icrs':
-        coord = SkyCoord(float(alpha), float(delta), frame = 'icrs', unit = 'deg')
-    elif frame == 'galactic':
-        coord = SkyCoord(float(alpha), float(delta), frame = 'galactic', unit = 'deg')
-    else:
-        print("The given frame is not available.")
-        print("Please use 'icrs' or 'galactic'.")
-        exit()
-    return coord
-
 #--------------------------------------------
 # Main code
 if __name__ == "__main__":
@@ -55,21 +47,25 @@ if __name__ == "__main__":
     start_time = time.time()
     #-----------------------------------
     # Load arguments
-    if len(argv) != 3:
+    if len(argv) != 4:
         print("The number of arguments is wrong.")
-        print("Usage: show_sources.py [coord table] [fits image file]")
+        print("Usage: show_YSO_sources.py [coord table] [cls_pred table] [fits image file]")
         exit(1)
     coord_table_name = argv[1]
-    image_name = argv[2]
+    cls_pred_name = argv[2]
+    image_name = argv[3]
     #-----------------------------------
     # Load data
     world_coord = np.loadtxt(coord_table_name)
+    cls_pred = np.loadtxt(cls_pred_name, dtype = int)
     image = pyfits.getdata(image_name) 
     hdu = pyfits.open(image_name)
     #header = hdu[0].header
     header = hdu[1].header
     print(header)
     #-----------------------------------
+    # Find the YSO index
+    yso_index = np.where(cls_pred == 2)[0]
     # Convert WCS coord to pixel coord
     w = wcs.WCS(header)
     # Plot and show
@@ -85,13 +81,13 @@ if __name__ == "__main__":
     )
     plt.colorbar()
     plt.scatter(
-        world_coord[:,0], 
-        world_coord[:,1], 
+        world_coord[yso_index,0], 
+        world_coord[yso_index,1], 
         s= 2, 
         c= 'r',
         transform=ax.get_transform('icrs')
     )
-    plt.savefig('{0}.png'.format(image_name[:-5]))
+    plt.savefig('{0}_yso.png'.format(image_name[:-5]))
     #-----------------------------------
     # Measure time
     elapsed_time = time.time() - start_time
