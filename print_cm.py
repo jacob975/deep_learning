@@ -40,6 +40,9 @@ if __name__ == "__main__":
     true_name = argv[1]
     pred_name = argv[2]
     # Load data
+    cls_true = np.loadtxt(true_name, dtype = int)
+    cls_pred = np.loadtxt(pred_name, dtype = int)
+    '''
     true = np.loadtxt(true_name)
     pred = np.loadtxt(pred_name)
     # Make cls for each labels.
@@ -49,6 +52,7 @@ if __name__ == "__main__":
     num_pred = input("How many pred labels given? ({0})\n".format(pred_name))
     num_pred = int(num_pred)
     cls_pred = np.argmax(pred[:,:num_pred], axis=1)
+    '''
     #-----------------------------------
     # print the properties of sources
     infos = confusion_matrix_infos(cls_true, cls_pred)
