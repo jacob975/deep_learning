@@ -60,9 +60,10 @@ def load_flux_color(band_index, sed_table):
         )
     return outp, out_name
 
-def adjust_ax(inp_ax):
+def adjust_ax(inp_axes, row_i, col_i):
     # Adjust the panel
     #inp_ax.set_ylim(-2, 4)
+    inp_ax = inp_axes[row_i, col_i]
     inp_ax.grid(True)
     inp_ax.tick_params(
         axis='x',          # changes apply to the x-axis
@@ -74,9 +75,10 @@ def adjust_ax(inp_ax):
         which='both',      # both major and minor ticks are affected
         direction='in'
     )
-    inp_ax.set_xlabel(x_name)
-    inp_ax.set_ylabel(y_name)
-    
+    if row_i == 1:
+        inp_ax.set_xlabel(x_name)
+    if col_i == 0:
+        inp_ax.set_ylabel(y_name)
 
 #--------------------------------------------
 # Main code
@@ -125,7 +127,25 @@ if __name__ == "__main__":
         2, 2,
         sharex = True,
         sharey = True,
+        figsize = (8,8),
     )
+    # Adjust the panel style
+    fig.suptitle(
+        "{0} vs. {1}".format(
+            x_name, 
+            y_name
+        )
+    )
+    plt.subplots_adjust(wspace=0, hspace=0)
+    adjust_ax(axes, 0, 0)
+    adjust_ax(axes, 0, 1)
+    adjust_ax(axes, 1, 0)
+    adjust_ax(axes, 1, 1)
+    # It will invert all axis in different panels because panels share the x and y axis.
+    if band_index_1[0] == 'f':
+        axes[0,0].invert_xaxis()
+    if band_index_2[0] == 'f':
+        axes[0,0].invert_yaxis()
     # 1st panel
     axes[0,0].scatter(
         x_data[index_star], 
@@ -166,12 +186,12 @@ if __name__ == "__main__":
         color = 'r',
         s = 1,
     )
-    # Adjust the panel
-    adjust_ax(axes[0,0])
-    adjust_ax(axes[0,1])
-    adjust_ax(axes[1,0])
-    adjust_ax(axes[1,1])
-    plt.savefig("Plot_test.png", dpi = 200)
+    plt.savefig(
+        "ccdiag_{0}_{1}.png".format(
+            band_index_1, 
+            band_index_2
+        ), 
+        dpi = 200)
     plt.close()
     #-----------------------------------
     # Measure time
