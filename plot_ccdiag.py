@@ -91,7 +91,7 @@ if __name__ == "__main__":
     if len(argv) != 5:
         print ("The number of arguments is wrong.")
         print ("Usage: plot_ccdiag.py [band/color index 1] [band/color index 2] [sed table] [cls table]")
-        print ("Example: plot_ccdiag.py c67 f8 sed_table.txt")
+        print ("Example: plot_ccdiag.py c67 f8 sed_table.txt cls_table.txt")
         exit()
     band_index_1 = argv[1]
     band_index_2 = argv[2]
