@@ -20,7 +20,6 @@ update log
 20190124 version alpha 2
     1. Add more arguments to describe the format of datasets.
 '''
-import matplotlib.pyplot as plt
 import tensorflow as tf
 import numpy as np
 from sklearn.metrics import confusion_matrix
