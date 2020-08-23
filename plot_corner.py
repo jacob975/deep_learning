@@ -61,7 +61,6 @@ def load_flux_color(band_index, sed_table):
 
 def adjust_ax(inp_axes, row_i, col_i):
     # Adjust the panel
-    #inp_ax.set_ylim(-2, 4)
     inp_ax = inp_axes[row_i, col_i]
     inp_ax.grid(True)
     inp_ax.tick_params(
@@ -74,7 +73,7 @@ def adjust_ax(inp_axes, row_i, col_i):
         which='both',      # both major and minor ticks are affected
         direction='in'
     )
-        
+
 #--------------------------------------------
 # Main code
 if __name__ == "__main__":
@@ -128,45 +127,93 @@ if __name__ == "__main__":
     print("Plot the diagram")
     fig, axes = plt.subplots(
         num_index, num_index,
-        sharex = True,
-        sharey = True,
-        figsize = (8,8),
+        figsize = (10,10),
     )
     # Adjust the panel style
     fig.suptitle('Corner plot')
     plt.subplots_adjust(wspace=0, hspace=0)
-    if data_index_list[0][0] == 'f':
-        axes[0,0].invert_xaxis() 
-    if data_index_list[0][0] == 'f':
-        axes[0,0].invert_yaxis() 
-    for i in range(num_index):
-        for j in range(1+i, num_index):
-            adjust_ax(axes, i, j)
-            axes[i,j].scatter(
-                data_list[i][index_star], 
-                data_list[j][index_star],
-                color = 'b',
-                s = 1,
-            )
-            axes[i,j].scatter(
-                data_list[i][index_gala], 
-                data_list[j][index_gala],
-                color = 'g',
-                s = 1,
-            )
-            axes[i,j].scatter(
-                data_list[i][index_ysos], 
-                data_list[j][index_ysos],
-                color = 'r',
-                s = 1,
-            )
-    # Set labels
     for i in range(num_index):
         for j in range(num_index):
-            if i == num_index -1:
-                axes[i,j].set_xlabel(data_name_list[j])
+            # Plot the histogram
+            if i == j:
+                axes[i,j].invert_xaxis() 
+                axes[i,j].hist(
+                    data_list[i][index_star],
+                    50,
+                    normed = 1,
+                    facecolor = "b",
+                    edgecolor = 'None',
+                    alpha = 0.3,
+                    zorder = 100,
+                ) 
+                axes[i,j].hist(
+                    data_list[i][index_gala],
+                    50,
+                    normed = 1,
+                    facecolor = "g",
+                    edgecolor = 'None',
+                    alpha = 0.3,
+                    zorder = 100,
+                ) 
+                axes[i,j].hist(
+                    data_list[i][index_ysos],
+                    50,
+                    normed = 1,
+                    facecolor = "r",
+                    edgecolor = 'None',
+                    alpha = 0.3,
+                    zorder = 100,
+                )
+            # Plot the mag-mag diagram
+            elif i > j:
+                axes[i,j].invert_xaxis() 
+                axes[i,j].invert_yaxis() 
+                adjust_ax(axes, i, j)
+                axes[i,j].scatter(
+                    data_list[j][index_star],
+                    data_list[i][index_star], 
+                    color = 'b',
+                    s = 1,
+                )
+                axes[i,j].scatter(
+                    data_list[j][index_gala],
+                    data_list[i][index_gala], 
+                    color = 'g',
+                    s = 1,
+                )
+                axes[i,j].scatter(
+                    data_list[j][index_ysos],
+                    data_list[i][index_ysos], 
+                    color = 'r',
+                    s = 1,
+                )
+            elif i < j:
+                axes[i,j].hist(
+                    data_list[i][index_star],
+                    50,
+                    normed = 1,
+                    facecolor = "b",
+                    edgecolor = 'None',
+                    alpha = 0.3,
+                    zorder = 100,
+                ) 
+                axes[i,j].set_visible(False)
+    # Set labels visibilities
+    for i in range(num_index):
+        for j in range(num_index):
+            if i == len(band_index_code)-1: 
+                axes[i,j].set_xlabel(
+                    data_name_list[j],
+                )
+            else:
+                axes[i,j].tick_params(axis='x', colors='None')
             if j == 0:
-                axes[i,j].set_ylabel(data_name_list[i])
+                axes[i,j].set_ylabel(
+                    data_name_list[i],
+                )
+            else:
+                axes[i,j].tick_params(axis='y', colors='None')
+
 
     plt.savefig(
         "corner_f{0}.png".format(
