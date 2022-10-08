@@ -1,5 +1,6 @@
 # Purpose
 Classify the identities of sources in c2d legacy catalog using SED data and our trained-AI.
+Published Paper: Chiu, Y.-L. et al. (2021). “Searching for young stellar objects through SEDs by machine learning”. In: Astronomy and Computing 36, p. 100470. issn: 2213-1337. doi: https://doi.org/10.1016/j.ascom. 2021.100470. url: https://www.sciencedirect.com/science/article/pii/S221313372100024X.
 
 # Preparation
 The module you need
